@@ -1,0 +1,17 @@
+# Normaliza finales de línea: evita ruido CRLF/LF entre Windows y Vercel (Linux).
+* text=auto eol=lf
+
+# Binarios: no tocar.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.woff2 binary
+*.pdf binary
+
+# Scripts de Windows conservan CRLF.
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.bat text eol=crlf
