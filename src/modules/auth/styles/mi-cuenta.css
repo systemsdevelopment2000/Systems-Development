@@ -1,0 +1,572 @@
+/* ==========================================================================
+   MI CUENTA & MENÚ DE USUARIO - SYSTEMS DEVELOPMENT
+   Tokens corporativos:
+     - Electric Blue: #025ff5
+     - Cyan: #05e4fd
+     - Dark Navy: #0b1026
+     - Chrome: #b9b8ba
+     - Deep Black: #05050b
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   BOTÓN INTERACTIVO DEL TOPBAR (Pill de usuario)
+   -------------------------------------------------------------------------- */
+.topbar__user-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: color-mix(in srgb, var(--surface-2) 65%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  padding: 4px 12px 4px 5px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  position: relative;
+  user-select: none;
+}
+
+.topbar__user-btn:hover {
+  background: color-mix(in srgb, var(--surface-2) 90%, #025ff5 10%);
+  border-color: color-mix(in srgb, #025ff5 40%, var(--border));
+  box-shadow: 0 0 16px rgba(2, 95, 245, 0.2);
+}
+
+.topbar__user-btn[aria-expanded="true"] {
+  border-color: #05e4fd;
+  box-shadow: 0 0 18px rgba(5, 228, 253, 0.28);
+  background: color-mix(in srgb, var(--surface-2) 95%, #025ff5 12%);
+}
+
+.user-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #025ff5 0%, #05e4fd 100%);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(2, 95, 245, 0.35);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.user-avatar--lg {
+  width: 52px;
+  height: 52px;
+  font-size: 20px;
+  box-shadow: 0 4px 14px rgba(2, 95, 245, 0.4);
+  border: 2px solid rgba(5, 228, 253, 0.4);
+}
+
+.topbar__user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  line-height: 1.2;
+}
+
+.topbar__user-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topbar__user-role {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  text-transform: capitalize;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topbar__user-chevron {
+  color: var(--text-faint);
+  transition: transform 0.2s ease;
+  margin-left: 2px;
+}
+
+.topbar__user-btn[aria-expanded="true"] .topbar__user-chevron {
+  transform: rotate(180deg);
+  color: #05e4fd;
+}
+
+/* --------------------------------------------------------------------------
+   DROPDOWN FLOTANTE DEL MENÚ DE USUARIO
+   -------------------------------------------------------------------------- */
+.user-menu-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.user-menu-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 290px;
+  background: color-mix(in srgb, var(--surface) 92%, #0b1026 8%);
+  border: 1px solid color-mix(in srgb, var(--border) 70%, #025ff5 30%);
+  border-radius: 14px;
+  box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(5, 228, 253, 0.12);
+  backdrop-filter: blur(20px);
+  z-index: 1000;
+  overflow: hidden;
+  animation: userMenuPop 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: top right;
+}
+
+@keyframes userMenuPop {
+  0% {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.user-menu__header {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: color-mix(in srgb, var(--surface-2) 60%, transparent);
+  border-bottom: 1px solid var(--border);
+}
+
+.user-menu__header-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.user-menu__name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-menu__email {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+}
+
+.user-menu__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  width: fit-content;
+  background: rgba(2, 95, 245, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(5, 228, 253, 0.3);
+}
+
+.user-menu__badge--admin {
+  background: rgba(2, 95, 245, 0.22);
+  color: #05e4fd;
+  border-color: rgba(5, 228, 253, 0.5);
+}
+
+.user-menu__items {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.user-menu__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.user-menu__item-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-menu__item-icon {
+  color: var(--text-muted);
+  transition: color 0.15s ease;
+  display: flex;
+  align-items: center;
+}
+
+.user-menu__item:hover {
+  background: color-mix(in srgb, var(--surface-2) 90%, #025ff5 10%);
+  color: #ffffff;
+}
+
+.user-menu__item:hover .user-menu__item-icon {
+  color: #05e4fd;
+}
+
+.user-menu__item--danger {
+  color: #f87171;
+}
+
+.user-menu__item--danger .user-menu__item-icon {
+  color: #f87171;
+}
+
+.user-menu__item--danger:hover {
+  background: rgba(239, 68, 68, 0.12);
+  color: #fca5a5;
+}
+
+.user-menu__item--danger:hover .user-menu__item-icon {
+  color: #fca5a5;
+}
+
+.user-menu__separator {
+  height: 1px;
+  background: var(--border);
+  margin: 6px 8px;
+}
+
+/* --------------------------------------------------------------------------
+   MODAL DE "MI CUENTA"
+   -------------------------------------------------------------------------- */
+.mi-cuenta {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mi-cuenta__tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 2px 0 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  border-bottom: none;
+}
+
+.mi-cuenta__tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.mi-cuenta__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 13px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  font-family: inherit;
+  margin-bottom: -1px;
+}
+
+.mi-cuenta__tab:hover {
+  color: var(--text);
+  background: rgba(2, 95, 245, 0.08);
+  border-radius: 6px 6px 0 0;
+}
+
+.mi-cuenta__tab.is-active {
+  color: #05e4fd;
+  border-bottom-color: #05e4fd;
+  font-weight: 600;
+  background: rgba(5, 228, 253, 0.06);
+  border-radius: 6px 6px 0 0;
+}
+
+.mi-cuenta__body {
+  min-height: auto;
+}
+
+.mi-cuenta__perfil-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  background: color-mix(in srgb, var(--surface-2) 75%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.mi-cuenta__perfil-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.mi-cuenta__perfil-info h3 {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mi-cuenta__perfil-info p {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mi-cuenta__grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 12px;
+}
+
+.mi-cuenta .campo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mi-cuenta .campo__etiqueta {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.mi-cuenta .input {
+  width: 100%;
+  min-height: 36px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 11px;
+  color: var(--text);
+  font-size: 13px;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+.mi-cuenta .input:focus {
+  outline: none;
+  border-color: #05e4fd;
+  box-shadow: 0 0 0 2px rgba(5, 228, 253, 0.22);
+}
+
+.mi-cuenta .btn--primario {
+  background: linear-gradient(135deg, #025ff5 0%, #05e4fd 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  font-weight: 600 !important;
+  box-shadow: 0 3px 12px rgba(2, 95, 245, 0.35) !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mi-cuenta .btn--primario:hover:not(:disabled) {
+  box-shadow: 0 4px 18px rgba(5, 228, 253, 0.45) !important;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 640px) {
+  .mi-cuenta__tabs {
+    padding: 0;
+    gap: 2px;
+  }
+  .mi-cuenta__tab {
+    padding: 7px 10px;
+    font-size: 12px;
+  }
+  .mi-cuenta__grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+  .mi-cuenta__perfil-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+  }
+  .mi-cuenta__perfil-info {
+    align-items: center;
+  }
+}
+
+.mi-cuenta__card-info {
+  background: color-mix(in srgb, var(--surface-2) 60%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mi-cuenta__card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.mi-cuenta__status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  width: fit-content;
+}
+
+.mi-cuenta__status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+}
+
+.mi-cuenta__permisos-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.mi-cuenta__permiso-chip {
+  padding: 4px 9px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.mi-cuenta__permiso-chip.is-allowed {
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.3);
+  background: rgba(2, 95, 245, 0.08);
+}
+
+.mi-cuenta__alert {
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  line-height: 1.4;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.mi-cuenta__alert--info {
+  background: rgba(2, 95, 245, 0.1);
+  border: 1px solid rgba(5, 228, 253, 0.25);
+  color: #bae6fd;
+}
+
+.mi-cuenta__alert--success {
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #86efac;
+}
+
+.mi-cuenta__alert--warn {
+  background: rgba(234, 179, 8, 0.12);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  color: #fde047;
+}
+
+.mi-cuenta__footer {
+  position: sticky;
+  bottom: -20px;
+  z-index: 10;
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border);
+  padding: 12px 0 4px;
+  margin: 16px 0 -20px;
+}
+
+@media (max-width: 640px) {
+  .mi-cuenta__footer {
+    bottom: -14px;
+    margin: 14px 0 -14px;
+    padding: 10px 0 2px;
+  }
+}
+
+.mi-cuenta__footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+

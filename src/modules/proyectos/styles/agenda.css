@@ -1,0 +1,140 @@
+/* Agenda global de reuniones (todos los proyectos). */
+
+.ag-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ag-grupo + .ag-grupo {
+  margin-top: 22px;
+}
+.ag-grupo__tit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+  font-weight: 700;
+}
+.ag-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ag-item {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: var(--borde-grosor) solid var(--border);
+  border-left: 3px solid var(--border-2);
+  border-radius: var(--radius);
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+.ag-item:hover {
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
+}
+.ag-item--prog {
+  border-left-color: var(--brand);
+}
+.ag-item__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.ag-item__id {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.ag-item__tit {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+.ag-proy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: inherit;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--brand-2);
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+.ag-proy:hover {
+  text-decoration: underline;
+}
+.ag-item__acc {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.ag-fecha {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.25;
+}
+.ag-fecha em {
+  font-style: normal;
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  color: var(--text-faint);
+}
+.ag-fecha--prog {
+  color: var(--brand-2);
+  font-weight: 600;
+}
+.ag-fecha--prog em {
+  color: var(--brand);
+}
+.ag-item__creada {
+  font-size: 11px;
+  color: var(--text-faint);
+}
+.ag-item__notas {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  white-space: pre-wrap;
+}
+.ag-item__parts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+@media (max-width: 620px) {
+  .ag-item__head {
+    flex-direction: column;
+  }
+  .ag-item__acc {
+    align-items: flex-start;
+  }
+  .ag-fecha {
+    align-items: flex-start;
+  }
+}
+

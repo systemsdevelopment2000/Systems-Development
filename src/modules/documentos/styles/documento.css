@@ -1,0 +1,324 @@
+/* Documentos — hoja blanca con identidad SD + CSS de impresión. */
+
+.doc-page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.doc-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.doc-toolbar__sel {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.doc-tpl {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  padding: 7px 16px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.doc-tpl:hover {
+  color: var(--text);
+}
+.doc-tpl.is-on {
+  color: var(--text);
+  background: var(--surface-2);
+}
+.doc-ayuda {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+.doc-ayuda strong {
+  color: var(--brand-2);
+}
+.doc-lienzo {
+  padding: 8px 0 30px;
+}
+
+/* ---- Hoja blanca ---- */
+.doc {
+  --dink: #1a1a1a;
+  --dmuted: #585858;
+  --dline: #dcdcdc;
+  --dbrand: #0234b2;
+
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 46px 52px;
+  background: #ffffff;
+  color: var(--dink);
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  line-height: 1.55;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.doc__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  padding-bottom: 16px;
+  margin-bottom: 22px;
+  border-bottom: 2px solid var(--dbrand);
+}
+.doc__marca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.doc__mark {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 11px;
+  background: #1c1c1e;
+  color: #fff;
+  font-weight: 800;
+  font-size: 20px;
+  box-shadow: inset 0 0 0 2px var(--dbrand);
+}
+.doc__marca-txt {
+  display: flex;
+  flex-direction: column;
+}
+.doc__marca-txt strong {
+  font-size: 16px;
+  color: #111;
+}
+.doc__marca-txt span {
+  font-size: 11px;
+  color: var(--dmuted);
+}
+.doc__contacto {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-size: 11px;
+  color: var(--dmuted);
+  text-align: right;
+}
+.doc__titulo {
+  margin: 0 0 20px;
+  font-size: 24px;
+  font-weight: 800;
+  color: #111;
+}
+.doc__pie {
+  margin-top: 34px;
+  padding-top: 14px;
+  border-top: 1px solid var(--dline);
+  font-size: 10.5px;
+  color: var(--dmuted);
+  text-align: center;
+}
+
+.doc-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 24px;
+  padding: 14px 16px;
+  margin-bottom: 22px;
+  background: #f7f7f8;
+  border-radius: 8px;
+}
+.doc-meta > div {
+  display: flex;
+  flex-direction: column;
+}
+.doc-k {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--dmuted);
+}
+.doc-v {
+  font-weight: 600;
+}
+
+.doc-intro {
+  margin: 0 0 18px;
+  color: var(--dink);
+}
+.doc-ficha {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 22px;
+  border: 1px solid var(--dline);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.doc-ficha__col {
+  padding: 14px 16px;
+}
+.doc-ficha__col + .doc-ficha__col {
+  border-left: 1px solid var(--dline);
+}
+.doc-ficha__tit {
+  margin: 0 0 9px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--dbrand);
+  font-weight: 700;
+}
+.doc-ficha__item {
+  display: grid;
+  grid-template-columns: 128px 1fr;
+  gap: 3px 10px;
+  padding: 3px 0;
+}
+.doc-ficha__item .doc-k {
+  font-size: 11px;
+}
+.doc-ficha__item .doc-v {
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+@media (max-width: 560px) {
+  .doc-ficha {
+    grid-template-columns: 1fr;
+  }
+  .doc-ficha__col + .doc-ficha__col {
+    border-left: 0;
+    border-top: 1px solid var(--dline);
+  }
+}
+
+.doc-sec {
+  margin-bottom: 18px;
+}
+.doc-sec h2 {
+  margin: 0 0 7px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #111;
+}
+.doc-p {
+  margin: 0 0 6px;
+}
+
+.doc-edit {
+  background: #fff6ef;
+  border-bottom: 1px dashed var(--dbrand);
+  padding: 0 2px;
+  border-radius: 2px;
+  outline: none;
+}
+.doc-edit--bloque {
+  display: block;
+  padding: 8px 10px;
+  border: 1px dashed #e4b998;
+  border-bottom: 1px dashed #e4b998;
+  border-radius: 6px;
+  background: #fffaf5;
+}
+.doc-edit:focus {
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(20, 64, 159, 0.22);
+}
+
+.doc-firmas {
+  display: flex;
+  gap: 40px;
+  margin-top: 30px;
+}
+.doc-firma {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.doc-firma__linea {
+  height: 0;
+  margin: 24px 0 6px;
+  border-top: 1px solid #333;
+}
+.doc-firma__rol {
+  font-size: 11px;
+  color: var(--dmuted);
+}
+.doc-firma__nombre {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+/* ---- Captura a PDF: sin resaltado de campos editables ---- */
+.doc--exportando .doc-edit,
+.doc--exportando .doc-edit--bloque {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* ---- Impresión: solo la hoja ---- */
+@media print {
+  .layout__sidebar,
+  .topbar,
+  .movil__top,
+  .movil__nav,
+  .doc-toolbar,
+  .doc-ayuda {
+    display: none !important;
+  }
+  .layout,
+  .layout__main,
+  .movil {
+    display: block !important;
+    height: auto !important;
+  }
+  .content,
+  .page,
+  .doc-page,
+  .doc-lienzo,
+  .movil__main {
+    padding: 0 !important;
+    gap: 0 !important;
+    overflow: visible !important;
+  }
+  html,
+  body,
+  #root {
+    background: #fff !important;
+  }
+  .doc {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  .doc-edit,
+  .doc-edit--bloque {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+  @page {
+    margin: 16mm;
+  }
+}

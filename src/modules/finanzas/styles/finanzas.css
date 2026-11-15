@@ -1,0 +1,742 @@
+/* Módulo Finanzas — presupuesto por alcance. */
+
+.fin-ctrl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  padding: 14px;
+  background: var(--surface);
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 18px;
+}
+.fin-ctrl .field:first-child {
+  grid-column: 1 / -1;
+}
+
+/* Resumen contable dentro del membrete */
+.mb .fin-resumen {
+  margin-top: 16px;
+}
+.mb .fin-resumen td {
+  padding: 7px 12px;
+}
+.mb .fin-resumen td:last-child {
+  text-align: right;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  white-space: nowrap;
+}
+.mb .fin-total td {
+  border-top: 2px solid var(--mbrand, #0234b2);
+  font-size: 14px;
+  color: #111;
+}
+.fin-nota {
+  margin: 14px 0 0;
+  font-size: 11.5px;
+  color: #585858;
+}
+
+@media (max-width: 640px) {
+  .fin-ctrl {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ---------- Tasas y divisas ---------- */
+.tas-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.tas-card {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  padding: 16px;
+  background: var(--surface);
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius);
+}
+.tas-k {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+}
+.tas-par {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+.tas-par .field {
+  flex: 1;
+}
+.tas-flecha {
+  color: var(--text-faint);
+  margin-bottom: 11px;
+}
+.tas-vigente {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 13px 14px;
+  background: color-mix(in srgb, var(--brand) 7%, transparent);
+  border: 1px solid color-mix(in srgb, var(--brand) 22%, transparent);
+  border-radius: var(--radius);
+}
+.tas-valor {
+  font-family: var(--font-mono);
+  font-size: 26px;
+  line-height: 1.1;
+  color: var(--brand-2);
+}
+.tas-detalle {
+  font-size: 12.5px;
+  color: var(--text);
+}
+.tas-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-faint);
+  flex-wrap: wrap;
+}
+.tas-meta em {
+  font-style: normal;
+  font-weight: 700;
+}
+.tas-sube {
+  color: #9fe3c3;
+}
+.tas-baja {
+  color: #ff9d9d;
+}
+.tas-manual {
+  display: flex;
+  gap: 8px;
+}
+.tas-manual input {
+  flex: 1;
+}
+.tas-calc {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tas-calc input {
+  flex: 1;
+}
+.tas-moneda {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.tas-swap {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  color: var(--brand-2);
+  background: color-mix(in srgb, var(--brand) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--brand) 30%, transparent);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.tas-swap:hover {
+  background: color-mix(in srgb, var(--brand) 22%, transparent);
+}
+.tas-resultado {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 14px;
+  background: var(--surface-2);
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius);
+}
+.tas-resultado strong {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  color: var(--text);
+}
+.tas-resultado span {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.tas-hist {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (max-width: 820px) {
+  .tas-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Presupuestos ensamblables ---------- */
+.pre-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 14px;
+}
+.pre-card {
+  background: var(--surface);
+  border: var(--borde-grosor) solid var(--border);
+  border-left: 3px solid var(--border-2);
+  border-radius: var(--radius);
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+.pre-card:hover {
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+.pre-card--aceptado {
+  border-left-color: #22c55e;
+}
+.pre-card--enviado {
+  border-left-color: #0ea5e9;
+}
+.pre-card--rechazado {
+  border-left-color: #ff5a5a;
+}
+.pre-card--borrador {
+  border-left-color: var(--border-2);
+}
+.pre-card__abrir {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  width: 100%;
+  padding: 15px;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+.pre-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.pre-card__cod {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-faint);
+}
+.pre-estado {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: var(--text-muted);
+  background: var(--surface-2);
+}
+.pre-estado--aceptado {
+  color: #9fe3c3;
+  background: rgba(34, 197, 94, 0.14);
+}
+.pre-estado--enviado {
+  color: #7cc4ff;
+  background: rgba(14, 165, 233, 0.14);
+}
+.pre-estado--rechazado {
+  color: #ffb3b8;
+  background: rgba(255, 77, 87, 0.15);
+}
+.pre-card__tit {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+.pre-card__cli {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.pre-card__foot {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 9px;
+  border-top: var(--borde-grosor) solid var(--border);
+}
+.pre-card__foot strong {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  color: var(--brand-2);
+}
+.pre-card__foot span {
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+/* Editor */
+.pre {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.pre__cab {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  padding: 15px;
+  background: var(--surface);
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius);
+}
+.pre__titulo {
+  grid-column: 1 / -1;
+}
+.pre__chico {
+  max-width: 160px;
+}
+.pre__lineas {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.pre-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  background: var(--surface);
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius);
+}
+.pre-grupo__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.pre-grupo__nom {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--brand-2);
+}
+.pre-grupo__sub {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.pre-tabla {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  overflow-x: auto;
+}
+.pre-th,
+.pre-tr {
+  display: grid;
+  grid-template-columns: minmax(180px, 2.4fr) 70px minmax(132px, 148px) 110px 70px 110px 34px;
+  gap: 7px;
+  align-items: center;
+  min-width: 700px;
+}
+.pre-th span {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+  padding: 0 4px;
+}
+.pre-tr .field__input {
+  padding: 7px 9px;
+  font-size: 12.5px;
+}
+.pre-importe {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--text);
+  text-align: right;
+  padding-right: 4px;
+}
+.pre-add {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: inherit;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px dashed var(--border-2);
+  border-radius: var(--radius-sm);
+  padding: 6px 11px;
+  cursor: pointer;
+}
+.pre-add:hover {
+  color: var(--brand-2);
+  border-color: var(--brand);
+}
+.pre__nuevo-grupo {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.pre__nuevo-grupo input {
+  flex: 1;
+  min-width: 220px;
+}
+.pre__totales {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius);
+  max-width: 460px;
+  align-self: flex-end;
+  width: 100%;
+}
+.pre-tot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.pre-tot b {
+  font-family: var(--font-mono);
+  color: var(--text);
+}
+.pre-tot span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.pre-pct {
+  width: 54px;
+  font: inherit;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-align: right;
+  color: var(--text);
+  background: var(--surface-2);
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+}
+.pre-tot--final {
+  margin-top: 6px;
+  padding-top: 11px;
+  border-top: 2px solid var(--brand);
+  font-size: 15px;
+  color: var(--text);
+}
+.pre-tot--final b {
+  font-size: 19px;
+  color: var(--brand-2);
+}
+
+/* Hoja imprimible */
+.pre__hoja {
+  margin-top: 8px;
+}
+.pre-hoja__grupo + .pre-hoja__grupo {
+  margin-top: 14px;
+}
+.pre-hoja__tit {
+  margin: 0 0 7px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--mbrand, #0234b2);
+}
+
+/* ── Plan de cobro ─────────────────────────────────────────────── */
+
+.pre-bloque {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: var(--borde-grosor) solid var(--borde);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--panel) 70%, transparent);
+}
+
+.pre-bloque__tit {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--texto-2);
+}
+
+.plan {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.plan__cab {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+}
+
+.plan__nota {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  color: var(--texto-2);
+  background: color-mix(in srgb, var(--naranja) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--naranja) 25%, transparent);
+}
+
+.plan__nota b {
+  color: var(--naranja);
+}
+
+.plan__tabla {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-x: auto;
+}
+
+.plan__th,
+.plan__tr {
+  display: grid;
+  grid-template-columns: minmax(140px, 1.6fr) 64px 92px minmax(150px, 1.2fr) 64px 100px 32px;
+  gap: 6px;
+  align-items: center;
+  min-width: 700px;
+}
+
+.plan__th {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--texto-3);
+  padding: 0 2px;
+}
+
+.plan__tr .field__input {
+  padding: 7px 8px;
+  font-size: 12.5px;
+}
+
+.plan__tr .field__input:disabled {
+  opacity: 0.4;
+}
+
+.plan__monto {
+  font-variant-numeric: tabular-nums;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: right;
+  color: var(--texto-1);
+}
+
+.plan__aviso {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 12.5px;
+  color: #eab308;
+}
+
+.plan__acc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.movil .plan__th,
+.movil .plan__tr {
+  min-width: 620px;
+}
+
+/* ── Flujo de aprobación de la cotización ──────────────────────
+   El estado estaba escondido en un desplegable, así que no se veía
+   dónde se acepta una cotización ni qué desencadena aceptarla. */
+
+.pre-estado {
+  grid-column: 1 / -1;
+}
+
+.pre-flujo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pre-flujo__paso {
+  padding: 8px 16px;
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease,
+    background 0.15s ease;
+}
+
+.pre-flujo__paso:hover {
+  border-color: var(--border-2);
+  color: var(--text);
+}
+
+.pre-flujo__paso.is-on {
+  color: var(--on-brand);
+  background: var(--brand);
+  border-color: var(--brand);
+  cursor: default;
+}
+
+.pre-flujo__paso.is-aceptado.is-on {
+  color: #04140a;
+  background: var(--exito);
+  border-color: var(--exito);
+}
+
+.pre-flujo__paso.is-rechazado.is-on {
+  color: #fff;
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+.pre-flujo__sello {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--exito);
+}
+
+/* Unidad de la línea, con sugerencia según el concepto. */
+.pre-unidad {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.pre-unidad select {
+  flex: 1 1 auto;
+  /* Suficiente para "licencia", la etiqueta más larga, más la flecha. */
+  min-width: 74px;
+  padding-right: 4px;
+}
+
+.pre-unidad__sug {
+  flex: 0 0 auto;
+  padding: 4px 7px;
+  border: 1px solid var(--brand);
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--brand-luz);
+  background: var(--tinte);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.pre-unidad__sug:hover {
+  color: var(--on-brand);
+  background: var(--brand);
+}
+
+/* Plantillas por tipo de sistema. */
+.pre-plantilla {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 10px;
+  padding: 11px 14px;
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--velo-1);
+}
+
+.pre-plantilla__et {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.pre-plantilla__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pre-plantilla__chip {
+  padding: 6px 13px;
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease,
+    background 0.15s ease;
+}
+
+.pre-plantilla__chip:hover {
+  color: var(--on-brand);
+  background: var(--brand);
+  border-color: var(--brand);
+}
+
+.plan__nota--mora {
+  background: color-mix(in srgb, var(--alerta) 10%, transparent);
+  border-color: color-mix(in srgb, var(--alerta) 28%, transparent);
+}
+
+/* Eliminar una sección completa del presupuesto. */
+.pre-grupo__x {
+  margin-left: 8px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.pre-grupo:hover .pre-grupo__x,
+.pre-grupo__x:focus-visible {
+  opacity: 1;
+}

@@ -1,0 +1,262 @@
+/* Membrete SD — identidad de marca en hoja blanca (reportes y documentos). */
+
+.mb {
+  --mink: #1a1a1a;
+  --mmuted: #585858;
+  --mline: #dcdcdc;
+  /* Azul intenso oficial: 9.83:1 sobre papel blanco. */
+  --mbrand: #0234b2;
+
+  /* Stacks locales: presentes en el sistema, sin descarga. */
+  --mfont: 'Segoe UI', Arial, Helvetica, sans-serif;
+  --mfont-mono: Consolas, 'Courier New', monospace;
+
+  /* La hoja es una PÁGINA, no un bloque que crece con el contenido: si el pie
+     queda pegado a la última línea, el documento pierde formalidad. Con una
+     altura mínima de página y el cuerpo elástico, el pie se ancla abajo.
+     La proporción es A4 (297/210) sobre el ancho útil de la hoja. */
+  --mb-ancho: 880px;
+  /* Misma relación que usa el generador de PDF (A4 menos sus márgenes). */
+  --mb-pagina: calc(var(--mb-ancho) * 1.441);
+
+  display: flex;
+  flex-direction: column;
+  max-width: var(--mb-ancho);
+  min-height: var(--mb-pagina);
+  margin: 0 auto;
+  padding: 40px 46px;
+  background: #ffffff;
+  color: var(--mink);
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  /* IMPORTANTE: la hoja impresa NO usa fuentes web.
+     El PDF se genera con html-to-image y `skipFonts: true` (obligatorio, o
+     falla por CORS al leer las hojas de Google Fonts). Al descartar la fuente
+     web, el render cae a un sustituto con métricas más anchas y el texto
+     desborda su celda y se solapa con la vecina. Con un stack local, lo que se
+     ve en pantalla es exactamente lo que se imprime. */
+  font-family: var(--mfont);
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* ---- Cabecera de marca (compartida con documentos) ---- */
+.sdcab-wrap {
+  margin-bottom: 16px;
+}
+.sdcab {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+/* Logo real (lockup horizontal) en el membrete/PDF */
+.sdcab__logo {
+  height: 58px;
+  width: auto;
+  max-width: 300px;
+  object-fit: contain;
+  display: block;
+}
+
+.sdcab__marca {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+.sdcab__badge {
+  display: grid;
+  place-items: center;
+  grid-auto-flow: column;
+  gap: 1px;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 auto;
+  border-radius: 14px;
+  /* Placa metálica: plateado oscuro → medio → brillo (paleta del logo). */
+  background: linear-gradient(150deg, #8a8a8a 0%, #474747 46%, #2a2a2a 100%);
+  box-shadow:
+    inset 0 0 0 2px rgba(2, 52, 178, 0.95),
+    inset 0 2px 3px rgba(217, 217, 217, 0.45),
+    inset 0 -4px 6px rgba(0, 0, 0, 0.55),
+    0 2px 5px rgba(0, 0, 0, 0.3);
+  font-weight: 800;
+  font-size: 23px;
+  letter-spacing: -1px;
+  line-height: 1;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.45);
+}
+/* "S" plateada metálica, "D" naranja (brillo → naranja intenso). */
+.sdcab__badge .s {
+  color: #d9d9d9;
+}
+.sdcab__badge .d {
+  color: #0a7ea4;
+}
+.sdcab__wm {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+.sdcab__wm b {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: #141416;
+}
+.sdcab__wm span {
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.42em;
+  color: var(--mbrand);
+}
+.sdcab__cont {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.sdcab__cont li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  color: var(--mmuted);
+}
+.sdcab__ic {
+  display: inline-grid;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #025ff5, #0234b2);
+  color: #fff;
+}
+.sdcab-rule {
+  height: 3px;
+  margin-top: 14px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #0234b2 0%, #025ff5 48%, rgba(2, 52, 178, 0) 100%);
+}
+
+/* ---- Pie ---- */
+.sdpie {
+  position: relative;
+  flex-shrink: 0;
+  margin-top: 26px;
+  padding-top: 13px;
+  border-top: 1px solid var(--mline);
+  font-size: 10.5px;
+  color: var(--mmuted);
+  text-align: center;
+}
+.sdpie__dash {
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #0234b2, #025ff5);
+}
+
+/* ---- Título del reporte ---- */
+.mb__titfila {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.mb__titulo {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #111;
+}
+.mb__sub {
+  font-family: var(--mfont-mono);
+  font-size: 11.5px;
+  color: var(--mmuted);
+}
+
+/* ---- Tabla dentro del membrete (clara) ---- */
+.mb .table-wrap {
+  border: 1px solid var(--mline);
+  border-radius: 6px;
+  background: #fff;
+  overflow: hidden;
+}
+.mb .table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.mb .table th,
+.mb .table td {
+  padding: 9px 12px;
+  text-align: left;
+  border-bottom: 1px solid #ececec;
+  color: var(--mink);
+}
+.mb .table th {
+  background: #f5f5f6;
+  color: #444;
+  font-weight: 700;
+}
+.mb .table tr:last-child td {
+  border-bottom: none;
+}
+.mb .muted {
+  color: var(--mmuted);
+}
+
+/* ---- Impresión: solo la hoja ---- */
+@media print {
+  .layout__sidebar,
+  .topbar,
+  .movil__top,
+  .movil__nav,
+  .no-print {
+    display: none !important;
+  }
+  .layout,
+  .layout__main {
+    display: block !important;
+    height: auto !important;
+  }
+  .content,
+  .page {
+    padding: 0 !important;
+    gap: 0 !important;
+  }
+  html,
+  body,
+  #root {
+    background: #fff !important;
+  }
+  .mb,
+  .doc {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  @page {
+    margin: 14mm;
+  }
+}
+
+.mb__cuerpo {
+  flex: 1 0 auto;
+}

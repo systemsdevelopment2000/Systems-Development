@@ -1,0 +1,275 @@
+/* Registro de auditoría: filtros y lista de asientos. */
+
+.aud-acc {
+  display: flex;
+  gap: 8px;
+}
+
+.aud-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 14px;
+  padding: 14px;
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.aud-filtros__buscar {
+  flex: 1 1 240px;
+  min-width: 200px;
+}
+
+.aud-filtros > .field:not(.aud-filtros__buscar) {
+  flex: 0 1 170px;
+}
+
+.aud-buscar {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.aud-buscar svg {
+  position: absolute;
+  left: 10px;
+  color: var(--text-faint);
+  pointer-events: none;
+}
+
+.aud-buscar .field__input {
+  padding-left: 31px;
+}
+
+.aud-aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 14px;
+  border: var(--borde-grosor) solid var(--border);
+  border-left: 3px solid var(--acento);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-faint);
+  background: var(--velo-1);
+}
+
+.aud-aviso svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.aud-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.aud-item {
+  border: var(--borde-grosor) solid var(--border);
+  border-left: 3px solid var(--acento-sombra);
+  border-radius: var(--radius-sm);
+  background: var(--velo-1);
+  overflow: hidden;
+}
+
+.aud-item.is-crear {
+  border-left-color: var(--exito);
+}
+
+.aud-item.is-editar {
+  border-left-color: var(--brand);
+}
+
+.aud-item.is-eliminar {
+  border-left-color: var(--danger);
+}
+
+.aud-item.is-config {
+  border-left-color: var(--alerta);
+}
+
+.aud-item.is-restaurar {
+  border-left-color: var(--brand-luz);
+}
+
+.aud-item__fila {
+  display: grid;
+  grid-template-columns: 26px 1fr minmax(120px, auto) 110px;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  padding: 9px 12px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+
+.aud-item__fila:disabled {
+  cursor: default;
+}
+
+.aud-item__fila:hover:not(:disabled) {
+  background: var(--velo-2);
+}
+
+.aud-item__ic {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-xs);
+  color: var(--text-muted);
+  background: var(--velo-2);
+}
+
+.aud-item__txt {
+  min-width: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.aud-item__txt b {
+  color: var(--text);
+}
+
+.aud-item__n {
+  margin-left: 7px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-style: normal;
+  color: var(--brand-luz);
+  background: var(--tinte-fuerte);
+}
+
+.aud-item__actor,
+.aud-item__fecha {
+  font-size: 11.5px;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.aud-item__fecha {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.aud-cambios {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  background: var(--velo-1);
+}
+
+.aud-cambios th,
+.aud-cambios td {
+  padding: 6px 12px;
+  text-align: left;
+  border-top: 1px solid var(--border);
+  word-break: break-word;
+}
+
+.aud-cambios th {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.aud-cambios td:first-child {
+  color: var(--text-muted);
+}
+
+.aud-cambios__antes {
+  color: var(--text-faint);
+  text-decoration: line-through;
+}
+
+.aud-cambios__despues {
+  color: var(--text);
+}
+
+.movil .aud-item__fila {
+  grid-template-columns: 24px 1fr;
+  row-gap: 4px;
+}
+
+.movil .aud-item__actor,
+.movil .aud-item__fecha {
+  grid-column: 2;
+  text-align: left;
+}
+
+/* ── Línea de tiempo ──────────────────────────────────────────── */
+
+.aud-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.aud-grupo {
+  position: relative;
+  padding-left: 22px;
+}
+
+/* El hilo vertical que conecta los movimientos de un mismo grupo. */
+.aud-grupo::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 16px;
+  bottom: 4px;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--brand) 55%, transparent),
+    var(--border)
+  );
+}
+
+.aud-grupo__cab {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  margin-bottom: 8px;
+}
+
+.aud-grupo__punto {
+  position: absolute;
+  left: 0;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--brand);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 20%, transparent);
+}
+
+.aud-grupo__tit {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  text-transform: capitalize;
+  color: var(--text);
+}
+
+.aud-grupo__n {
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+/* Dentro de un grupo las tarjetas van más juntas: son del mismo momento. */
+.aud-grupo .aud-lista {
+  gap: 4px;
+}

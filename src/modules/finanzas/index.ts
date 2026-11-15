@@ -1,0 +1,11 @@
+// API pública del módulo `finanzas`.
+export { PresupuestoPage } from './pages/PresupuestoPage'
+export { TasasPage } from './pages/TasasPage'
+export { usePresupuestos } from './hooks/usePresupuestos'
+export { calcularPresupuesto } from './lib/calculo'
+export type { Costeo } from './lib/calculo'
+export { ESTADOS_PRESUPUESTO, TIPOS_PRESUPUESTO, presupuestoVacio, lineaVacia, UNIDADES } from './lib/presupuesto'
+export { CobranzaPage } from './pages/CobranzaPage'
+export { usePagos } from './hooks/usePagos'
+export type { CuentaPorCobrar } from './hooks/usePagos'
+export { UNIDADES_POR_DEFECTO, queMide, sugerirUnidad, lineasDeTipo } from './lib/presupuesto'

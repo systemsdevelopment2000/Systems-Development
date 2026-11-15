@@ -1,0 +1,192 @@
+/* Dashboard — KPIs + visuales (tema oscuro). */
+
+.dash-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.dash-kpi {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: var(--surface);
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius);
+}
+.dash-kpi__icono {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  border-radius: var(--radius);
+  color: var(--brand-2);
+  background: color-mix(in srgb, var(--brand) 12%, transparent);
+}
+.dash-kpi__valor {
+  display: block;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--text);
+}
+.dash-kpi__label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 16px;
+}
+.dash-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  background: var(--surface);
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius);
+}
+.dash-card--ancho {
+  grid-column: 1 / -1;
+}
+.dash-card__tit {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* Barras por estado */
+.dash-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.dash-bar {
+  display: grid;
+  grid-template-columns: 120px 1fr 28px;
+  align-items: center;
+  gap: 10px;
+}
+.dash-bar__lbl {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dash-bar__lbl i {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-xs);
+  flex: 0 0 auto;
+  box-shadow: 0 0 7px currentColor;
+}
+.dash-bar__track {
+  height: 9px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.dash-bar__track span {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-sm);
+}
+.dash-bar__n {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  text-align: right;
+  color: var(--text);
+}
+
+/* Actividad reciente */
+.dash-act {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+.dash-act li {
+  display: flex;
+  gap: 11px;
+}
+.dash-act__dot {
+  width: 9px;
+  height: 9px;
+  margin-top: 5px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  background: var(--text-faint);
+}
+.dash-act__dot.t-creacion {
+  background: #8b8f99;
+}
+.dash-act__dot.t-estado {
+  background: var(--brand);
+}
+.dash-act__dot.t-reunion {
+  background: #0ea5e9;
+}
+.dash-act__dot.t-nota {
+  background: #14b8a6;
+}
+.dash-act__dot.t-asignacion {
+  background: #a855f7;
+}
+.dash-act__dot.t-evaluacion {
+  background: #eab308;
+}
+.dash-act__dot.t-documento {
+  background: #ec4899;
+}
+.dash-act__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.dash-act__desc {
+  font-size: 13px;
+  color: var(--text);
+}
+.dash-act__meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+/* Próximas entregas */
+.dash-prox {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.dash-prox__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 14px;
+  background: var(--surface-2);
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.dash-prox__nombre {
+  font-weight: 600;
+  font-size: 13.5px;
+}
+.dash-prox__fecha {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--brand-2);
+}

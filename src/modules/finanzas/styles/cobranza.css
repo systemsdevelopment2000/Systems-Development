@@ -1,0 +1,611 @@
+/* Cuentas por cobrar y registro de cobros. */
+
+.cxc-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
+}
+
+.cxc-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border: var(--borde-grosor) solid var(--borde);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.cxc-kpi__et {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--texto-3);
+}
+
+.cxc-kpi__val {
+  font-size: 24px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: var(--texto-1);
+}
+
+.cxc-kpi__pie {
+  font-size: 12px;
+  color: var(--texto-3);
+}
+
+.cxc-kpi__alerta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #f87171;
+}
+
+.cxc-mora {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: #fca5a5;
+  background: color-mix(in srgb, #ef4444 12%, transparent);
+  border: 1px solid color-mix(in srgb, #ef4444 28%, transparent);
+}
+
+.cxc-layout {
+  display: grid;
+  grid-template-columns: minmax(240px, 300px) 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.cxc-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cxc-fila {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  padding: 12px 14px;
+  border: var(--borde-grosor) solid var(--borde);
+  border-radius: var(--radius);
+  background: var(--panel);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.cxc-fila:hover {
+  border-color: color-mix(in srgb, var(--naranja) 45%, var(--borde));
+  transform: translateY(-1px);
+}
+
+.cxc-fila.is-on {
+  border-color: var(--naranja);
+  background: color-mix(in srgb, var(--naranja) 8%, var(--panel));
+}
+
+.cxc-fila__cab {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.cxc-fila__cli {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--texto-1);
+}
+
+.cxc-fila__cod {
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: var(--texto-3);
+}
+
+.cxc-fila__tit {
+  font-size: 12px;
+  color: var(--texto-2);
+}
+
+.cxc-barra {
+  display: block;
+  height: 5px;
+  border-radius: 99px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--texto-3) 22%, transparent);
+}
+
+.cxc-barra__fill {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--brand-sombra), var(--brand-luz));
+  transition: width 0.3s ease;
+}
+
+.cxc-barra__fill.is-mora {
+  background: linear-gradient(90deg, #ef4444, #f87171);
+}
+
+.cxc-fila__pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--texto-3);
+}
+
+.cxc-fila__pie b {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--texto-1);
+}
+
+.cxc-fila__mora {
+  font-style: normal;
+  font-weight: 600;
+  color: #f87171;
+}
+
+.cxc-detalle {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border: var(--borde-grosor) solid var(--borde);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+}
+
+.cxc-detalle__cab {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cxc-detalle__tit {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: var(--texto-1);
+}
+
+.cxc-detalle__sub {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  color: var(--texto-3);
+}
+
+.cxc-tot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cxc-tot span {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 8px 12px;
+  border: var(--borde-grosor) solid var(--borde);
+  border-radius: var(--radius-sm);
+  font-size: 11.5px;
+  color: var(--texto-3);
+  background: color-mix(in srgb, var(--fondo) 50%, transparent);
+}
+
+.cxc-tot b {
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--texto-1);
+}
+
+.cxc-tot--saldo {
+  border-color: color-mix(in srgb, var(--naranja) 40%, transparent);
+}
+
+.cxc-tot--saldo b {
+  color: var(--naranja);
+}
+
+.cxc-tot--mora b {
+  color: #f87171;
+}
+
+.cxc-h3 {
+  margin: 6px 0 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--texto-3);
+}
+
+.cxc-cuotas,
+.cxc-pagos {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cxc-cuota {
+  display: grid;
+  grid-template-columns: 26px 1fr auto auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border: var(--borde-grosor) solid var(--borde);
+  border-left: 3px solid var(--texto-3);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--fondo) 45%, transparent);
+}
+
+.cxc-cuota.is-pagada {
+  border-left-color: #22c55e;
+}
+
+.cxc-cuota.is-parcial {
+  border-left-color: #eab308;
+}
+
+.cxc-cuota.is-vencida {
+  border-left-color: #ef4444;
+  background: color-mix(in srgb, #ef4444 7%, transparent);
+}
+
+.cxc-cuota__n {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--texto-2);
+  background: color-mix(in srgb, var(--texto-3) 18%, transparent);
+}
+
+.cxc-cuota__txt,
+.cxc-cuota__montos {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.cxc-cuota__montos {
+  text-align: right;
+}
+
+.cxc-cuota b {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--texto-1);
+}
+
+.cxc-cuota__montos b {
+  font-variant-numeric: tabular-nums;
+}
+
+.cxc-cuota em {
+  font-size: 11px;
+  font-style: normal;
+  color: var(--texto-3);
+}
+
+.cxc-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  border-radius: 99px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.cxc-pill--pendiente {
+  color: var(--texto-2);
+  background: color-mix(in srgb, var(--texto-3) 18%, transparent);
+}
+
+.cxc-pill--parcial {
+  color: #fde047;
+  background: color-mix(in srgb, #eab308 18%, transparent);
+}
+
+.cxc-pill--pagada {
+  color: #86efac;
+  background: color-mix(in srgb, #22c55e 18%, transparent);
+}
+
+.cxc-pill--vencida {
+  color: #fca5a5;
+  background: color-mix(in srgb, #ef4444 18%, transparent);
+}
+
+.cxc-pago {
+  display: grid;
+  grid-template-columns: 76px minmax(110px, 1fr) minmax(150px, auto) minmax(90px, 1fr) 30px;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 12px;
+  border: var(--borde-grosor) solid var(--borde);
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  background: color-mix(in srgb, var(--fondo) 45%, transparent);
+}
+
+.cxc-pago__fecha,
+.cxc-pago__ref {
+  font-size: 11.5px;
+  color: var(--texto-3);
+}
+
+.cxc-pago__medio {
+  color: var(--texto-2);
+}
+
+.cxc-pago__monto {
+  display: flex;
+  flex-direction: column;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  text-align: right;
+  color: var(--texto-1);
+}
+
+.cxc-pago__monto em {
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 400;
+  color: var(--naranja);
+}
+
+/* Registro de cobro (modal). */
+
+.pago {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pago__cab {
+  display: grid;
+  grid-template-columns: 1fr 160px;
+  gap: 10px;
+}
+
+.pago__saldo {
+  margin: 0;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  color: var(--texto-2);
+  background: color-mix(in srgb, var(--naranja) 9%, transparent);
+  border: 1px solid color-mix(in srgb, var(--naranja) 22%, transparent);
+}
+
+.pago__saldo--falta {
+  color: var(--naranja);
+}
+
+.pago__lineas {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pago__linea {
+  display: grid;
+  grid-template-columns: 22px minmax(140px, 1.3fr) 110px 76px 110px minmax(110px, 1fr) auto;
+  gap: 8px;
+  align-items: end;
+  padding: 10px;
+  border: var(--borde-grosor) solid var(--borde);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--fondo) 45%, transparent);
+}
+
+.pago__num {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 30px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--texto-3);
+}
+
+.pago__linea .field__input {
+  padding: 7px 8px;
+  font-size: 12.5px;
+}
+
+.pago__linea .field__label {
+  font-size: 10px;
+  letter-spacing: 0.03em;
+}
+
+.pago__eq {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: right;
+}
+
+.pago__eq b {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--naranja);
+}
+
+.pago__eq b.is-error {
+  color: #f87171;
+}
+
+.pago__linea-acc {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-bottom: 4px;
+}
+
+.pago__mini {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 9px;
+  border: var(--borde-grosor) solid var(--borde);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--texto-2);
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.pago__mini:hover:not(:disabled) {
+  border-color: var(--naranja);
+  color: var(--naranja);
+}
+
+.pago__mini:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pago__acc {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.pago__qrs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pago__qr {
+  display: flex;
+  justify-content: center;
+  padding: 12px;
+  border: var(--borde-grosor) solid var(--borde);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--fondo) 50%, transparent);
+}
+
+.pago__total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 14px;
+  border: 1px solid var(--naranja);
+  border-radius: var(--radius);
+  font-size: 12.5px;
+  color: var(--texto-2);
+  background: color-mix(in srgb, var(--naranja) 8%, transparent);
+}
+
+.pago__total b {
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--naranja);
+}
+
+.pago__aviso {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 12.5px;
+  color: #eab308;
+}
+
+/* Vista teléfono: una columna, sin desplazamiento horizontal. */
+
+.movil .cxc-layout {
+  grid-template-columns: 1fr;
+}
+
+.movil .cxc-cuota {
+  grid-template-columns: 24px 1fr;
+  row-gap: 6px;
+}
+
+.movil .cxc-cuota__montos {
+  grid-column: 2;
+  text-align: left;
+}
+
+.movil .cxc-cuota .cxc-pill {
+  grid-column: 2;
+  justify-self: start;
+}
+
+.movil .cxc-pago {
+  grid-template-columns: 1fr 1fr 30px;
+  row-gap: 4px;
+}
+
+.movil .cxc-pago__monto {
+  text-align: left;
+}
+
+.movil .pago__cab,
+.movil .pago__linea {
+  grid-template-columns: 1fr;
+}
+
+.movil .pago__num {
+  width: auto;
+  height: auto;
+  justify-self: start;
+}
+
+.movil .pago__eq,
+.movil .pago__linea-acc {
+  justify-content: flex-start;
+  text-align: left;
+}

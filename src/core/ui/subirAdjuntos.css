@@ -1,0 +1,125 @@
+/* Carga de documentos: imágenes y PDF. */
+
+.adj {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.adj__zona {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 14px 16px;
+  border: var(--borde-grosor) dashed var(--border-2);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  background: var(--velo-1);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.adj__zona:hover,
+.adj__zona.is-encima {
+  border-color: var(--brand);
+  background: var(--tinte);
+  color: var(--text);
+}
+
+.adj__zona span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.adj__zona em {
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 400;
+  color: var(--text-faint);
+}
+
+.adj__error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--danger);
+}
+
+.adj__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.adj__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius-xs);
+  background: var(--velo-1);
+}
+
+.adj__ic {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: var(--radius-xs);
+  color: var(--text-muted);
+  background: var(--velo-2);
+}
+
+.adj__ic--pdf {
+  color: #ff8a72;
+}
+
+.adj__miniatura {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border-radius: var(--radius-xs);
+}
+
+.adj__nombre {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  font-size: 12.5px;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adj__nombre:hover {
+  color: var(--brand-luz);
+}
+
+.adj__nombre em {
+  font-size: 10.5px;
+  font-style: normal;
+  color: var(--text-faint);
+}
+
+.adj__nada {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--text-faint);
+}

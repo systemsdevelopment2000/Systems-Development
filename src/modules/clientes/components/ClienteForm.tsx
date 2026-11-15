@@ -1,0 +1,331 @@
+import { useState, type FormEvent } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { Button, SubirImagen, Combobox, Stepper, type PasoDef } from '@/core/ui'
+import type { Cliente, MedioComunicacion } from '@/core/datos'
+import type { EntradaCliente } from '../hooks/useClientes'
+
+interface Props {
+  inicial?: Cliente
+  onGuardar: (datos: EntradaCliente) => void
+  onCancelar: () => void
+}
+
+const PASOS_CLIENTE: PasoDef[] = [
+  { id: 'identidad', titulo: '1. Identidad', descripcion: 'Datos fiscales' },
+  { id: 'contacto', titulo: '2. Contacto', descripcion: 'Canales y enlace' },
+  { id: 'comercial', titulo: '3. Comercial', descripcion: 'Pagos y notas' },
+]
+
+export function ClienteForm({ inicial, onGuardar, onCancelar }: Props) {
+  const [paso, setPaso] = useState(0)
+  const [maxPaso, setMaxPaso] = useState(inicial ? 2 : 0)
+  const [error, setError] = useState<string | null>(null)
+
+  const [tipoDocumento, setTipoDocumento] = useState<'cedula' | 'rif'>(
+    inicial?.tipoDocumento ?? 'rif',
+  )
+  const [documento, setDocumento] = useState(inicial?.documento ?? '')
+  const [nombre, setNombre] = useState(inicial?.nombre ?? '')
+  const [logo, setLogo] = useState<string | undefined>(inicial?.logo)
+  const [ubicacion, setUbicacion] = useState(inicial?.ubicacion ?? '')
+
+  const [telefono, setTelefono] = useState(inicial?.contacto.telefono ?? '')
+  const [correo, setCorreo] = useState(inicial?.contacto.correo ?? '')
+  const [medio, setMedio] = useState<MedioComunicacion>(inicial?.contacto.medio ?? 'whatsapp')
+
+  // Responsable / contacto (enlace directo)
+  const [respNombre, setRespNombre] = useState(inicial?.responsable?.nombre ?? '')
+  const [respCargo, setRespCargo] = useState(inicial?.responsable?.cargo ?? '')
+  const [respTel, setRespTel] = useState(inicial?.responsable?.telefono ?? '')
+  const [respCorreo, setRespCorreo] = useState(inicial?.responsable?.correo ?? '')
+
+  const [medioPago, setMedioPago] = useState(inicial?.medioPago ?? '')
+  const [notas, setNotas] = useState(inicial?.notas ?? '')
+
+  function validarPaso1(): boolean {
+    if (!nombre.trim()) {
+      setError('Debes ingresar el nombre o razón social del cliente.')
+      return false
+    }
+    if (!documento.trim()) {
+      setError(`Debes ingresar el número de ${tipoDocumento === 'rif' ? 'RIF' : 'cédula'}.`)
+      return false
+    }
+    setError(null)
+    return true
+  }
+
+  function avanzar() {
+    if (paso === 0 && !validarPaso1()) return
+    const siguiente = Math.min(paso + 1, PASOS_CLIENTE.length - 1)
+    setPaso(siguiente)
+    setMaxPaso((prev) => Math.max(prev, siguiente))
+  }
+
+  function retroceder() {
+    setError(null)
+    setPaso((prev) => Math.max(prev - 1, 0))
+  }
+
+  function irAlPaso(n: number) {
+    if (n > paso && !validarPaso1()) return
+    setError(null)
+    setPaso(n)
+  }
+
+  function submit(e: FormEvent) {
+    e.preventDefault()
+    if (!validarPaso1()) {
+      setPaso(0)
+      return
+    }
+
+    const nombreResp = respNombre.trim()
+    onGuardar({
+      id: inicial?.id,
+      tipoDocumento,
+      documento: documento.trim(),
+      nombre: nombre.trim(),
+      logo,
+      ubicacion: ubicacion.trim() || undefined,
+      contacto: {
+        telefono: telefono.trim() || undefined,
+        correo: correo.trim() || undefined,
+        medio,
+      },
+      responsable: nombreResp
+        ? {
+            nombre: nombreResp,
+            cargo: respCargo.trim() || undefined,
+            telefono: respTel.trim() || undefined,
+            correo: respCorreo.trim() || undefined,
+          }
+        : undefined,
+      medioPago: medioPago.trim() || undefined,
+      notas: notas.trim() || undefined,
+    })
+  }
+
+  return (
+    <form onSubmit={submit} noValidate>
+      <Stepper
+        pasos={PASOS_CLIENTE}
+        pasoActual={paso}
+        maxPasoAlcanzado={maxPaso}
+        onPasoClick={irAlPaso}
+      />
+
+      {/* ── PASO 1: IDENTIDAD Y DATOS FISCALES ── */}
+      {paso === 0 && (
+        <div className="form-grid">
+          <div className="form-grid__full">
+            <SubirImagen valor={logo} onCambio={setLogo} etiqueta="Logo corporativo" forma="cuadrado" />
+          </div>
+
+          <label className="field form-grid__full">
+            <span className="field__label">
+              Nombre / Razón social <b style={{ color: 'var(--brand)' }}>*</b>
+            </span>
+            <input
+              className="field__input"
+              required
+              autoFocus
+              value={nombre}
+              onChange={(e) => {
+                setNombre(e.target.value)
+                setError(null)
+              }}
+              placeholder="Ej. Comercial El Roble, C.A."
+            />
+          </label>
+
+          <div className="field">
+            <span className="field__label">Tipo de documento</span>
+            <Combobox
+              opciones={[
+                { valor: 'rif', etiqueta: 'RIF (Empresa)' },
+                { valor: 'cedula', etiqueta: 'Cédula (Persona natural)' },
+              ]}
+              valor={tipoDocumento}
+              onCambio={(v) => setTipoDocumento(v as 'cedula' | 'rif')}
+              buscar={false}
+            />
+          </div>
+
+          <label className="field">
+            <span className="field__label">
+              Número de documento <b style={{ color: 'var(--brand)' }}>*</b>
+            </span>
+            <input
+              className="field__input"
+              required
+              value={documento}
+              onChange={(e) => {
+                setDocumento(e.target.value)
+                setError(null)
+              }}
+              placeholder={tipoDocumento === 'rif' ? 'J-12345678-9' : 'V-12345678'}
+            />
+          </label>
+
+          <label className="field form-grid__full">
+            <span className="field__label">Ubicación / Ciudad</span>
+            <input
+              className="field__input"
+              value={ubicacion}
+              onChange={(e) => setUbicacion(e.target.value)}
+              placeholder="Puerto Ordaz, Bolívar"
+            />
+          </label>
+        </div>
+      )}
+
+      {/* ── PASO 2: CANALES DE CONTACTO Y ENLACE DIRECTO ── */}
+      {paso === 1 && (
+        <div className="form-grid">
+          <label className="field">
+            <span className="field__label">Teléfono institucional</span>
+            <input
+              className="field__input"
+              type="tel"
+              value={telefono}
+              onChange={(e) => setTelefono(e.target.value)}
+              placeholder="0414-1234567"
+            />
+          </label>
+
+          <label className="field">
+            <span className="field__label">Correo institucional</span>
+            <input
+              className="field__input"
+              type="email"
+              value={correo}
+              onChange={(e) => setCorreo(e.target.value)}
+              placeholder="contacto@empresa.com"
+            />
+          </label>
+
+          <div className="field form-grid__full">
+            <span className="field__label">Canal preferido de comunicación</span>
+            <Combobox
+              opciones={[
+                { valor: 'whatsapp', etiqueta: 'WhatsApp' },
+                { valor: 'correo', etiqueta: 'Correo electrónico' },
+                { valor: 'llamada', etiqueta: 'Llamada telefónica' },
+                { valor: 'otro', etiqueta: 'Otro medio' },
+              ]}
+              valor={medio}
+              onCambio={(v) => setMedio(v as MedioComunicacion)}
+              buscar={false}
+            />
+          </div>
+
+          <div className="form-seccion form-grid__full">
+            <span className="form-seccion__tit">Persona de contacto / Enlace</span>
+          </div>
+
+          <label className="field">
+            <span className="field__label">Nombre del responsable</span>
+            <input
+              className="field__input"
+              value={respNombre}
+              onChange={(e) => setRespNombre(e.target.value)}
+              placeholder="Ej. Ing. Juan Pérez"
+            />
+          </label>
+
+          <label className="field">
+            <span className="field__label">Cargo / Rol</span>
+            <input
+              className="field__input"
+              value={respCargo}
+              onChange={(e) => setRespCargo(e.target.value)}
+              placeholder="Gerente de Operaciones"
+            />
+          </label>
+
+          <label className="field">
+            <span className="field__label">Teléfono directo</span>
+            <input
+              className="field__input"
+              type="tel"
+              value={respTel}
+              onChange={(e) => setRespTel(e.target.value)}
+              placeholder="0412-9876543"
+            />
+          </label>
+
+          <label className="field">
+            <span className="field__label">Correo directo</span>
+            <input
+              className="field__input"
+              type="email"
+              value={respCorreo}
+              onChange={(e) => setRespCorreo(e.target.value)}
+              placeholder="juan.perez@empresa.com"
+            />
+          </label>
+        </div>
+      )}
+
+      {/* ── PASO 3: COMERCIAL Y NOTAS ── */}
+      {paso === 2 && (
+        <div className="form-grid">
+          <label className="field form-grid__full">
+            <span className="field__label">Medio de pago preferido</span>
+            <input
+              className="field__input"
+              value={medioPago}
+              onChange={(e) => setMedioPago(e.target.value)}
+              placeholder="Pago Móvil, Transferencia nacional, Zelle, Divisas efectivo…"
+            />
+          </label>
+
+          <label className="field form-grid__full">
+            <span className="field__label">Notas u observaciones</span>
+            <textarea
+              className="field__input"
+              rows={4}
+              value={notas}
+              onChange={(e) => setNotas(e.target.value)}
+              placeholder="Horarios de atención, requerimientos especiales de facturación…"
+            />
+          </label>
+        </div>
+      )}
+
+      {error && (
+        <p className="form__error" style={{ marginTop: 12 }} role="alert">
+          {error}
+        </p>
+      )}
+
+      {/* ── BOTONES DE NAVEGACIÓN Y GUARDADO ── */}
+      <footer className="form-acciones">
+        <div>
+          {paso > 0 ? (
+            <Button type="button" variant="ghost" onClick={retroceder}>
+              <ChevronLeft size={16} /> Anterior
+            </Button>
+          ) : (
+            <Button type="button" variant="ghost" onClick={onCancelar}>
+              Cancelar
+            </Button>
+          )}
+        </div>
+
+        <div className="form-acciones__grupo">
+          {paso < PASOS_CLIENTE.length - 1 ? (
+            <Button type="button" onClick={avanzar}>
+              Siguiente <ChevronRight size={16} />
+            </Button>
+          ) : (
+            <Button type="submit">
+              {inicial ? 'Guardar cambios' : 'Registrar cliente'}
+            </Button>
+          )}
+        </div>
+      </footer>
+    </form>
+  )
+}

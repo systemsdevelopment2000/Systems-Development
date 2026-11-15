@@ -1,0 +1,204 @@
+/* Buscador global (paleta de comandos). */
+
+.bus-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  cursor: pointer;
+  min-width: 220px;
+  transition: border-color 0.15s, color 0.15s;
+}
+.bus-trigger:hover {
+  color: var(--text);
+  border-color: var(--brand);
+}
+.bus-trigger span {
+  flex: 1;
+  text-align: left;
+}
+.bus-trigger kbd,
+.bus__campo kbd {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-faint);
+  background: var(--surface-2);
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+}
+
+.bus {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 11vh 20px 20px;
+  background: rgba(4, 4, 6, 0.72);
+  backdrop-filter: blur(6px);
+  animation: bus-fade 0.14s ease;
+}
+@keyframes bus-fade {
+  from {
+    opacity: 0;
+  }
+}
+.bus__panel {
+  width: min(620px, 100%);
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: var(--borde-grosor) solid var(--border-2);
+  border-radius: var(--radius);
+  box-shadow: 0 34px 80px rgba(0, 0, 0, 0.62);
+  overflow: hidden;
+  animation: bus-in 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes bus-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+.bus__campo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: var(--borde-grosor) solid var(--border);
+  color: var(--text-muted);
+}
+.bus__campo input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 15px;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  outline: none;
+}
+.bus__campo input::placeholder {
+  color: var(--text-faint);
+}
+.bus__pista {
+  margin: 0;
+  padding: 18px 16px;
+  font-size: 12.5px;
+  color: var(--text-faint);
+}
+.bus__lista {
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.bus__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  font: inherit;
+  text-align: left;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 9px 11px;
+  cursor: pointer;
+}
+.bus__item.is-sel {
+  background: color-mix(in srgb, var(--brand) 12%, transparent);
+}
+.bus__tipo {
+  flex: 0 0 auto;
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border: var(--borde-grosor) solid var(--border);
+}
+.bus__tipo--proyecto {
+  color: var(--brand-2);
+  background: color-mix(in srgb, var(--brand) 14%, transparent);
+}
+.bus__tipo--cliente {
+  color: #7cc4ff;
+  background: rgba(14, 165, 233, 0.14);
+}
+.bus__tipo--colaborador {
+  color: #9fe3c3;
+  background: rgba(34, 197, 94, 0.13);
+}
+.bus__tipo--tarea {
+  color: #cdbef0;
+  background: rgba(124, 92, 255, 0.16);
+}
+.bus__txt {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.bus__tit {
+  font-size: 13.5px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bus__det {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bus__cod {
+  flex: 0 0 auto;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-faint);
+}
+.bus__enter {
+  flex: 0 0 auto;
+  color: var(--brand-2);
+}
+
+@media (max-width: 760px) {
+  .bus-trigger span,
+  .bus-trigger kbd {
+    display: none;
+  }
+  .bus-trigger {
+    min-width: 0;
+  }
+}
+
+/* En la barra superior el buscador va a la izquierda */
+.topbar .bus-trigger {
+  margin-right: auto;
+}
+
+/* Resultado de tipo módulo: es "ir a una pantalla", no un registro. */
+.bus__tipo--modulo {
+  color: var(--brand-luz);
+  background: var(--tinte-fuerte);
+}

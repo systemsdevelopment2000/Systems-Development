@@ -1,0 +1,5 @@
+-- Datos de ejemplo para desarrollo local (supabase db reset los aplica).
+-- En producción NO se ejecuta.
+--
+-- Para convertir una cuenta existente en admin, tras registrarte:
+--   update public.usuarios set rol = 'admin' where email = 'tu@correo.com';

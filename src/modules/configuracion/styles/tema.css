@@ -1,0 +1,262 @@
+/* Selector de identidad visual: muestras con luz y sombra. */
+
+.tema-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(176px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tema-op {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  width: 100%;
+  padding: 10px;
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.tema-op:hover,
+.tema-op:focus-visible {
+  transform: translateY(-2px);
+  border-color: var(--border-2);
+  box-shadow: var(--shadow-md);
+}
+
+.tema-op.is-activa {
+  border-color: var(--brand);
+}
+
+.tema-op.is-fijada {
+  box-shadow: var(--glow);
+}
+
+/* Maqueta en miniatura: un panel del tema, con su botón iluminado. */
+.tema-op__lienzo {
+  display: grid;
+  place-items: center;
+  height: 86px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.tema-op__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 78%;
+  padding: 9px;
+  border: 1px solid;
+  border-radius: var(--radius-sm);
+}
+
+.tema-op__barra {
+  display: block;
+  height: 4px;
+  width: 100%;
+  border-radius: 99px;
+  opacity: 0.75;
+}
+
+.tema-op__btn {
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 3px 9px;
+  border-radius: var(--radius-sm);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.tema-op__nombre {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.tema-op__nombre svg {
+  color: var(--brand);
+  flex-shrink: 0;
+}
+
+.tema-op__attrs {
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+  color: var(--text-faint);
+}
+
+/* Rampa: sombra → base → luz, del primario y del secundario. */
+.tema-op__rampa {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  height: 9px;
+  border-radius: 99px;
+  overflow: hidden;
+  border: var(--borde-grosor) solid var(--border);
+}
+
+.tema-op__rampa i {
+  display: block;
+  height: 100%;
+}
+
+.tema-razon {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px;
+  border: var(--borde-grosor) solid var(--border);
+  border-left: 3px solid var(--brand);
+  border-radius: var(--radius);
+  background: var(--tinte);
+}
+
+.tema-razon__tit {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--text);
+}
+
+.tema-razon__txt {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.tema-tokens {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 8px;
+  margin: 4px 0 0;
+}
+
+.tema-tokens div {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.tema-tokens dt {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.tema-tokens dd {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.movil .tema-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.movil .tema-op__lienzo {
+  height: 68px;
+}
+
+/* Añadidos del selector de combinaciones. */
+
+.tema-op__titulo {
+  font-size: 10px;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+.tema-op__attrs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+}
+
+.tema-razon__tit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.tema-razon__tit em {
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--text-faint);
+}
+
+.tema-razon__riesgo {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-faint);
+}
+
+.tema-razon__riesgo b {
+  color: var(--text-muted);
+}
+
+/* Ficha del estilo de diseño: es común a todas las combinaciones,
+   así que se enuncia una vez arriba y no se repite en cada tarjeta. */
+.tema-estilo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px 18px;
+  margin: 0;
+  padding: 12px 14px;
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--velo-1);
+}
+
+.tema-estilo div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.tema-estilo dt {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.tema-estilo dd {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.tema-estilo div:first-child dd {
+  font-weight: 600;
+  color: var(--text);
+}

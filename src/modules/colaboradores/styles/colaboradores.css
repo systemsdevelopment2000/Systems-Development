@@ -1,0 +1,125 @@
+/* Módulo Colaboradores — tarjeta de equipo.
+   Reutiliza .cl-grid, .cl-card__nombre, .cl-card__acciones y .cl-card__datos
+   (cargados siempre: el router importa todas las páginas de forma estática). */
+
+.co-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: var(--surface);
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+.co-card:hover {
+  border-color: var(--border-2);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.32);
+  transform: translateY(-2px);
+}
+.co-card__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.co-card__id {
+  flex: 1;
+  min-width: 0;
+}
+
+.co-avatar {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 auto;
+}
+.co-avatar img,
+.co-avatar > span {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--surface-2);
+  border: var(--borde-grosor) solid var(--border);
+  color: var(--brand-2);
+  font-weight: 700;
+  font-size: 14px;
+}
+.co-dot {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--surface);
+}
+.co-dot--on {
+  background: #22c55e;
+}
+.co-dot--off {
+  background: var(--text-faint);
+}
+.co-rol {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.co-badges {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.co-estado {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 999px;
+}
+.co-estado--on {
+  color: #6ee7a8;
+  background: rgba(34, 197, 94, 0.12);
+}
+.co-estado--off {
+  color: var(--text-faint);
+  background: var(--surface-2);
+}
+.co-badge-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--brand-2);
+  background: color-mix(in srgb, var(--brand) 12%, transparent);
+  padding: 2px 9px;
+  border-radius: 999px;
+}
+
+.co-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 11px;
+  border-top: var(--borde-grosor) solid var(--border);
+}
+.co-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.co-stat strong {
+  font-size: 16px;
+  color: var(--brand-2);
+}
+.co-stat span {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}

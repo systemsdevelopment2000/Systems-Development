@@ -1,0 +1,717 @@
+/* Recursos humanos: candidatos, plantillas y evaluación. */
+
+.rh-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: 999px;
+  background: var(--velo-1);
+  align-self: flex-start;
+}
+
+.rh-tabs button {
+  padding: 7px 18px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-faint);
+  background: transparent;
+  cursor: pointer;
+}
+
+.rh-tabs button.is-on {
+  color: var(--on-brand);
+  background: var(--brand);
+}
+
+.rh-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+}
+
+.rh-estados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rh-estados button {
+  padding: 5px 12px;
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-faint);
+  background: transparent;
+  cursor: pointer;
+}
+
+.rh-estados button.is-on {
+  color: var(--text);
+  border-color: var(--brand);
+}
+
+.rh-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rh-card {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+  padding: 14px 16px;
+  border: var(--borde-grosor) solid var(--border);
+  border-left: 3px solid var(--acento-sombra);
+  border-radius: var(--radius);
+  background: var(--surface);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.rh-card:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-2);
+}
+
+.rh-card__cab {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.rh-card__cab b {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.rh-card__cab em {
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.rh-card__cargo {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.rh-card__pie {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+
+.rh-card__pie b {
+  color: var(--brand-luz);
+}
+
+.rh-plant {
+  display: flex;
+  align-items: stretch;
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.rh-plant__abrir {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rh-plant__abrir:hover {
+  background: var(--velo-1);
+}
+
+.rh-plant__abrir b {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.rh-plant__abrir em {
+  font-size: 12px;
+  font-style: normal;
+  color: var(--brand-luz);
+}
+
+.rh-plant__abrir span {
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+
+.rh-plant__acc {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  border-left: var(--borde-grosor) solid var(--border);
+}
+
+/* ---------- Ficha del candidato ---------- */
+
+.rh-ficha,
+.rh-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px;
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.rh-ficha__cab {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* El nombre se edita en sitio: sin caja, como un título. Con el fondo de
+   campo parecía un botón deshabilitado. */
+.rh-ficha__nombre {
+  min-width: 260px;
+  padding: 2px 0;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  font-size: 20px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  background: transparent;
+}
+
+.rh-ficha__nombre::placeholder {
+  color: var(--text-faint);
+}
+
+.rh-ficha__nombre:hover {
+  border-bottom-color: var(--border);
+}
+
+.rh-ficha__nombre:focus {
+  outline: none;
+  border-bottom-color: var(--brand);
+}
+
+.rh-ficha__cod {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.rh-ficha__acc {
+  display: flex;
+  gap: 8px;
+}
+
+.rh-editor__ident {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 280px;
+}
+
+.rh-editor__cargo {
+  font-size: 13px;
+}
+
+/* ---------- Evaluación ---------- */
+
+.rh-eval {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: var(--borde-grosor) solid var(--border);
+  border-left: 3px solid var(--brand);
+  border-radius: var(--radius-sm);
+  background: var(--tinte);
+}
+
+.rh-eval__cab {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.rh-eval__tit {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.rh-eval__ayuda {
+  border: 0;
+  background: transparent;
+  font-size: 11.5px;
+  color: var(--brand-luz);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.rh-eval__nota {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.rh-eval__nota b {
+  font-size: 20px;
+  color: var(--brand-luz);
+}
+
+.rh-eval__nota em {
+  display: block;
+  font-size: 11px;
+  font-style: normal;
+  text-align: right;
+  color: var(--text-faint);
+}
+
+.rh-escala {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-xs);
+  list-style: none;
+  font-size: 11.5px;
+  color: var(--text-faint);
+  background: var(--velo-1);
+}
+
+.rh-escala b {
+  display: inline-block;
+  width: 14px;
+  color: var(--brand-luz);
+}
+
+.rh-criterios {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rh-criterio {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: var(--radius-xs);
+  background: var(--velo-1);
+}
+
+.rh-criterio__txt {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.rh-criterio__txt b {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.rh-criterio__txt em {
+  font-size: 11.5px;
+  font-style: normal;
+  color: var(--text-faint);
+}
+
+.rh-criterio__escala {
+  display: flex;
+  gap: 2px;
+}
+
+.rh-punto {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: var(--radius-xs);
+  color: var(--text-faint);
+  background: transparent;
+  cursor: pointer;
+}
+
+.rh-punto:hover {
+  color: var(--brand-luz);
+  background: var(--velo-2);
+}
+
+.rh-punto.is-on,
+.rh-criterio__escala .rh-punto svg[fill='currentColor'] {
+  color: var(--brand-luz);
+}
+
+/* ---------- Editor de plantilla ---------- */
+
+.rh-sec {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 6px 0 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.rh-sec em {
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-faint);
+}
+
+.rh-bloque {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--velo-1);
+}
+
+.rh-bloque__cab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rh-bloque__asa {
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+.rh-bloque__tit {
+  font-weight: 600;
+}
+
+.rh-preg {
+  display: grid;
+  grid-template-columns: 22px 1fr 30px;
+  gap: 8px;
+  align-items: center;
+}
+
+.rh-preg__n {
+  font-size: 11px;
+  text-align: center;
+  color: var(--text-faint);
+}
+
+.rh-sumar {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 30px;
+  padding: 5px 10px;
+  border: var(--borde-grosor) dashed var(--border-2);
+  border-radius: var(--radius-xs);
+  font-size: 11.5px;
+  color: var(--text-faint);
+  background: transparent;
+  cursor: pointer;
+}
+
+.rh-sumar:hover {
+  color: var(--brand-luz);
+  border-color: var(--brand);
+}
+
+.rh-crit-ed {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-x: auto;
+}
+
+.rh-crit-ed__th,
+.rh-crit-ed__tr {
+  display: grid;
+  grid-template-columns: minmax(130px, 1fr) minmax(200px, 2fr) 78px 32px;
+  gap: 8px;
+  align-items: center;
+  min-width: 560px;
+}
+
+.rh-crit-ed__th {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+/* ---------- Hoja impresa ---------- */
+
+.mb .rh-hoja__tabla td b {
+  font-weight: 700;
+}
+
+.mb .rh-hoja__tabla td em {
+  font-style: normal;
+  color: var(--mmuted);
+}
+
+.mb .rh-hoja__n {
+  width: 34px;
+  text-align: center;
+}
+
+/* ---------- Teléfono ---------- */
+
+.movil .rh-crit-ed__th,
+.movil .rh-crit-ed__tr {
+  min-width: 520px;
+}
+
+.movil .rh-criterio {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* ── Ficha de ingreso ─────────────────────────────────────────── */
+
+.rh-ingreso {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: var(--borde-grosor) solid var(--border);
+}
+
+.rh-ingreso__cab {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.rh-ingreso__aviso {
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+
+.rh-ingreso__aviso b {
+  color: var(--text-muted);
+}
+
+.fp {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fp-sec {
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--velo-1);
+  overflow: hidden;
+}
+
+.fp-sec.is-abierta {
+  border-color: var(--border-2);
+}
+
+.fp-sec__cab {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 11px 13px;
+  border: 0;
+  font: inherit;
+  color: var(--text-muted);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fp-sec__cab:hover {
+  color: var(--text);
+}
+
+.fp-sec__tit {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.fp-sec__nota {
+  font-size: 11px;
+  font-style: normal;
+  color: var(--text-faint);
+}
+
+.fp-sec__chev {
+  margin-left: auto;
+  flex-shrink: 0;
+  transition: transform 0.18s ease;
+}
+
+.fp-sec.is-abierta .fp-sec__chev {
+  transform: rotate(180deg);
+}
+
+.fp-sec__cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 13px 14px;
+}
+
+.fp-aviso {
+  margin: 0;
+  padding: 9px 12px;
+  border-radius: var(--radius-xs);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-faint);
+  background: var(--velo-2);
+}
+
+.fp-aviso--sensible {
+  border-left: 3px solid var(--alerta);
+  color: var(--text-muted);
+}
+
+.fp-aviso b {
+  color: var(--text);
+}
+
+.fp-dep {
+  display: grid;
+  grid-template-columns: 22px minmax(140px, 1.6fr) 130px 140px auto auto 30px;
+  gap: 7px;
+  align-items: center;
+}
+
+.fp-dep__n {
+  font-size: 11px;
+  text-align: center;
+  color: var(--text-faint);
+}
+
+.fp-dep .field__input {
+  padding: 7px 8px;
+  font-size: 12.5px;
+  min-width: 0;
+}
+
+.fp-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.fp-check input {
+  accent-color: var(--brand);
+}
+
+.fp-consent {
+  padding: 10px 12px;
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius-xs);
+  font-size: 12.5px;
+  white-space: normal;
+}
+
+.fp-consent em {
+  font-style: normal;
+  color: var(--exito);
+}
+
+.movil .fp-dep {
+  grid-template-columns: 1fr 1fr;
+  row-gap: 6px;
+  padding: 10px;
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius-xs);
+}
+
+.movil .fp-dep > *:nth-child(2) {
+  grid-column: 1 / -1;
+}
+
+/* Barra del detalle: volver + selector de documento. */
+.rh-barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* Ficha de ingreso impresa. */
+.mb .rh-ing__meta {
+  grid-template-columns: repeat(3, 1fr);
+  margin-bottom: 10px;
+}
+
+.mb .rh-ing__meta--2 {
+  grid-template-columns: 2.2fr 1fr;
+  margin-bottom: 10px;
+}
+
+.mb .rh-ing__col {
+  width: 18%;
+}
+
+.movil .rh-barra .ag-tabs {
+  width: 100%;
+}

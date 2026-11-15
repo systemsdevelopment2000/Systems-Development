@@ -1,0 +1,411 @@
+/* Hoja de pendientes asignables: configurador, editor y hoja impresa. */
+
+/* ---------- Configurador ---------- */
+
+/* Fila fluida en vez de rejilla rígida: la columna de botones estiraba los
+   rótulos a dos líneas y se comía el ancho de los campos. */
+.pend-conf {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 14px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+/* El selector de proyecto es el que crece. */
+.pend-conf > .field:first-child {
+  flex: 1 1 240px;
+  min-width: 200px;
+}
+
+/* Los campos numéricos tienen ancho propio y su rótulo no se parte. */
+.pend-conf__num {
+  flex: 0 0 auto;
+  width: 108px;
+}
+
+.pend-conf__num .field__label {
+  white-space: nowrap;
+}
+
+.pend-conf__checks {
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pend-check {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.pend-check input {
+  accent-color: var(--brand);
+}
+
+/* Los botones van en línea, pegados a la derecha, y su texto no se parte. */
+.pend-conf__acc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.pend-conf__acc .btn {
+  white-space: nowrap;
+}
+
+/* ---------- Editor de líneas ---------- */
+
+.pend-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  overflow-x: auto;
+}
+
+.pend-editor__th,
+.pend-editor__tr {
+  display: grid;
+  grid-template-columns: 62px minmax(200px, 2.2fr) minmax(130px, 1fr) minmax(120px, 1fr) 110px 110px 32px;
+  gap: 6px;
+  align-items: center;
+  min-width: 780px;
+}
+
+.pend-editor__th {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding: 0 2px 2px;
+}
+
+.pend-editor__tr .field__input {
+  padding: 7px 8px;
+  font-size: 12.5px;
+}
+
+/* ---------- Hoja impresa (dentro del membrete) ---------- */
+
+.pend-hoja {
+  margin-top: 8px;
+}
+
+.mb .pend-meta {
+  display: grid;
+  grid-template-columns: 1.6fr 0.8fr 1.2fr;
+  gap: 18px;
+  margin: 0 0 16px;
+}
+
+.mb .pend-meta div {
+  min-width: 0;
+}
+
+.mb .pend-meta dt {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mmuted);
+}
+
+.mb .pend-meta dd {
+  margin: 2px 0 0;
+  padding-bottom: 2px;
+  min-height: 17px;
+  font-size: 12.5px;
+  color: var(--mink);
+  overflow-wrap: anywhere;
+}
+
+/* Campo a llenar a mano: línea dibujada, no guiones bajos. */
+.mb .pend-meta dd.is-vacio {
+  border-bottom: 1px solid #9a9a9a;
+}
+
+/* La tabla NO lleva `table-layout: fixed` ni anchos en px.
+   Con ancho fijo, cualquier texto más largo de lo previsto desborda su celda y
+   se solapa con la vecina en vez de reacomodarse. Aquí los anchos son
+   porcentajes como pista, el navegador reparte, y las celdas parten palabras
+   antes que desbordar. */
+.mb .pend-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.mb .pend-tabla th,
+.mb .pend-tabla td {
+  /* Sin rejilla: solo un filete horizontal. Una caja por celda hacía que la
+     hoja pareciera planilla de cálculo en lugar de documento de SD. */
+  border: 0;
+  border-bottom: 1px solid var(--mline);
+  padding: 0 10px;
+  /* Altura uniforme para TODAS las filas, llenas o vacías: así la hoja
+     mantiene su ritmo y queda espacio para escribir a mano. */
+  height: 27px;
+  text-align: left;
+  vertical-align: middle;
+  color: var(--mink);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.mb .pend-tabla th {
+  height: 24px;
+  border-bottom: 1.5px solid #9a9a9a;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #4a4a4a;
+}
+
+.mb .pend-tabla tr:last-child td {
+  border-bottom: 1px solid #9a9a9a;
+}
+
+.mb .pend-tabla td:first-child,
+.mb .pend-tabla th:first-child {
+  padding-left: 2px;
+}
+
+/* Los campos cortos no se parten; los largos sí. */
+.mb .pend-tabla__ok {
+  width: 4%;
+  text-align: center;
+  padding: 0;
+}
+.mb .pend-tabla__ord {
+  width: 5%;
+  text-align: center;
+  font-weight: 700;
+  color: var(--mmuted);
+  white-space: nowrap;
+}
+.mb .pend-tabla__asig {
+  width: 17%;
+}
+.mb .pend-tabla__mod {
+  width: 15%;
+}
+.mb .pend-tabla__pri {
+  width: 11%;
+  white-space: nowrap;
+}
+.mb .pend-tabla__ent {
+  width: 12%;
+  white-space: nowrap;
+}
+
+/* Recuadro para tildar a mano cuando la tarea se cumple. */
+.mb .pend-caja {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border: 1.2px solid #9a9a9a;
+  border-radius: 2px;
+  vertical-align: middle;
+}
+
+/* Las filas alternas llevan un lavado muy leve: ayuda a seguir la línea con la
+   vista sin necesidad de dibujar la rejilla. */
+.mb .pend-tabla tbody tr:nth-child(even) td {
+  background: #fafaf9;
+}
+
+.mb .pend-pri {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* En papel la prioridad se distingue por tono, no por color saturado. */
+.mb .pend-pri--baja {
+  background: #eeeeee;
+  color: #5a5a5a;
+}
+.mb .pend-pri--media {
+  background: #e4ecf6;
+  color: #2d4a6b;
+}
+.mb .pend-pri--alta {
+  background: #fbe6d2;
+  color: #8a4210;
+}
+.mb .pend-pri--critica {
+  background: #f6dcdc;
+  color: #8d2020;
+}
+
+.mb .pend-notas {
+  margin-top: 16px;
+}
+
+.mb .pend-notas__tit {
+  margin: 0 0 7px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--mbrand);
+}
+
+.mb .pend-notas__txt {
+  margin: 0 0 8px;
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  color: var(--mink);
+}
+
+/* Renglones para escribir a mano. */
+.mb .pend-notas__linea {
+  display: block;
+  height: 22px;
+  border-bottom: 1px solid var(--mline);
+}
+
+.mb .pend-firmas {
+  display: flex;
+  gap: 48px;
+  margin-top: 30px;
+}
+
+.mb .pend-firmas span {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--mmuted);
+}
+
+.mb .pend-firmas i {
+  display: block;
+  height: 1px;
+  background: #9a9a9a;
+}
+
+.mb .pend-pie {
+  margin: 16px 0 0;
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: var(--mmuted);
+}
+
+/* ---------- Vista teléfono ---------- */
+
+.movil .pend-conf {
+  grid-template-columns: 1fr;
+}
+
+/* El apilado en teléfono vive en `styles/movil.css`: forzar 700px aquí
+   obligaba a desplazar en horizontal dentro de un marco de 368px. */
+
+/* ---------- Añadir líneas en bloque ---------- */
+
+.pend-sumar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.pend-sumar__num {
+  width: 72px;
+  padding: 7px 8px;
+  font-size: 12.5px;
+  text-align: center;
+}
+
+.pend-sumar__rapido {
+  padding: 6px 11px;
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.pend-sumar__rapido:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+/* ---------- Editor del pie ---------- */
+
+.pend-pie-ed {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 14px 16px 16px;
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.pend-pie-ed legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.pend-pie-ed__firmas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.pend-pie-ed__acc {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.pend-pie-ed__ok {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--exito);
+}
+
+.movil .pend-pie-ed__firmas {
+  grid-template-columns: 1fr;
+}

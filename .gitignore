@@ -25,6 +25,7 @@ build/
 
 # === Documentación interna y capturas de QA (local, no versionar) ===
 docs/
+design/
 
 # === Caché incremental de TypeScript ===
 *.tsbuildinfo

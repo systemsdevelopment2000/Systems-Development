@@ -1,0 +1,45 @@
+/* Reportes — barra y pestañas (pantalla). La impresión la maneja el membrete. */
+
+.rep-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.rep-acciones {
+  display: flex;
+  gap: 10px;
+}
+.rep-tabs {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  align-self: flex-start;
+  background: var(--surface);
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.rep-tabs button {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  padding: 7px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.rep-tabs button:hover {
+  color: var(--text);
+}
+.rep-tabs button.is-on {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+@media print {
+  @page {
+    size: landscape;
+  }
+}

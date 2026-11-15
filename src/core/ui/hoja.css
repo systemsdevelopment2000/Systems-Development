@@ -1,0 +1,65 @@
+/* Alternancia entre la interfaz de trabajo y la hoja impresa. */
+
+.hoja-sw {
+  display: inline-flex;
+  gap: 3px;
+  padding: 3px;
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: 999px;
+  background: var(--velo-1);
+}
+
+.hoja-sw button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-faint);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
+}
+
+.hoja-sw button:hover {
+  color: var(--text);
+}
+
+.hoja-sw button.is-on {
+  color: var(--on-brand);
+  background: var(--brand);
+}
+
+/*
+  Cuando la hoja no se ve NO se usa `display: none`: el generador de PDF
+  rasteriza este nodo, y un nodo sin caja no se puede rasterizar. Se saca de
+  la pantalla pero se mantiene maquetado.
+*/
+.hoja-panel.is-oculta {
+  position: absolute;
+  left: -10000px;
+  top: 0;
+  width: 960px;
+  pointer-events: none;
+}
+
+/*
+  Con la hoja en pantalla, el resto de la página se oculta: son dos vistas
+  alternativas, no una debajo de la otra.
+
+  Se mantiene visible la cabecera y CUALQUIER bloque que contenga el propio
+  conmutador: si se ocultara el bloque donde vive el interruptor, no habría
+  forma de volver a la interfaz.
+*/
+.page.is-hoja > *:not(.page__header):not(.hoja-panel):not(:has(.hoja-sw)) {
+  display: none;
+}
+
+.page.is-hoja .hoja-panel {
+  margin-top: 4px;
+}

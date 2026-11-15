@@ -1,0 +1,194 @@
+/* Minuta de reunión: configurador en pantalla y hoja impresa. */
+
+/* ---------- Pantalla ---------- */
+
+.min-cuando {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--brand);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--text-muted);
+  background: var(--tinte);
+}
+
+.min-cuando b {
+  color: var(--text);
+}
+
+.min-bloques {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.min-bloques__tit {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.min-bloques__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.min-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-faint);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.min-chip em {
+  font-size: 10px;
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: var(--velo-2);
+}
+
+.min-chip.is-on {
+  color: var(--text);
+  border-color: var(--brand);
+}
+
+.min-chip.is-on em {
+  color: var(--on-brand);
+  background: var(--brand);
+}
+
+/* El propósito de cada bloque es para quien dirige la reunión: explica por qué
+   se pregunta, para poder improvisar si la conversación se desvía. */
+.min-guia {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 0;
+  padding: 12px 16px 12px 30px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-faint);
+}
+
+.min-guia b {
+  color: var(--text-muted);
+}
+
+.min-adjuntar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text-faint);
+}
+
+.min-adjuntar__link {
+  color: var(--brand);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ---------- Hoja impresa ---------- */
+
+.mb .min-meta {
+  grid-template-columns: 1.4fr 0.7fr 0.6fr 1.1fr;
+}
+
+.mb .min-meta--2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.mb .min-bloque {
+  margin-top: 16px;
+  /* Evita que un título quede solo al final de una página del PDF. */
+  break-inside: avoid;
+}
+
+.mb .min-bloque--evitar-corte {
+  break-inside: avoid;
+}
+
+.mb .min-bloque__tit {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 0 8px;
+  padding-bottom: 4px;
+  border-bottom: 1.5px solid var(--mbrand);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mbrand);
+}
+
+.mb .min-bloque__tit em {
+  font-size: 9.5px;
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--mmuted);
+}
+
+.mb .min-preg {
+  margin-bottom: 9px;
+  break-inside: avoid;
+}
+
+.mb .min-preg__q {
+  margin: 0 0 2px;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--mink);
+}
+
+/* Renglón para escribir a mano. */
+.mb .min-linea {
+  display: block;
+  height: 21px;
+  border-bottom: 1px solid var(--mline);
+}
+
+.mb .min-tabla__quien {
+  width: 22%;
+}
+
+.mb .min-tabla__cuando {
+  width: 18%;
+}
+
+.mb .min-proxima {
+  margin-top: 18px;
+}
+
+/* ---------- Teléfono ---------- */
+
+.movil .min-guia {
+  padding-left: 26px;
+}

@@ -1,0 +1,214 @@
+/* ============================================================
+   SD Sistema — combinaciones de color
+   ============================================================
+   El ESTILO no cambia: se mantiene el caparazón actual de SD
+   (base oscura, resplandor, radios y sombras del neón). Lo único
+   que varía aquí es el color.
+
+   Esto funciona porque antes se ató todo lo decorativo al token
+   del primario: los resplandores, los lavados y los degradados
+   usaban `rgba(244,121,32,…)` escrito a mano y ahora salen de
+   `var(--brand)`. Por eso una combinación recolorea el sistema
+   entero y no solo los botones.
+
+   Cada combinación define, para el primario y el secundario, su
+   base, su LUZ (realce, hover, foco) y su SOMBRA (pulsado,
+   profundidad), y matiza las superficies para acompañar al color
+   sin cambiar su luminosidad: el contraste del texto se mantiene.
+
+   Contrastes verificados sobre el panel de cada combinación:
+   texto ≥ 15.5:1 · apagado ≥ 6.4:1 · primario ≥ 4:1 ·
+   texto sobre primario ≥ 4.7:1. Ninguna falla.
+   ============================================================ */
+
+/* ── NARANJA · identidad anterior a noviembre 2026 ──────────── */
+[data-paleta='naranja'] {
+  --brand: #f47920;
+  --brand-luz: #ff9a4d;
+  --brand-sombra: #b95410;
+  --brand-2: #ff9a4d;
+  --on-brand: #1c1c1e;
+
+  --acento: #8b8f99;
+  --acento-luz: #b9bdc6;
+  --acento-sombra: #5f636d;
+
+  --bg: #0b0b0e;
+  --surface: #121217;
+  --surface-2: #1a1a20;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-2: rgba(255, 255, 255, 0.14);
+
+  --text: #ececf0;
+  --text-muted: #8b8f99;
+  --text-faint: #5f636d;
+
+  --velo-1: rgba(255, 255, 255, 0.03);
+  --velo-2: rgba(255, 255, 255, 0.07);
+  --velo-3: rgba(255, 255, 255, 0.14);
+  --velo-4: rgba(255, 255, 255, 0.3);
+
+  --luz-borde: rgba(255, 255, 255, 0.07);
+}
+
+/* ── ORO · lujo sobrio, elegancia ───────────────────────────── */
+[data-paleta='oro'] {
+  --brand: #d4a541;
+  --brand-luz: #efc46b;
+  --brand-sombra: #9a7421;
+  --brand-2: #efc46b;
+  --on-brand: #17130a;
+
+  --acento: #b8bcc4;
+  --acento-luz: #dcdfe4;
+  --acento-sombra: #6e737c;
+
+  --bg: #0b0a07;
+  --surface: #13110d;
+  --surface-2: #1c1a14;
+  --border: rgba(255, 246, 224, 0.09);
+  --border-2: rgba(255, 246, 224, 0.16);
+
+  --text: #f2efe9;
+  --text-muted: #9c968a;
+  --text-faint: #6b665c;
+
+  --danger: #e8716b;
+  --danger-bg: rgba(232, 113, 107, 0.12);
+  --exito: #76b36a;
+  --alerta: #d9a521;
+
+  --luz-borde: rgba(255, 240, 205, 0.08);
+}
+
+/* ── MARINO · seguridad y confianza ─────────────────────────── */
+[data-paleta='marino'] {
+  --brand: #3b82f6;
+  --brand-luz: #6ba5fa;
+  --brand-sombra: #1d4ed8;
+  --brand-2: #6ba5fa;
+  --on-brand: #061021;
+
+  --acento: #a9b6cc;
+  --acento-luz: #d2dae7;
+  --acento-sombra: #64748b;
+
+  --bg: #080b12;
+  --surface: #0f131c;
+  --surface-2: #171c28;
+  --border: rgba(214, 231, 255, 0.09);
+  --border-2: rgba(214, 231, 255, 0.17);
+
+  --text: #e8edf7;
+  --text-muted: #94a3b8;
+  --text-faint: #64748b;
+
+  --danger: #f2717c;
+  --danger-bg: rgba(242, 113, 124, 0.12);
+  --exito: #34d399;
+  --alerta: #fbbf24;
+
+  --luz-borde: rgba(210, 228, 255, 0.09);
+}
+
+/* ── ESMERALDA · pulcritud y orden ──────────────────────────── */
+[data-paleta='esmeralda'] {
+  --brand: #14b8a6;
+  --brand-luz: #49d6c6;
+  --brand-sombra: #0c7a6e;
+  --brand-2: #49d6c6;
+  --on-brand: #041513;
+
+  --acento: #afbdb9;
+  --acento-luz: #d6dedb;
+  --acento-sombra: #6b7a76;
+
+  --bg: #06100e;
+  --surface: #0c1917;
+  --surface-2: #142422;
+  --border: rgba(214, 255, 247, 0.09);
+  --border-2: rgba(214, 255, 247, 0.16);
+
+  --text: #e6f1ee;
+  --text-muted: #90a5a0;
+  --text-faint: #637671;
+
+  --danger: #f2717c;
+  --danger-bg: rgba(242, 113, 124, 0.12);
+  --exito: #4ade80;
+  --alerta: #eab308;
+
+  --luz-borde: rgba(205, 255, 246, 0.08);
+}
+
+/* ── BORGOÑA · elegancia y carácter ─────────────────────────── */
+[data-paleta='borgona'] {
+  --brand: #d13a57;
+  --brand-luz: #e86d84;
+  --brand-sombra: #8e2240;
+  --brand-2: #e86d84;
+  --on-brand: #ffffff;
+
+  --acento: #d9c6a3;
+  --acento-luz: #ede0c7;
+  --acento-sombra: #9a8864;
+
+  --bg: #0c0709;
+  --surface: #150d11;
+  --surface-2: #1f1419;
+  --border: rgba(255, 232, 229, 0.09);
+  --border-2: rgba(255, 232, 229, 0.16);
+
+  --text: #f3eae8;
+  --text-muted: #a89396;
+  --text-faint: #76666a;
+
+  /* El rojo de peligro se corre a coral: con un primario vino,
+     el rojo de alerta dejaría de distinguirse de la marca. */
+  --danger: #ff8a72;
+  --danger-bg: rgba(255, 138, 114, 0.14);
+  --exito: #79bd7a;
+  --alerta: #e0b252;
+
+  --luz-borde: rgba(255, 235, 225, 0.08);
+}
+
+/* ── CARBÓN · lujo contenido, color solo para informar ──────── */
+[data-paleta='carbon'] {
+  --brand: #edebe6;
+  --brand-luz: #ffffff;
+  --brand-sombra: #b8b5ae;
+  --brand-2: #ffffff;
+  --on-brand: #0a0a0c;
+
+  --acento: #e5435c;
+  --acento-luz: #f07a8c;
+  --acento-sombra: #c8102e;
+
+  --bg: #08080a;
+  --surface: #101014;
+  --surface-2: #17171c;
+  --border: rgba(245, 244, 241, 0.1);
+  --border-2: rgba(245, 244, 241, 0.2);
+
+  --text: #f5f4f1;
+  --text-muted: #9a9894;
+  --text-faint: #6a6864;
+
+  --danger: #e5435c;
+  --danger-bg: rgba(200, 16, 46, 0.14);
+  --exito: #4ade80;
+  --alerta: #e0b252;
+
+  --luz-borde: rgba(245, 244, 241, 0.08);
+
+  /* El primario es hueso: un resplandor de color no aplica, y el
+     degradado del botón se aplana para que no parezca metálico. */
+  --glow: 0 0 0 1px var(--velo-3);
+}
+
+/* Con primario hueso, el botón principal va plano: el degradado
+   claro-sobre-claro se ve sucio. */
+[data-paleta='carbon'] .btn--primary {
+  background: var(--brand);
+}

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="SD — Systems Development">
+  <defs>
+    <linearGradient id="azul" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#01D3FE"/>
+      <stop offset="1" stop-color="#14409F"/>
+    </linearGradient>
+    <linearGradient id="plata" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#E6E6E7"/>
+      <stop offset="1" stop-color="#7B7B7C"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#0B1128"/>
+  <rect x="3" y="3" width="58" height="58" rx="12" fill="none" stroke="#14409F" stroke-width="1.5"/>
+  <text x="19" y="43" font-family="IBM Plex Sans, Segoe UI, Arial, sans-serif" font-size="27" font-weight="700" fill="url(#azul)" text-anchor="middle">S</text>
+  <text x="43" y="43" font-family="IBM Plex Sans, Segoe UI, Arial, sans-serif" font-size="27" font-weight="700" fill="url(#plata)" text-anchor="middle">D</text>
+</svg>

@@ -1,0 +1,884 @@
+/* ============================================================
+   Vista teléfono — marco (preview en desktop) + shell móvil
+   ============================================================ */
+
+/* ---------- Marco de teléfono ---------- */
+.marco-fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  overflow: auto;
+  background:
+    radial-gradient(1100px 560px at 50% -10%, color-mix(in srgb, var(--brand) 8%, transparent), transparent 60%),
+    #070709;
+}
+.marco-salir {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  border: var(--borde-grosor) solid var(--border-2);
+  border-radius: var(--radius-sm);
+  padding: 9px 14px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.marco-salir:hover {
+  border-color: var(--brand);
+}
+.marco-tel {
+  position: relative;
+  width: 392px;
+  max-width: 100%;
+  height: min(840px, 92vh);
+  padding: 12px;
+  background: var(--acento-sombra);
+  border-radius: 48px;
+  box-shadow:
+    0 50px 110px rgba(0, 0, 0, 0.65),
+    0 0 0 2px #26262c,
+    inset 0 0 0 7px #0c0c0e;
+}
+.marco-tel__pantalla {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--bg);
+  transform: translateZ(0);
+  contain: paint;
+}
+
+/* Modales dentro de la interfaz móvil (permanecen confinados al teléfono) */
+.movil .modal {
+  position: absolute;
+  inset: 0;
+  z-index: 70;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: rgba(5, 5, 11, 0.75);
+  backdrop-filter: blur(8px);
+  animation: modal-fade 0.18s ease both;
+}
+
+.movil .modal__panel {
+  width: 100%;
+  max-width: 100% !important;
+  max-height: 94%;
+  border-radius: 20px 20px 0 0;
+  border-bottom: none;
+  border-left: none;
+  border-right: none;
+  margin: 0;
+  background: var(--surface);
+  box-shadow: 0 -12px 36px rgba(0, 0, 0, 0.6);
+  animation: hojaSube 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.movil .modal__head {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.movil .modal__body {
+  padding: 14px;
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ---------- Shell móvil ---------- */
+.movil {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg);
+}
+.movil__top {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  padding-top: calc(12px + env(safe-area-inset-top, 0px));
+  border-bottom: var(--borde-grosor) solid var(--border);
+  background: color-mix(in srgb, var(--bg) 78%, transparent);
+  backdrop-filter: blur(10px);
+}
+.movil__main {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.movil__nav {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 6px;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  border-top: var(--borde-grosor) solid var(--border);
+  background: rgba(8, 8, 11, 0.9);
+  backdrop-filter: blur(12px);
+}
+.movil__nav a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 5px 12px;
+  border-radius: var(--radius);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: color 0.15s;
+}
+.movil__nav a.on {
+  color: var(--brand-2);
+}
+.movil__nav a.on svg {
+  filter: drop-shadow(0 0 7px color-mix(in srgb, var(--brand) 50%, transparent));
+}
+
+/* ---------- Overrides para que las páginas de escritorio quepan ---------- */
+.movil .page {
+  padding: 16px;
+}
+.movil .page__header--fila {
+  align-items: stretch;
+  flex-direction: column;
+}
+
+/* Tablero (kanban) en teléfono: columnas apiladas, sin scroll horizontal */
+.movil .kb-scope {
+  margin: 0;
+  min-height: auto;
+}
+.movil .kb-scope::before {
+  display: none;
+}
+.movil .kb-bar {
+  padding: 14px 16px;
+  gap: 10px;
+}
+.movil .kb-bar__title {
+  flex: 1 1 100%;
+}
+.movil .kb-bar__spacer {
+  display: none;
+}
+.movil .kb-filtro {
+  flex: 1 1 100%;
+  order: 2;
+}
+.movil .kb-filtro__btn {
+  width: 100%;
+}
+.movil .kb-filpop {
+  order: 3;
+}
+.movil .kb-team {
+  order: 3;
+  margin-left: auto;
+}
+.movil .kb-new {
+  flex: 1 1 100%;
+  justify-content: center;
+  order: 5;
+}
+.movil .kb-board {
+  flex-direction: column;
+  overflow-x: visible;
+  gap: 14px;
+  padding: 14px 16px 24px;
+}
+.movil .kb-col {
+  flex: 1 1 auto;
+  width: 100%;
+  animation: none;
+}
+.movil .kb-filtro__pop {
+  left: 0;
+  right: 0;
+  width: auto;
+}
+.movil .kb-fpop {
+  width: 260px;
+  max-width: calc(100% - 8px);
+}
+
+/* Proyectos (tablero por estado) en teléfono: columnas apiladas */
+.movil .pr-top {
+  flex-direction: column;
+  align-items: stretch;
+}
+.movil .pr-board {
+  flex-direction: column;
+  overflow-x: visible;
+}
+.movil .pr-col {
+  flex: 1 1 auto;
+  width: 100%;
+}
+
+/* Recordatorio de pagos: absoluto dentro del teléfono, por encima de la nav */
+.movil .record {
+  position: absolute;
+  right: 12px;
+  left: 12px;
+  bottom: calc(74px + env(safe-area-inset-bottom, 0px));
+  width: auto;
+  z-index: 30;
+}
+
+/* ---------- Home móvil (acciones + reportes) ---------- */
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 18px 16px 24px;
+}
+.home__hola h1 {
+  margin: 2px 0 2px;
+  font-size: 24px;
+  font-weight: 700;
+}
+.home__hola p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.home__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+.home__sec {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.home__tit {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+.home__acciones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.home__accion {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(160deg, color-mix(in srgb, var(--brand) 12%, transparent), var(--surface));
+  border: var(--borde-grosor) solid var(--border);
+  color: var(--text);
+  font-weight: 600;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.home__accion:active {
+  transform: scale(0.98);
+}
+.home__accion svg {
+  color: var(--brand-2);
+}
+.home__accion-ir {
+  position: absolute;
+  top: 14px;
+  right: 12px;
+  color: var(--text-faint) !important;
+}
+.home__reportes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.home__kpi {
+  padding: 14px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: var(--borde-grosor) solid var(--border);
+}
+.home__kpi strong {
+  display: block;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--brand-2);
+  line-height: 1.1;
+}
+.home__kpi span {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.home__barras {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 14px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: var(--borde-grosor) solid var(--border);
+}
+.home__barra {
+  display: grid;
+  grid-template-columns: 96px 1fr 22px;
+  align-items: center;
+  gap: 9px;
+}
+.home__barra-lbl {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.home__barra-lbl i {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-xs);
+  flex: 0 0 auto;
+}
+.home__barra-track {
+  height: 7px;
+  border-radius: var(--radius-xs);
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.home__barra-track span {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-xs);
+}
+.home__barra-n {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  text-align: right;
+}
+
+/* ============================================================
+   Correcciones de vista teléfono
+   ------------------------------------------------------------
+   Cada regla responde a un desborde medido dentro del marco de
+   368px, no a una sospecha. El marco es un div de tamaño fijo
+   sobre un viewport de escritorio, así que las @media NO se
+   disparan dentro: todo override de teléfono cuelga de `.movil`.
+   ============================================================ */
+
+/* Configuración: la rejilla "menú lateral + panel" empujaba el panel
+   281px fuera del marco. */
+.movil .cfg-layout {
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.movil .cfg-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.movil .cfg-nav__item {
+  flex: 1 1 auto;
+  justify-content: center;
+}
+
+/* Reportes: la barra de pestañas medía 679px sin poder partirse. */
+.movil .rep-tabs {
+  flex-wrap: wrap;
+  align-self: stretch;
+}
+
+.movil .rep-tabs button {
+  flex: 1 1 auto;
+}
+
+/* Usuarios: la tarjeta pedía 330px mínimos y no entraba con el padding. */
+.movil .usr-grid,
+.movil .rh-grid,
+.movil .cxc-kpis,
+.movil .hrr-grid {
+  grid-template-columns: 1fr;
+}
+
+/* Tasas: pares de campos y acciones en una sola fila rígida. */
+.movil .tas-par,
+.movil .tas-manual,
+.movil .cfg-acciones,
+.movil .form-acciones {
+  flex-wrap: wrap;
+}
+
+.movil .tas-par .field,
+.movil .tas-manual input {
+  flex: 1 1 140px;
+  min-width: 0;
+}
+
+/* Un campo nunca debe imponer su ancho por el `size` por defecto. */
+.movil .field__input,
+.movil input,
+.movil select,
+.movil textarea {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Nombres largos: se recortan en vez de empujar la tarjeta. */
+.movil .cl-card__nombre,
+.movil .cl-card__nombre--btn,
+.movil .usr-card__nombre,
+.movil .rh-card__cab b {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Cualquier tabla ancha se desplaza dentro de su caja, no de la página. */
+.movil .table-wrap,
+.movil .hrt-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* ---- Editor de la hoja de pendientes ----
+   Forzaba 700px de ancho mínimo y obligaba a desplazar en horizontal.
+   En teléfono cada línea pasa a ser una ficha apilada. */
+.movil .pend-editor__th {
+  display: none;
+}
+
+.movil .pend-editor__tr {
+  display: grid;
+  grid-template-columns: 38px 1fr 34px;
+  grid-template-areas:
+    'orden pendiente quitar'
+    'asignado asignado asignado'
+    'modulo modulo modulo'
+    'prioridad prioridad entrega';
+  gap: 6px;
+  min-width: 0;
+  padding: 10px;
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--velo-1);
+}
+
+.movil .pend-editor__tr > *:nth-child(1) {
+  grid-area: orden;
+}
+.movil .pend-editor__tr > *:nth-child(2) {
+  grid-area: pendiente;
+}
+.movil .pend-editor__tr > *:nth-child(3) {
+  grid-area: asignado;
+}
+.movil .pend-editor__tr > *:nth-child(4) {
+  grid-area: modulo;
+}
+.movil .pend-editor__tr > *:nth-child(5) {
+  grid-area: prioridad;
+}
+.movil .pend-editor__tr > *:nth-child(6) {
+  grid-area: entrega;
+}
+.movil .pend-editor__tr > *:nth-child(7) {
+  grid-area: quitar;
+}
+
+.movil .pend-editor {
+  gap: 8px;
+  overflow-x: visible;
+}
+
+/* Mismo criterio para el resto de editores en rejilla ancha. */
+.movil .plan__th,
+.movil .pre-lineas__th,
+.movil .rh-crit-ed__th {
+  display: none;
+}
+
+.movil .plan__tr,
+.movil .rh-crit-ed__tr {
+  grid-template-columns: 1fr 1fr;
+  min-width: 0;
+  gap: 6px;
+  padding: 10px;
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--velo-1);
+}
+
+/* La hoja impresa no cabe en un teléfono: se deja desplazar. */
+.movil .hoja-panel {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.movil .mb {
+  min-height: 0;
+}
+
+/* Rejillas de dos columnas que no caben en 368px. */
+.movil .form-grid,
+.movil .tas-grid,
+.movil .pend-pie-ed__firmas,
+.movil .rh-ficha .form-grid,
+.movil .cfg-prev {
+  grid-template-columns: 1fr;
+}
+
+/* Tablas anchas: se desplazan dentro de su caja, nunca arrastran la página. */
+.movil .table,
+.movil .pend-tabla,
+.movil .aud-cambios {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+/* Nota: NO se redefine tbody/thead a `display: table`. Hacerlo le devuelve al
+   grupo de filas su ancho natural y vuelve a desbordar: el scroll tiene que
+   quedarse en el elemento <table> convertido en bloque. */
+
+/* El nombre del cliente es un botón: necesita el recorte en el propio botón. */
+.movil button.cl-card__nombre,
+.movil .cl-card__nombre--btn {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Dashboard: la rejilla de tarjetas pedía dos columnas. */
+.movil .dash-grid,
+.movil .dash-cols {
+  grid-template-columns: 1fr;
+}
+
+/* Un campo numérico con flecha ocupa más de lo que declara. */
+.movil .pend-conf__num,
+.movil .pend-sumar__num {
+  width: 100%;
+}
+
+/* Tabla dentro de su envoltorio con scroll: el <table> vuelve a comportarse
+   como tabla y es el envoltorio el que se desplaza. Convertir la tabla en
+   bloque aquí rompía la alineación de columnas. */
+.movil .table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.movil .table-wrap > .table {
+  display: table;
+  width: auto;
+  min-width: 100%;
+  white-space: nowrap;
+}
+
+/* El campo de orden del editor de pendientes tiene flechas que suman ancho. */
+.movil .pend-editor__tr input[type='number'] {
+  width: 100%;
+  min-width: 0;
+}
+
+/* ============================================================
+   Sensación de aplicación
+   ------------------------------------------------------------
+   Lo que separa "una web en un teléfono" de "una app": el toque
+   no parpadea en azul, el scroll tiene inercia, nada queda bajo
+   el notch, y ningún objetivo táctil baja de 44px.
+   ============================================================ */
+
+.movil {
+  /* El resaltado azul del toque delata que es una página web. */
+  -webkit-tap-highlight-color: transparent;
+  /* El rebote del navegador al llegar al final rompe la ilusión de app. */
+  overscroll-behavior-y: contain;
+}
+
+.movil button,
+.movil a,
+.movil [role='button'] {
+  -webkit-tap-highlight-color: transparent;
+  /* Un mantener-pulsado no debe seleccionar texto como en una web. */
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+/* El contenido sí se puede seleccionar: es dato, no control. */
+.movil p,
+.movil td,
+.movil .mono,
+.movil input,
+.movil textarea {
+  user-select: text;
+}
+
+.movil__main {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* ---- Objetivos táctiles ----
+   44px es el mínimo con el que un dedo acierta sin frustrarse. */
+.movil .icono-btn,
+.movil .hoja-sw button,
+.movil .ag-tabs button,
+.movil .rh-tabs button,
+.movil .hrr-vista button,
+.movil .rh-estados button,
+.movil .hrr-filtros button {
+  min-height: 40px;
+  padding-inline: 14px;
+}
+
+.movil .btn,
+.movil .field__input,
+.movil select,
+.movil textarea {
+  min-height: 44px;
+}
+
+.movil .field__input,
+.movil select {
+  /* iOS hace zoom si la fuente del campo baja de 16px. */
+  font-size: 16px;
+}
+
+/* ---- Cabecera ---- */
+.movil__volver {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 50%;
+  color: var(--text);
+  background: var(--velo-2);
+  cursor: pointer;
+}
+
+.movil__volver:active {
+  background: var(--velo-3);
+  transform: scale(0.94);
+}
+
+.movil__titulo {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+}
+
+/* El disparador de escritorio reserva 220px de ancho mínimo; en la cabecera
+   de un teléfono eso se come el título. */
+.bus-trigger--compacto {
+  flex: 0 0 auto;
+  width: 40px;
+  min-width: 40px;
+  padding: 0;
+  justify-content: center;
+}
+
+/* ---- Navegación inferior ---- */
+.movil__nav button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex: 1;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.movil__nav a,
+.movil__nav button {
+  min-height: 48px;
+  padding-top: 4px;
+  transition: color 0.15s ease;
+}
+
+.movil__nav a:active,
+.movil__nav button:active {
+  transform: scale(0.93);
+}
+
+.movil__nav button.on {
+  color: var(--brand-luz);
+}
+
+/* ---- Hoja inferior ---- */
+.movil-hoja {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.movil-hoja__velo {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
+  animation: hojaVelo 0.18s ease;
+}
+
+.movil-hoja__panel {
+  position: relative;
+  max-height: 82%;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  border-radius: 20px 20px 0 0;
+  background: var(--surface);
+  border-top: var(--borde-grosor) solid var(--border-2);
+  box-shadow: 0 -16px 40px rgba(0, 0, 0, 0.5);
+  animation: hojaSube 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes hojaVelo {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes hojaSube {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .movil-hoja__panel,
+  .movil-hoja__velo {
+    animation: none;
+  }
+}
+
+/* El asa es la señal de que la hoja se arrastra. */
+.movil-hoja__asa {
+  width: 38px;
+  height: 4px;
+  margin: 9px auto 2px;
+  border-radius: 99px;
+  background: var(--velo-3);
+}
+
+.movil-hoja__cab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 16px 10px;
+}
+
+.movil-hoja__cab h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 650;
+  color: var(--text);
+}
+
+.movil-hoja__cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 14px 10px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.movil-hoja__grupo {
+  margin: 0 0 7px 4px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.movil-hoja__rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 8px;
+}
+
+.movil-hoja__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 13px 6px;
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 11.5px;
+  font-weight: 500;
+  text-align: center;
+  color: var(--text-muted);
+  background: var(--velo-1);
+}
+
+.movil-hoja__item svg {
+  color: var(--text-faint);
+}
+
+.movil-hoja__item:active {
+  transform: scale(0.95);
+  background: var(--velo-2);
+}
+
+.movil-hoja__item.is-on {
+  color: var(--text);
+  border-color: var(--brand);
+  background: var(--tinte);
+}
+
+.movil-hoja__item.is-on svg {
+  color: var(--brand-luz);
+}
