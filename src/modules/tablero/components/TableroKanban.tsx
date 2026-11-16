@@ -59,7 +59,11 @@ export function TableroKanban() {
   )
 
   function pasaFiltro(a: Actividad): boolean {
-    if (proyecto !== 'todos' && a.proyectoId !== proyecto) return false
+    if (proyecto === 'sin_proyecto') {
+      if (a.proyectoId) return false
+    } else if (proyecto !== 'todos' && a.proyectoId !== proyecto) {
+      return false
+    }
     if (prioridades.length && !prioridades.includes(a.prioridad)) return false
     if (respFiltro.length && !a.responsables.some((r) => respFiltro.includes(r))) return false
     return true
@@ -220,7 +224,7 @@ export function TableroKanban() {
           {tareaActiva ? (
             <TarjetaTarea
               tarea={tareaActiva}
-              proyecto={proyectosMap[tareaActiva.proyectoId]}
+              proyecto={tareaActiva.proyectoId ? proyectosMap[tareaActiva.proyectoId] : undefined}
               responsables={tareaActiva.responsables.map((id) => colabMap[id]).filter(Boolean)}
               overlay
             />
@@ -237,7 +241,7 @@ export function TableroKanban() {
         <TareaForm
           inicial={editando}
           estadoInicial={estadoNuevo}
-          proyectoInicialId={proyecto !== 'todos' ? proyecto : undefined}
+          proyectoInicialId={proyecto !== 'todos' && proyecto !== 'sin_proyecto' ? proyecto : undefined}
           proyectos={proyectos}
           colaboradores={colaboradores}
           onEditar={onEditar}
@@ -255,7 +259,7 @@ export function TableroKanban() {
         {tareaDetalle && (
           <TareaDetalle
             tarea={tareaDetalle}
-            proyecto={proyectosMap[tareaDetalle.proyectoId]}
+            proyecto={tareaDetalle.proyectoId ? proyectosMap[tareaDetalle.proyectoId] : undefined}
             responsables={tareaDetalle.responsables.map((id) => colabMap[id]).filter(Boolean)}
             onEditar={() => abrirEditar(tareaDetalle)}
             onBorrar={() => onBorrar(tareaDetalle.id)}

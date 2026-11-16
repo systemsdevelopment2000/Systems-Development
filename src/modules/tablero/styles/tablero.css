@@ -450,6 +450,9 @@
   font-size: 10.5px;
   color: var(--kb-muted);
 }
+.kb-proj--general {
+  color: var(--brand-2, #38bdf8);
+}
 .kb-proj i {
   width: 7px;
   height: 7px;

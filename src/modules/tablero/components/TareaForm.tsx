@@ -38,7 +38,7 @@ export function TareaForm({
   const [titulo, setTitulo] = useState(inicial?.titulo ?? '')
   const [titulos, setTitulos] = useState('') // crear: una tarea por línea
   const [proyectoId, setProyectoId] = useState(
-    inicial?.proyectoId ?? proyectoInicialId ?? proyectos[0]?.id ?? '',
+    inicial?.proyectoId ?? proyectoInicialId ?? '',
   )
   const [estado, setEstado] = useState<EstadoActividad>(inicial?.estado ?? estadoInicial)
   const [prioridad, setPrioridad] = useState<Prioridad>(inicial?.prioridad ?? 'media')
@@ -78,10 +78,6 @@ export function TareaForm({
 
   function submit(e: FormEvent) {
     e.preventDefault()
-    if (!proyectoId) {
-      setError('Selecciona un proyecto para la tarea.')
-      return
-    }
 
     if (esEdicion) {
       if (!titulo.trim()) {
@@ -91,7 +87,7 @@ export function TareaForm({
       onEditar({
         ...inicial!,
         titulo: titulo.trim(),
-        proyectoId,
+        proyectoId: proyectoId || undefined,
         estado,
         prioridad,
         responsables,
@@ -115,7 +111,7 @@ export function TareaForm({
       return
     }
     const base: BaseActividad = {
-      proyectoId,
+      proyectoId: proyectoId || undefined,
       estado,
       prioridad,
       responsables,
@@ -183,12 +179,17 @@ export function TareaForm({
       </label>
 
       <div className="field">
-        <span className="field__label">Proyecto</span>
+        <span className="field__label">
+          Proyecto <span className="field__hint">(opcional · puede ser tarea general)</span>
+        </span>
         <Combobox
-          opciones={proyectos.map((p) => ({ valor: p.id, etiqueta: p.nombre }))}
+          opciones={[
+            { valor: '', etiqueta: 'Sin proyecto (General)' },
+            ...proyectos.map((p) => ({ valor: p.id, etiqueta: p.nombre })),
+          ]}
           valor={proyectoId}
           onCambio={setProyectoId}
-          placeholder="Selecciona proyecto…"
+          placeholder="Sin proyecto (General)"
         />
       </div>
 

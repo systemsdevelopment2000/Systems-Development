@@ -47,10 +47,15 @@ export function TareaDetalle({
   return (
     <div className="td">
       <div className="td__chips">
-        {proyecto && (
+        {proyecto ? (
           <span className="kb-proj">
             <i style={{ background: colorDe(proyecto.id) }} />
             {proyecto.nombre}
+          </span>
+        ) : (
+          <span className="kb-proj kb-proj--general">
+            <i style={{ background: '#38bdf8' }} />
+            General
           </span>
         )}
         {columna && (

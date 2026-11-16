@@ -58,10 +58,15 @@ export function TarjetaTarea({
       }}
     >
       <div className="kb-card__top">
-        {proyecto && (
+        {proyecto ? (
           <span className="kb-proj">
             <i style={{ background: colorDe(proyecto.id) }} />
             {proyecto.nombre}
+          </span>
+        ) : (
+          <span className="kb-proj kb-proj--general">
+            <i style={{ background: '#38bdf8' }} />
+            General
           </span>
         )}
         <span className={`kb-prio kb-prio--${tarea.prioridad}`}>{PRIO_LABEL[tarea.prioridad]}</span>

@@ -34,7 +34,12 @@ export function FiltroProyecto({ proyectos, seleccion, onSeleccion }: Props) {
     }
   }, [abierto])
 
-  const actual = seleccion === 'todos' ? null : proyectos.find((p) => p.id === seleccion)
+  const actual =
+    seleccion === 'todos'
+      ? null
+      : seleccion === 'sin_proyecto'
+        ? { id: 'sin_proyecto', nombre: 'Sin proyecto (General)' }
+        : proyectos.find((p) => p.id === seleccion)
   const filtrados = proyectos.filter((p) => p.nombre.toLowerCase().includes(q.trim().toLowerCase()))
 
   function elegir(id: string) {
@@ -86,6 +91,19 @@ export function FiltroProyecto({ proyectos, seleccion, onSeleccion }: Props) {
             >
               <span className="kb-filtro__op-txt">Todos los proyectos</span>
               {seleccion === 'todos' && <Check size={14} />}
+            </button>
+            <button
+              type="button"
+              role="option"
+              aria-selected={seleccion === 'sin_proyecto'}
+              className={'kb-filtro__op' + (seleccion === 'sin_proyecto' ? ' is-active' : '')}
+              onClick={() => elegir('sin_proyecto')}
+            >
+              <span className="kb-filtro__op-txt">
+                <i style={{ background: '#38bdf8', color: '#38bdf8' }} />
+                Sin proyecto (General)
+              </span>
+              {seleccion === 'sin_proyecto' && <Check size={14} />}
             </button>
             {filtrados.map((p) => (
               <button

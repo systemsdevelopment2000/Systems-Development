@@ -33,7 +33,7 @@ export function Columna({ columna, tareas, proyectos, colaboradores, onAbrir, on
             <TarjetaTarea
               key={t.id}
               tarea={t}
-              proyecto={proyectos[t.proyectoId]}
+              proyecto={t.proyectoId ? proyectos[t.proyectoId] : undefined}
               responsables={t.responsables.map((id) => colaboradores[id]).filter(Boolean)}
               creador={t.creadorId ? colaboradores[t.creadorId]?.nombre : undefined}
               onAbrir={onAbrir}

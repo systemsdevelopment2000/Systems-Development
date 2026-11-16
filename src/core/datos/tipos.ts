@@ -169,7 +169,8 @@ export interface Actividad {
   id: ID
   /** Código correlativo (TAR-AAAA-NNNN). */
   codigo?: string
-  proyectoId: ID
+  /** Id del proyecto asociado; opcional (una tarea puede ser general o existir sin proyecto). */
+  proyectoId?: ID
   titulo: string
   estado: EstadoActividad
   prioridad: Prioridad

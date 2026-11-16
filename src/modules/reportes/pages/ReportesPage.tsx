@@ -83,7 +83,7 @@ export function ReportesPage() {
         filas: Object.values(estado.actividades).map((a) => ({
           'Código': a.codigo ?? '—',
           Tarea: a.titulo,
-          Proyecto: estado.proyectos[a.proyectoId]?.nombre ?? '—',
+          Proyecto: (a.proyectoId && estado.proyectos[a.proyectoId]?.nombre) || 'Sin proyecto',
           Estado: ESTADOS[a.estado] ?? a.estado,
           Prioridad: a.prioridad,
           Responsables:
