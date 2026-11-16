@@ -3,6 +3,7 @@ import {
   Plus,
   Trash2,
   Save,
+  Check,
   FileDown,
   Loader2,
   PackagePlus,
@@ -10,6 +11,7 @@ import {
   LayoutTemplate,
 } from 'lucide-react'
 import { Button, Combobox, useConfirmar } from '@/core/ui'
+import { notificarError, notificarExito, notificarAdvertencia } from '@/core/notificaciones'
 import type {
   Cliente,
   LineaPresupuesto,
@@ -63,6 +65,7 @@ export function PresupuestoEditor({
   const confirmar = useConfirmar()
   const [grupoNuevo, setGrupoNuevo] = useState('')
   const [conAdicionales, setConAdicionales] = useState(false)
+  const [recienteGuardado, setRecienteGuardado] = useState(false)
   const totales = useMemo(() => totalizar(p), [p])
 
   function set<K extends keyof Presupuesto>(k: K, v: Presupuesto[K]) {
@@ -71,6 +74,35 @@ export function PresupuestoEditor({
   function setLinea(id: string, cambios: Partial<LineaPresupuesto>) {
     onCambio({ ...p, lineas: p.lineas.map((l) => (l.id === id ? { ...l, ...cambios } : l)) })
   }
+
+  function guardarManual() {
+    if (!p.titulo || !p.titulo.trim()) {
+      notificarError('Título requerido', 'Por favor ingresa un título para la cotización antes de guardar.')
+      return
+    }
+
+    const lineasInvalidas = p.lineas.some(
+      (l) => isNaN(l.cantidad) || isNaN(l.precioUnitario) || l.cantidad < 0 || l.precioUnitario < 0
+    )
+    if (lineasInvalidas) {
+      notificarError(
+        'Líneas inválidas',
+        'Hay líneas con cantidades o precios no válidos. Verifica los números ingresados.'
+      )
+      return
+    }
+
+    try {
+      onCambio(p)
+      setRecienteGuardado(true)
+      notificarExito('Cotización guardada', `"${p.titulo.trim()}" se guardó correctamente.`)
+      setTimeout(() => setRecienteGuardado(false), 3000)
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Error al guardar la cotización.'
+      notificarError('Error al guardar', msg)
+    }
+  }
+
   /** Añade de golpe los módulos propios de un tipo de sistema. */
   function cargarPlantilla(tipo: TipoDesarrollo) {
     const nuevas = lineasDeTipo(tipo, tarifaHora, { incluirAdicionales: conAdicionales })
@@ -101,7 +133,10 @@ export function PresupuestoEditor({
   }
   function agregarGrupo() {
     const g = grupoNuevo.trim()
-    if (!g) return
+    if (!g) {
+      notificarAdvertencia('Sección requerida', 'Escribe el nombre de la nueva sección antes de añadirla.')
+      return
+    }
     onCambio({ ...p, lineas: [...p.lineas, lineaVacia(g)] })
     setGrupoNuevo('')
   }
@@ -291,7 +326,10 @@ export function PresupuestoEditor({
                     min={0}
                     step="0.5"
                     value={l.cantidad}
-                    onChange={(e) => setLinea(l.id, { cantidad: Number(e.target.value) })}
+                    onChange={(e) => {
+                      const val = parseFloat(e.target.value)
+                      setLinea(l.id, { cantidad: isNaN(val) ? 0 : Math.max(0, val) })
+                    }}
                   />
                   <div className="pre-unidad">
                     {/* Texto libre con sugerencias: la lista se configura en
@@ -328,7 +366,10 @@ export function PresupuestoEditor({
                     min={0}
                     step="0.01"
                     value={l.precioUnitario}
-                    onChange={(e) => setLinea(l.id, { precioUnitario: Number(e.target.value) })}
+                    onChange={(e) => {
+                      const val = parseFloat(e.target.value)
+                      setLinea(l.id, { precioUnitario: isNaN(val) ? 0 : Math.max(0, val) })
+                    }}
                   />
                   <input
                     className="field__input"
@@ -336,7 +377,10 @@ export function PresupuestoEditor({
                     min={0}
                     max={100}
                     value={l.descuento ?? 0}
-                    onChange={(e) => setLinea(l.id, { descuento: Number(e.target.value) })}
+                    onChange={(e) => {
+                      const val = parseFloat(e.target.value)
+                      setLinea(l.id, { descuento: isNaN(val) ? 0 : Math.min(100, Math.max(0, val)) })
+                    }}
                   />
                   <span className="pre-importe">{money(importeLinea(l), p.moneda)}</span>
                   <button
@@ -431,7 +475,10 @@ export function PresupuestoEditor({
               min={0}
               max={100}
               value={p.descuentoGlobal}
-              onChange={(e) => set('descuentoGlobal', Number(e.target.value))}
+              onChange={(e) => {
+                const val = parseFloat(e.target.value)
+                set('descuentoGlobal', isNaN(val) ? 0 : Math.min(100, Math.max(0, val)))
+              }}
             />
             %
           </span>
@@ -450,7 +497,10 @@ export function PresupuestoEditor({
               min={0}
               max={100}
               value={p.impuesto}
-              onChange={(e) => set('impuesto', Number(e.target.value))}
+              onChange={(e) => {
+                const val = parseFloat(e.target.value)
+                set('impuesto', isNaN(val) ? 0 : Math.min(100, Math.max(0, val)))
+              }}
             />
             %
           </span>
@@ -505,8 +555,20 @@ export function PresupuestoEditor({
         <Button type="button" variant="ghost" onClick={onPdf} disabled={generandoPdf}>
           {generandoPdf ? <Loader2 size={15} className="spin" /> : <FileDown size={15} />} PDF
         </Button>
-        <Button type="button" onClick={() => onCambio(p)}>
-          <Save size={15} /> Guardado
+        <Button
+          type="button"
+          onClick={guardarManual}
+          className={recienteGuardado ? 'btn--primary is-guardado' : 'btn--primary'}
+        >
+          {recienteGuardado ? (
+            <>
+              <Check size={15} /> Guardado
+            </>
+          ) : (
+            <>
+              <Save size={15} /> Guardar cotización
+            </>
+          )}
         </Button>
       </div>
     </div>

@@ -1,8 +1,10 @@
 import '../styles/finanzas.css'
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Plus, ArrowLeft, Calculator } from 'lucide-react'
 import { ConmutadorHoja, Hoja, MembreteSD, VistaPreviaPdf } from '@/core/ui'
 import { useDatos } from '@/core/datos'
+import { notificarError } from '@/core/notificaciones'
 import { generarPdf, type PdfGenerado } from '@/core/lib/pdf'
 import { usePresupuestos } from '../hooks/usePresupuestos'
 import { PresupuestoEditor } from '../components/PresupuestoEditor'
@@ -13,11 +15,28 @@ export function PresupuestoPage() {
   const { estado } = useDatos()
   const { presupuestos, clientes, proyectos, crear, guardar, borrar, cambiarEstado } =
     usePresupuestos()
-  const [editId, setEditId] = useState<string | null>(null)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const idParam = searchParams.get('id')
+  const [editId, setEditId] = useState<string | null>(idParam)
   const [generando, setGenerando] = useState(false)
   const [verHoja, setVerHoja] = useState(false)
   const [previa, setPrevia] = useState<PdfGenerado | null>(null)
   const hojaRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (idParam) {
+      setEditId(idParam)
+    }
+  }, [idParam])
+
+  function abrirEdicion(id: string | null) {
+    setEditId(id)
+    if (id) {
+      setSearchParams({ id })
+    } else {
+      setSearchParams({})
+    }
+  }
 
   const actual = editId ? presupuestos.find((p) => p.id === editId) : undefined
   const totales = useMemo(() => (actual ? totalizar(actual) : null), [actual])
@@ -25,7 +44,7 @@ export function PresupuestoPage() {
 
   function nuevo() {
     const p = crear(estado.empresa.finanzas?.moneda ?? 'USD')
-    setEditId(p.id)
+    abrirEdicion(p.id)
   }
 
   async function verPdf() {
@@ -34,6 +53,12 @@ export function PresupuestoPage() {
     setGenerando(true)
     try {
       setPrevia(await generarPdf(hoja, `presupuesto-${actual?.codigo ?? 'sd'}`))
+    } catch (err) {
+      console.error('[PDF] Error al generar PDF:', err)
+      notificarError(
+        'Error al generar PDF',
+        err instanceof Error ? err.message : 'No se pudo generar el documento PDF.',
+      )
     } finally {
       setGenerando(false)
     }
@@ -74,7 +99,7 @@ export function PresupuestoPage() {
               const c = p.clienteId ? estado.clientes[p.clienteId] : undefined
               return (
                 <article className={'pre-card pre-card--' + p.estado} key={p.id}>
-                  <button className="pre-card__abrir" onClick={() => setEditId(p.id)}>
+                  <button className="pre-card__abrir" onClick={() => abrirEdicion(p.id)}>
                     <div className="pre-card__head">
                       <span className="pre-card__cod">{p.codigo ?? '—'}</span>
                       <span className={'pre-estado pre-estado--' + p.estado}>
@@ -105,7 +130,7 @@ export function PresupuestoPage() {
     <section className={'page' + (verHoja ? ' is-hoja' : '')}>
       <header className="page__header page__header--fila">
         <div>
-          <button className="pd-volver" onClick={() => setEditId(null)}>
+          <button className="pd-volver" onClick={() => abrirEdicion(null)}>
             <ArrowLeft size={16} /> Presupuestos
           </button>
           <h1 className="page__title">{actual.titulo}</h1>
@@ -126,7 +151,7 @@ export function PresupuestoPage() {
         tarifaHora={estado.empresa.finanzas?.tarifaHora}
         onBorrar={() => {
           borrar(actual.id)
-          setEditId(null)
+          abrirEdicion(null)
         }}
         onPdf={verPdf}
         generandoPdf={generando}

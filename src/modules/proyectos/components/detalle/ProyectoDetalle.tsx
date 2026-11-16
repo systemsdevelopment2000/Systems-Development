@@ -172,9 +172,10 @@ export function ProyectoDetalle({ proyectoId }: { proyectoId: string }) {
         {tab === 'presupuestos' && (
           <TabPresupuestos
             presupuestos={deProyecto(proyectoId)}
-            onCrear={(tipo) =>
-              crear(undefined, { tipo, proyectoId, clienteId: p.cliente?.id })
-            }
+            onCrear={(tipo) => {
+              const nuevo = crear(undefined, { tipo, proyectoId, clienteId: p.cliente?.id })
+              nav(`/presupuesto?id=${nuevo.id}`)
+            }}
           />
         )}
         {tab === 'evaluaciones' && (

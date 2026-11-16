@@ -23,6 +23,16 @@ export async function pedirPermiso(): Promise<NotificationPermission> {
 }
 
 export async function notificar(titulo: string, cuerpo?: string): Promise<void> {
+  // Siempre mostrar en la interfaz de la aplicación mediante el sistema de toasts
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(
+      new CustomEvent('sd:toast', {
+        detail: { tipo: 'info', titulo, detalle: cuerpo, duracionMs: 4500 },
+      }),
+    )
+  }
+
+  // Si tiene permiso de notificaciones de escritorio, también enviarla
   if (!soportado() || Notification.permission !== 'granted') return
   const opciones: NotificationOptions = {
     body: cuerpo,

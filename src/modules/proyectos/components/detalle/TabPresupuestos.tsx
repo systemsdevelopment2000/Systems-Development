@@ -27,7 +27,7 @@ export function TabPresupuestos({ presupuestos, onCrear }: Props) {
   function tarjeta(p: Presupuesto) {
     const t = totalizar(p)
     return (
-      <button key={p.id} className="prs-item" onClick={() => nav('/presupuesto')}>
+      <button key={p.id} className="prs-item" onClick={() => nav(`/presupuesto?id=${p.id}`)}>
         <span className="prs-item__cod">{p.codigo ?? '—'}</span>
         <span className="prs-item__tit">{p.titulo}</span>
         <span className={'pre-estado pre-estado--' + p.estado}>

@@ -1,6 +1,7 @@
 import type { EstadoDatos } from './tipos'
 import { estadoInicial } from './estadoInicial'
 import { PREFIJOS, asignarCodigosFaltantes } from '@/core/lib/codigos'
+import { notificarError } from '@/core/notificaciones'
 
 const CLAVE = 'sd:datos:v5'
 
@@ -119,11 +120,15 @@ export function cargar(): EstadoDatos {
   }
 }
 
-/** Persiste el estado en localStorage (ignora errores de almacenamiento). */
+/** Persiste el estado en localStorage y notifica si ocurre un error. */
 export function guardar(estado: EstadoDatos): void {
   try {
     localStorage.setItem(CLAVE, JSON.stringify({ v: VERSION, datos: estado } satisfies Envoltura))
-  } catch {
-    /* almacenamiento no disponible */
+  } catch (err) {
+    console.error('[Persistencia] Error al guardar datos:', err)
+    notificarError(
+      'Error al guardar en el navegador',
+      'No se pudo escribir en el almacenamiento local (cuota excedida o bloqueado).',
+    )
   }
 }

@@ -16,6 +16,13 @@ import {
   nombreEntidad,
   recortar,
 } from '@/core/lib/auditoria'
+import {
+  TABLAS_SYNC,
+  cargarColeccionDesdeSupabase,
+  guardarEnSupabase,
+  eliminarDeSupabase,
+  suscribirRealtime,
+} from '@/core/supabase/sync'
 
 /** Colecciones que llevan código correlativo y su prefijo. */
 const PREFIJO_COLECCION: Partial<Record<ColeccionRecord, string>> = {
@@ -207,11 +214,72 @@ export function DatosProvider({
     guardar(estado)
   }, [estado])
 
+  // Sincronización inicial y Realtime con Supabase
+  useEffect(() => {
+    let cancelado = false
+
+    async function sincronizarInicial() {
+      for (const coleccion of TABLAS_SYNC) {
+        if (cancelado) break
+        const remotos = await cargarColeccionDesdeSupabase(coleccion)
+        if (remotos && Object.keys(remotos).length > 0 && !cancelado) {
+          for (const item of Object.values(remotos)) {
+            dispatch({
+              tipo: 'upsert',
+              coleccion,
+              entidad: item as { id: string },
+              actor: 'supabase-inicial',
+            })
+          }
+        }
+      }
+    }
+
+    void sincronizarInicial()
+
+    const desuscribir = suscribirRealtime(
+      (coleccion, entidad) => {
+        if (!cancelado && entidad.id) {
+          dispatch({
+            tipo: 'upsert',
+            coleccion,
+            entidad: entidad as { id: string },
+            actor: 'supabase-realtime',
+          })
+        }
+      },
+      (coleccion, id) => {
+        if (!cancelado && id) {
+          dispatch({
+            tipo: 'eliminar',
+            coleccion,
+            id,
+            actor: 'supabase-realtime',
+          })
+        }
+      },
+    )
+
+    return () => {
+      cancelado = true
+      desuscribir()
+    }
+  }, [])
+
   const valor: Ctx = {
     estado,
-    upsert: (coleccion, entidad) =>
-      dispatch({ tipo: 'upsert', coleccion, entidad: entidad as { id: string }, actor }),
-    eliminar: (coleccion, id) => dispatch({ tipo: 'eliminar', coleccion, id, actor }),
+    upsert: (coleccion, entidad) => {
+      dispatch({ tipo: 'upsert', coleccion, entidad: entidad as { id: string }, actor })
+      if (actor !== 'supabase-realtime' && actor !== 'supabase-inicial') {
+        void guardarEnSupabase(coleccion, entidad as { id: string })
+      }
+    },
+    eliminar: (coleccion, id) => {
+      dispatch({ tipo: 'eliminar', coleccion, id, actor })
+      if (actor !== 'supabase-realtime') {
+        void eliminarDeSupabase(coleccion, id)
+      }
+    },
     setEstados: (estados) => dispatch({ tipo: 'estados', estados, actor }),
     setEmpresa: (empresa) => dispatch({ tipo: 'empresa', empresa, actor }),
     reemplazarTodo: (nuevo) => dispatch({ tipo: 'reemplazar', estado: nuevo, actor }),

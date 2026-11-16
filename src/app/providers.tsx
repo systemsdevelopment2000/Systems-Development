@@ -5,6 +5,7 @@ import { DatosProvider, useDatos } from '@/core/datos'
 import { VistaProvider } from '@/core/vista'
 import { ConfirmarProvider } from '@/core/ui'
 import { SonidoProvider } from '@/core/sonido'
+import { ToastProvider } from '@/core/notificaciones'
 import { aplicarPaleta } from '@/core/lib/paletas'
 import { useSession } from '@/core/hooks/useSession'
 
@@ -38,15 +39,17 @@ function PaletaGlobal({ children }: { children: ReactNode }) {
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <VistaProvider>
-        <DatosConActor>
-          <PaletaGlobal>
-            <SonidoProvider>
-              <ConfirmarProvider>{children}</ConfirmarProvider>
-            </SonidoProvider>
-          </PaletaGlobal>
-        </DatosConActor>
-      </VistaProvider>
+      <ToastProvider>
+        <VistaProvider>
+          <DatosConActor>
+            <PaletaGlobal>
+              <SonidoProvider>
+                <ConfirmarProvider>{children}</ConfirmarProvider>
+              </SonidoProvider>
+            </PaletaGlobal>
+          </DatosConActor>
+        </VistaProvider>
+      </ToastProvider>
     </QueryClientProvider>
   )
 }
