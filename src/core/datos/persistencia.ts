@@ -2,7 +2,7 @@ import type { EstadoDatos } from './tipos'
 import { estadoInicial } from './estadoInicial'
 import { PREFIJOS, asignarCodigosFaltantes } from '@/core/lib/codigos'
 
-const CLAVE = 'sd:datos'
+const CLAVE = 'sd:datos:v5'
 
 /**
  * Versión del esquema del store. Súbela cuando cambie la forma de los datos:
@@ -104,6 +104,10 @@ function migrarMarca(e: EstadoDatos): EstadoDatos {
 /** Carga el estado desde localStorage; si no hay o la versión no coincide, usa la semilla. */
 export function cargar(): EstadoDatos {
   try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('sd:datos')
+      localStorage.removeItem('sd:dev-auth-user')
+    }
     const raw = localStorage.getItem(CLAVE)
     if (!raw) return conCodigos(estadoInicial())
     const env = JSON.parse(raw) as Envoltura
