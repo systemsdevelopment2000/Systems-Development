@@ -8,7 +8,7 @@ const CLAVE = 'sd:datos'
  * Versión del esquema del store. Súbela cuando cambie la forma de los datos:
  * en la fase front eso re-siembra el estado (descarta datos locales de ejemplo).
  */
-const VERSION = 4
+const VERSION = 5
 
 interface Envoltura {
   v: number

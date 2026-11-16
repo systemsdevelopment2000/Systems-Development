@@ -6,13 +6,13 @@ import { env } from '@/core/config/env'
 export const DEV_SESSION_KEY = 'sd:dev-auth-user'
 export const DEV_LOGGED_OUT_KEY = 'sd:dev-logged-out'
 
-// Usuario ficticio inicial para desarrollo local (Carlos G. · Arquitecto)
+// Usuario inicial por defecto
 const DEV_DEFAULT_USER = {
-  id: 'cg',
-  email: 'carlos@sd.dev',
+  id: 'admin_sd',
+  email: 'systemsdevelopment2000@gmail.com',
   aud: 'authenticated',
   app_metadata: {},
-  user_metadata: { nombre: 'Carlos G.', rol: 'Arquitecto' },
+  user_metadata: { nombre: 'Systems Development', rol: 'Administrador' },
   created_at: new Date().toISOString(),
 } as unknown as User
 
