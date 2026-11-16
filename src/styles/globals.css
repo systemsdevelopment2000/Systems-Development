@@ -1391,6 +1391,16 @@ input[type='range'] {
   background: var(--velo-2);
 }
 
+.nav__grupo-tit.is-activo-colapsado {
+  color: #01d3fe;
+}
+
+.nav__grupo-tit.is-activo-colapsado .nav__grupo-n {
+  background: rgba(1, 211, 254, 0.15);
+  color: #01d3fe;
+  font-weight: 700;
+}
+
 /* ---------- Métodos de cobro + QR ---------- */
 .cob-lista {
   display: flex;

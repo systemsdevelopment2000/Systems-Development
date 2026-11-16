@@ -78,16 +78,16 @@ const NAV = [
 ]
 
 /** Layout de la zona privada: barra lateral + cabecera + contenido. */
-const CLAVE_GRUPOS = 'sd:nav-cerrados'
+const CLAVE_ABIERTOS = 'sd:nav-abiertos-v1'
 
 export function RootLayout() {
   const { vista, esMovilReal } = useVista()
   const ruta = useLocation()
 
-  // Qué grupos están plegados. Se recuerda para no replegarlos en cada visita.
-  const [cerrados, setCerrados] = useState<string[]>(() => {
+  // Grupos desplegados: por defecto todos cerrados (array vacío)
+  const [abiertos, setAbiertos] = useState<string[]>(() => {
     try {
-      const g = localStorage.getItem(CLAVE_GRUPOS)
+      const g = localStorage.getItem(CLAVE_ABIERTOS)
       return g ? (JSON.parse(g) as string[]) : []
     } catch {
       return []
@@ -95,10 +95,10 @@ export function RootLayout() {
   })
 
   function alternarGrupo(grupo: string) {
-    setCerrados((prev) => {
+    setAbiertos((prev) => {
       const sig = prev.includes(grupo) ? prev.filter((x) => x !== grupo) : [...prev, grupo]
       try {
-        localStorage.setItem(CLAVE_GRUPOS, JSON.stringify(sig))
+        localStorage.setItem(CLAVE_ABIERTOS, JSON.stringify(sig))
       } catch {
         /* sin almacenamiento */
       }
@@ -126,26 +126,27 @@ export function RootLayout() {
         </div>
         <nav className="nav">
           {NAV.map((g) => {
-            const abierto = !cerrados.includes(g.grupo)
-            // El grupo de la página actual no se puede plegar sin perder de
-            // vista dónde estás, así que se fuerza abierto.
+            const abierto = abiertos.includes(g.grupo)
             const contieneActual = g.items.some((i) => ruta.pathname.startsWith(i.to))
-            const visible = abierto || contieneActual
+
             return (
               <div className="nav__grupo" key={g.grupo}>
                 <button
                   type="button"
-                  className={'nav__grupo-tit' + (visible ? ' is-abierto' : '')}
+                  className={
+                    'nav__grupo-tit' +
+                    (abierto ? ' is-abierto' : '') +
+                    (contieneActual && !abierto ? ' is-activo-colapsado' : '')
+                  }
                   onClick={() => alternarGrupo(g.grupo)}
-                  aria-expanded={visible}
-                  disabled={contieneActual && !abierto}
+                  aria-expanded={abierto}
                 >
                   <ChevronRight size={13} className="nav__chevron" aria-hidden />
                   {g.grupo}
-                  {!visible && <em className="nav__grupo-n">{g.items.length}</em>}
+                  {!abierto && <em className="nav__grupo-n">{g.items.length}</em>}
                 </button>
 
-                {visible &&
+                {abierto &&
                   g.items.map((item) => (
                     <NavLink
                       key={item.to}
