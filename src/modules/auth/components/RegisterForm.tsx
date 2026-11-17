@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Eye, EyeOff, UserPlus, CheckCircle2, ArrowRight, ArrowLeft } from 'lucide-react'
 import { Button } from '@/core/ui'
 import { env } from '@/core/config/env'
+import { soloLetras } from '@/core/lib/validaciones'
 import { useAuth } from '../hooks/useAuth'
 
 interface Props {
@@ -188,14 +189,14 @@ export function RegisterForm({ onIrALogin, autoFocus = false }: Props) {
       ) : (
         <>
           <label className="field">
-            <span className="field__label">Nombre completo</span>
+            <span className="field__label">Nombre completo (solo letras)</span>
             <input
               className="field__input"
               required
               autoFocus
               value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
-              placeholder="Ej. Ing. Carlos González"
+              onChange={(e) => setNombre(soloLetras(e.target.value))}
+              placeholder="Ej. Carlos González"
             />
           </label>
 

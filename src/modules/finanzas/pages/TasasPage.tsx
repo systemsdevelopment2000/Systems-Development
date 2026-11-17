@@ -104,7 +104,7 @@ export function TasasPage() {
               <input
                 className="field__input"
                 value={base}
-                onChange={(e) => setBase(e.target.value.toUpperCase())}
+                onChange={(e) => setBase(e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase())}
                 maxLength={5}
               />
             </label>
@@ -114,7 +114,7 @@ export function TasasPage() {
               <input
                 className="field__input"
                 value={destino}
-                onChange={(e) => setDestino(e.target.value.toUpperCase())}
+                onChange={(e) => setDestino(e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase())}
                 maxLength={5}
               />
             </label>
@@ -163,7 +163,7 @@ export function TasasPage() {
               className="field__input"
               placeholder={`Tasa manual ${base}→${destino}`}
               value={manual}
-              onChange={(e) => setManual(e.target.value)}
+              onChange={(e) => setManual(e.target.value.replace(/[^0-9.,]/g, ''))}
             />
             <Button type="button" variant="ghost" onClick={guardarManual}>
               <Plus size={15} /> Registrar

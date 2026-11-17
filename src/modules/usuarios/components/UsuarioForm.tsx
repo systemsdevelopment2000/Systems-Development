@@ -20,7 +20,7 @@ interface Props {
 
 export function UsuarioForm({ inicial, disponibles, onGuardar, onCancelar }: Props) {
   const [colaboradorId, setColaboradorId] = useState(inicial?.id ?? '')
-  const [correo, setCorreo] = useState(inicial?.contacto.correo ?? '')
+  const [correo, setCorreo] = useState(inicial?.contacto?.correo ?? '')
   const [rolSistema, setRolSistema] = useState<RolSistema>(inicial?.rolSistema ?? 'editor')
   const [activo, setActivo] = useState(inicial?.activo ?? true)
   const [permisos, setPermisos] = useState<Permisos>(
@@ -31,7 +31,7 @@ export function UsuarioForm({ inicial, disponibles, onGuardar, onCancelar }: Pro
   function elegirColaborador(id: string) {
     setColaboradorId(id)
     const c = disponibles.find((x) => x.id === id)
-    if (c && !correo) setCorreo(c.contacto.correo ?? '')
+    if (c && !correo) setCorreo(c.contacto?.correo ?? '')
   }
 
   function cambiarRol(v: string) {

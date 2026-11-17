@@ -195,12 +195,12 @@ export function RegistrarPago({ cuenta, tasaDe, metodosCobro, onRegistrar, onCer
             </label>
 
             <label className="field pago__f--moneda">
-              <span className="field__label">Moneda</span>
+              <span className="field__label">Moneda (letras)</span>
               <input
                 className="field__input"
                 value={a.moneda}
                 maxLength={4}
-                onChange={(e) => set(a.id, { moneda: e.target.value.toUpperCase() })}
+                onChange={(e) => set(a.id, { moneda: e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase() })}
               />
             </label>
 
@@ -225,7 +225,7 @@ export function RegistrarPago({ cuenta, tasaDe, metodosCobro, onRegistrar, onCer
               <input
                 className="field__input"
                 value={a.referencia}
-                onChange={(e) => set(a.id, { referencia: e.target.value })}
+                onChange={(e) => set(a.id, { referencia: e.target.value.replace(/[^a-zA-Z0-9-]/g, '') })}
                 placeholder="N° de operación"
               />
             </label>

@@ -153,7 +153,7 @@ export function FichaPersonalForm({ ficha, onCambio }: Props) {
             <input
               className="field__input"
               value={f.rif ?? ''}
-              onChange={(e) => set('rif', e.target.value)}
+              onChange={(e) => set('rif', e.target.value.replace(/[^jvgJvGeE0-9-]/g, '').toUpperCase())}
               placeholder="V-12345678-9"
             />
           </label>
@@ -346,7 +346,7 @@ export function FichaPersonalForm({ ficha, onCambio }: Props) {
             <input
               className="field__input"
               value={f.salud?.emergenciaTelefono ?? ''}
-              onChange={(e) => setSalud('emergenciaTelefono', e.target.value)}
+              onChange={(e) => setSalud('emergenciaTelefono', e.target.value.replace(/[^\d+-\s]/g, ''))}
               placeholder="0414-0000000"
             />
           </label>
@@ -362,7 +362,7 @@ export function FichaPersonalForm({ ficha, onCambio }: Props) {
             <input
               className="field__input"
               value={f.ivss ?? ''}
-              onChange={(e) => set('ivss', e.target.value)}
+              onChange={(e) => set('ivss', e.target.value.replace(/[^0-9-]/g, ''))}
             />
           </label>
           <label className="field">
@@ -370,7 +370,7 @@ export function FichaPersonalForm({ ficha, onCambio }: Props) {
             <input
               className="field__input"
               value={f.faov ?? ''}
-              onChange={(e) => set('faov', e.target.value)}
+              onChange={(e) => set('faov', e.target.value.replace(/[^0-9-]/g, ''))}
             />
           </label>
 
@@ -379,7 +379,7 @@ export function FichaPersonalForm({ ficha, onCambio }: Props) {
             <input
               className="field__input"
               value={f.banco?.banco ?? ''}
-              onChange={(e) => setBanco('banco', e.target.value)}
+              onChange={(e) => setBanco('banco', e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s,.-]/g, ''))}
               placeholder="Banesco, Mercantil…"
             />
           </label>
@@ -402,7 +402,7 @@ export function FichaPersonalForm({ ficha, onCambio }: Props) {
             <input
               className="field__input mono"
               value={f.banco?.numeroCuenta ?? ''}
-              onChange={(e) => setBanco('numeroCuenta', e.target.value)}
+              onChange={(e) => setBanco('numeroCuenta', e.target.value.replace(/[^0-9-]/g, ''))}
               placeholder="0000-0000-00-0000000000"
             />
           </label>
@@ -413,7 +413,7 @@ export function FichaPersonalForm({ ficha, onCambio }: Props) {
             <input
               className="field__input"
               value={f.banco?.titular ?? ''}
-              onChange={(e) => setBanco('titular', e.target.value)}
+              onChange={(e) => setBanco('titular', e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s.'-]/g, ''))}
             />
           </label>
           <label className="field">
@@ -421,7 +421,7 @@ export function FichaPersonalForm({ ficha, onCambio }: Props) {
             <input
               className="field__input"
               value={f.banco?.documentoTitular ?? ''}
-              onChange={(e) => setBanco('documentoTitular', e.target.value)}
+              onChange={(e) => setBanco('documentoTitular', e.target.value.replace(/[^vVeEpP0-9-]/g, '').toUpperCase())}
             />
           </label>
           <label className="field">
@@ -429,7 +429,7 @@ export function FichaPersonalForm({ ficha, onCambio }: Props) {
             <input
               className="field__input"
               value={f.banco?.pagoMovil ?? ''}
-              onChange={(e) => setBanco('pagoMovil', e.target.value)}
+              onChange={(e) => setBanco('pagoMovil', e.target.value.replace(/[^\d+-\s]/g, ''))}
               placeholder="0414-0000000"
             />
           </label>
