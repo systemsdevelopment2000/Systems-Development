@@ -10,18 +10,17 @@ import type {
 import { cargar, guardar } from './persistencia'
 import { nuevoId } from './estadoInicial'
 import { PREFIJOS, siguienteCodigo } from '@/core/lib/codigos'
-import {
-  ETIQUETA_COLECCION,
-  compararEntidad,
-  nombreEntidad,
-  recortar,
-} from '@/core/lib/auditoria'
+import { ETIQUETA_COLECCION, compararEntidad, nombreEntidad, recortar } from '@/core/lib/auditoria'
 import {
   TABLAS_SYNC,
   cargarColeccionDesdeSupabase,
   guardarEnSupabase,
   eliminarDeSupabase,
   suscribirRealtime,
+  cargarConfiguracionEmpresa,
+  guardarEmpresaEnSupabase,
+  cargarEstadosProyecto,
+  guardarEstadosProyectoEnSupabase,
 } from '@/core/supabase/sync'
 
 /** Colecciones que llevan código correlativo y su prefijo. */
@@ -115,8 +114,7 @@ function reducer(estado: EstadoDatos, accion: Accion): EstadoDatos {
 
     case 'eliminar': {
       const original = (estado[accion.coleccion] as Record<string, unknown>)[accion.id] as
-        | Record<string, unknown>
-        | undefined
+        Record<string, unknown> | undefined
       const col = { ...(estado[accion.coleccion] as Record<string, unknown>) }
       delete col[accion.id]
       const siguiente = { ...estado, [accion.coleccion]: col } as EstadoDatos
@@ -238,6 +236,12 @@ export function DatosProvider({
           })
         }
       }
+
+      const [emp, est] = await Promise.all([cargarConfiguracionEmpresa(), cargarEstadosProyecto()])
+      if (!cancelado) {
+        if (emp) dispatch({ tipo: 'empresa', empresa: emp, actor: 'supabase' })
+        if (est) dispatch({ tipo: 'estados', estados: est, actor: 'supabase' })
+      }
     }
 
     void sincronizarInicial()
@@ -285,8 +289,14 @@ export function DatosProvider({
         void eliminarDeSupabase(coleccion, id)
       }
     },
-    setEstados: (estados) => dispatch({ tipo: 'estados', estados, actor }),
-    setEmpresa: (empresa) => dispatch({ tipo: 'empresa', empresa, actor }),
+    setEstados: (estados) => {
+      dispatch({ tipo: 'estados', estados, actor })
+      void guardarEstadosProyectoEnSupabase(estados)
+    },
+    setEmpresa: (empresa) => {
+      dispatch({ tipo: 'empresa', empresa, actor })
+      void guardarEmpresaEnSupabase(empresa)
+    },
     reemplazarTodo: (nuevo) => dispatch({ tipo: 'reemplazar', estado: nuevo, actor }),
   }
 

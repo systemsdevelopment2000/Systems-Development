@@ -29,9 +29,9 @@ export function ClienteForm({ inicial, onGuardar, onCancelar }: Props) {
   const [logo, setLogo] = useState<string | undefined>(inicial?.logo)
   const [ubicacion, setUbicacion] = useState(inicial?.ubicacion ?? '')
 
-  const [telefono, setTelefono] = useState(inicial?.contacto.telefono ?? '')
-  const [correo, setCorreo] = useState(inicial?.contacto.correo ?? '')
-  const [medio, setMedio] = useState<MedioComunicacion>(inicial?.contacto.medio ?? 'whatsapp')
+  const [telefono, setTelefono] = useState(inicial?.contacto?.telefono ?? '')
+  const [correo, setCorreo] = useState(inicial?.contacto?.correo ?? '')
+  const [medio, setMedio] = useState<MedioComunicacion>(inicial?.contacto?.medio ?? 'whatsapp')
 
   // Responsable / contacto (enlace directo)
   const [respNombre, setRespNombre] = useState(inicial?.responsable?.nombre ?? '')

@@ -1,5 +1,5 @@
 import { supabase } from './client'
-import type { ColeccionRecord } from '@/core/datos/tipos'
+import type { ColeccionRecord, DatosEmpresa, EstadoProyecto } from '@/core/datos/tipos'
 import { notificarError, notificarInfo } from '@/core/notificaciones'
 
 /**
@@ -39,6 +39,12 @@ export const TABLAS_SYNC: ColeccionRecord[] = [
   'tasas',
   'tags',
   'herramientas',
+  'candidatos',
+  'plantillasEntrevista',
+  'evalColaborador',
+  'evalCliente',
+  'hechos',
+  'auditoria',
 ]
 
 /** Convierte camelCase a snake_case */
@@ -93,12 +99,41 @@ export function mapearA_DB(coleccion: string, entidad: Record<string, unknown>):
     if (res.total === undefined) res.total = 0
     if (!res.cliente_id) res.cliente_id = null
     if (!res.proyecto_id) res.proyecto_id = null
+  } else if (coleccion === 'pagos') {
+    if (!res.presupuesto_id) res.presupuesto_id = null
+    if (!res.proyecto_id) res.proyecto_id = null
+    if (!res.cliente_id) res.cliente_id = null
+    if (!res.cuota_id) res.cuota_id = null
+    if (res.monto === undefined) res.monto = 0
+  } else if (coleccion === 'reuniones') {
+    if (!res.proyecto_id) res.proyecto_id = null
+    if (!res.participantes) res.participantes = []
+    if (!res.adjuntos) res.adjuntos = []
   } else if (coleccion === 'clientes') {
     if (!res.tipo_documento) res.tipo_documento = 'rif'
     if (!res.documento) res.documento = ''
     if (!res.contacto) res.contacto = {}
   } else if (coleccion === 'colaboradores') {
     if (!res.contacto) res.contacto = {}
+  } else if (coleccion === 'candidatos') {
+    if (!res.contacto) res.contacto = {}
+    if (!res.datos_personales) res.datos_personales = {}
+    if (!res.evaluacion) res.evaluacion = {}
+    if (!res.creado_en) res.creado_en = new Date().toISOString()
+  } else if (coleccion === 'plantillasEntrevista') {
+    if (!res.bloques) res.bloques = []
+    if (!res.criterios) res.criterios = []
+    if (!res.creado_en) res.creado_en = new Date().toISOString()
+  } else if (coleccion === 'evalColaborador') {
+    if (!res.criterios) res.criterios = {}
+    res.porcentaje = Number(res.porcentaje) || 0
+  } else if (coleccion === 'evalCliente') {
+    res.amigabilidad = Number(res.amigabilidad) || 0
+    res.puntualidad_pago = Number(res.puntualidad_pago) || 0
+    res.estabilidad_alcance = Number(res.estabilidad_alcance) || 0
+    res.comunicacion = Number(res.comunicacion) || 0
+  } else if (coleccion === 'hechos' || coleccion === 'auditoria') {
+    if (!res.fecha) res.fecha = new Date().toISOString()
   }
 
   return res
@@ -135,6 +170,30 @@ export function mapearDe_DB(coleccion: string, fila: Record<string, unknown>): R
   } else if (coleccion === 'proyectos') {
     if (!Array.isArray(res.modulos)) res.modulos = []
     if (!Array.isArray(res.tagIds)) res.tagIds = []
+  } else if (coleccion === 'presupuestos') {
+    if (!res.lineas && Array.isArray(res.items)) {
+      res.lineas = res.items
+    }
+    if (!Array.isArray(res.lineas)) {
+      res.lineas = []
+    }
+    if (!res.estado) res.estado = 'borrador'
+    if (!res.moneda) res.moneda = 'USD'
+    if (res.descuentoGlobal === undefined && res.descuento !== undefined) {
+      res.descuentoGlobal = res.descuento
+    }
+  } else if (coleccion === 'candidatos') {
+    if (!res.contacto || typeof res.contacto !== 'object') res.contacto = {}
+    if (!res.datosPersonales || typeof res.datosPersonales !== 'object') res.datosPersonales = {}
+    if (!res.evaluacion || typeof res.evaluacion !== 'object') res.evaluacion = {}
+  } else if (coleccion === 'plantillasEntrevista') {
+    if (!Array.isArray(res.bloques)) res.bloques = []
+    if (!Array.isArray(res.criterios)) res.criterios = []
+  } else if (coleccion === 'evalColaborador') {
+    if (!res.criterios || typeof res.criterios !== 'object') res.criterios = {}
+  } else if (coleccion === 'herramientas') {
+    if (!Array.isArray(res.clienteIds)) res.clienteIds = []
+    if (!Array.isArray(res.proyectoIds)) res.proyectoIds = []
   }
 
   return res
@@ -285,5 +344,91 @@ export function suscribirRealtime(
 
   return () => {
     supabase.removeChannel(channel)
+  }
+}
+
+/**
+ * Consulta la configuración de la empresa desde Supabase.
+ */
+export async function cargarConfiguracionEmpresa(): Promise<DatosEmpresa | null> {
+  try {
+    const { data, error } = await clienteDb.from('empresa').select('*').limit(1).maybeSingle()
+    if (error || !data) return null
+    return {
+      nombre: data.nombre,
+      telefonos: data.telefonos,
+      ubicacion: data.ubicacion,
+      correo: data.correo,
+      logo: data.logo,
+      pie: data.pie ?? '',
+      unidades: Array.isArray(data.unidades) ? data.unidades : [],
+      hojaPendientes: data.hoja_pendientes ?? {},
+      finanzas: data.finanzas ?? {},
+    } as DatosEmpresa
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Guarda o actualiza los datos corporativos de la empresa en Supabase.
+ */
+export async function guardarEmpresaEnSupabase(empresa: DatosEmpresa): Promise<void> {
+  try {
+    await clienteDb.from('empresa').upsert({
+      id: 'sd_empresa',
+      nombre: empresa.nombre,
+      telefonos: empresa.telefonos,
+      ubicacion: empresa.ubicacion,
+      correo: empresa.correo,
+      logo: empresa.logo,
+      pie: empresa.pie,
+      unidades: empresa.unidades,
+      hoja_pendientes: empresa.hojaPendientes,
+      finanzas: empresa.finanzas,
+      actualizado_en: new Date().toISOString(),
+    })
+  } catch (err) {
+    console.warn('[SupabaseSync] Error al guardar empresa:', err)
+  }
+}
+
+/**
+ * Carga el catálogo de estados de proyecto desde Supabase.
+ */
+export async function cargarEstadosProyecto(): Promise<EstadoProyecto[] | null> {
+  try {
+    const { data, error } = await clienteDb
+      .from('estados_proyecto')
+      .select('*')
+      .order('orden', { ascending: true })
+    if (error || !data || data.length === 0) return null
+    return data.map((d: Record<string, unknown>) => ({
+      id: d.id as string,
+      nombre: d.nombre as string,
+      orden: (d.orden as number) ?? 0,
+      color: (d.color as string) ?? '#05e4fd',
+      esFinal: Boolean(d.es_final),
+    }))
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Guarda el catálogo de estados de proyecto en Supabase.
+ */
+export async function guardarEstadosProyectoEnSupabase(estados: EstadoProyecto[]): Promise<void> {
+  try {
+    const filas = estados.map((e) => ({
+      id: e.id,
+      nombre: e.nombre,
+      orden: e.orden,
+      color: e.color,
+      es_final: e.esFinal,
+    }))
+    await clienteDb.from('estados_proyecto').upsert(filas)
+  } catch (err) {
+    console.warn('[SupabaseSync] Error al guardar estados:', err)
   }
 }

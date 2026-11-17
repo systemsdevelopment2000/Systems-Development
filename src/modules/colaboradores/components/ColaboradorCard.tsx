@@ -9,13 +9,17 @@ interface Props {
   onBorrar: () => void
 }
 
-function iniciales(nombre: string) {
-  return nombre
-    .split(' ')
-    .slice(0, 2)
-    .map((p) => p[0])
-    .join('')
-    .toUpperCase()
+function iniciales(nombre?: string) {
+  if (!nombre) return 'CO'
+  return (
+    nombre
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((p) => p[0])
+      .join('')
+      .toUpperCase() || 'CO'
+  )
 }
 
 export function ColaboradorCard({ colaborador, stats, onEditar, onBorrar }: Props) {
@@ -31,7 +35,7 @@ export function ColaboradorCard({ colaborador, stats, onEditar, onBorrar }: Prop
           <i className={'co-dot ' + (colaborador.activo ? 'co-dot--on' : 'co-dot--off')} />
         </div>
         <div className="co-card__id">
-          <h3 className="cl-card__nombre">{colaborador.nombre}</h3>
+          <h3 className="cl-card__nombre">{colaborador.nombre || 'Colaborador'}</h3>
           <span className="co-rol">
             {colaborador.rol ?? 'Colaborador'}
             {colaborador.titulo ? ` · ${colaborador.titulo}` : ''}
@@ -57,12 +61,12 @@ export function ColaboradorCard({ colaborador, stats, onEditar, onBorrar }: Prop
             <IdCard size={13} /> {colaborador.cedula}
           </li>
         )}
-        {colaborador.contacto.correo && (
+        {colaborador.contacto?.correo && (
           <li>
             <Mail size={13} /> {colaborador.contacto.correo}
           </li>
         )}
-        {colaborador.contacto.telefono && (
+        {colaborador.contacto?.telefono && (
           <li>
             <Phone size={13} /> {colaborador.contacto.telefono}
           </li>

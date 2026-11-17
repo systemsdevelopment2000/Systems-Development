@@ -68,10 +68,6 @@ export function ProyectoForm({
       setError('Debes ingresar el nombre del proyecto.')
       return false
     }
-    if (!clienteId) {
-      setError('Debes seleccionar un cliente para el proyecto.')
-      return false
-    }
     if (!estadoId) {
       setError('Debes seleccionar un estado para el proyecto.')
       return false
@@ -158,10 +154,13 @@ export function ProyectoForm({
 
           <div className="field">
             <span className="field__label">
-              Cliente asociado <b style={{ color: 'var(--brand)' }}>*</b>
+              Cliente asociado
             </span>
             <Combobox
-              opciones={clientes.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
+              opciones={[
+                { valor: '', etiqueta: 'Sin cliente (Interno / Propio)' },
+                ...clientes.map((c) => ({ valor: c.id, etiqueta: c.nombre })),
+              ]}
               valor={clienteId}
               onCambio={(v) => {
                 setClienteId(v)

@@ -15,8 +15,8 @@ export function ColaboradorForm({ inicial, onGuardar, onCancelar }: Props) {
   const [cedula, setCedula] = useState(inicial?.cedula ?? '')
   const [titulo, setTitulo] = useState(inicial?.titulo ?? '')
   const [rol, setRol] = useState(inicial?.rol ?? '')
-  const [correo, setCorreo] = useState(inicial?.contacto.correo ?? '')
-  const [telefono, setTelefono] = useState(inicial?.contacto.telefono ?? '')
+  const [correo, setCorreo] = useState(inicial?.contacto?.correo ?? '')
+  const [telefono, setTelefono] = useState(inicial?.contacto?.telefono ?? '')
   const [activo, setActivo] = useState(inicial?.activo ?? true)
   const [esUsuario, setEsUsuario] = useState(inicial?.esUsuario ?? true)
 
