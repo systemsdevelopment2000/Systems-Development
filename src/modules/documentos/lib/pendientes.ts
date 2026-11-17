@@ -75,7 +75,7 @@ function fechaCorta(iso?: string): string {
 function moduloDe(a: Actividad, modulos: ModuloProyecto[]): string {
   if (a.modulo) return a.modulo
   const nombres = modulos.filter((m) => m.incluido).map((m) => m.nombre)
-  const etiquetas = a.etiquetas.map((e) => e.toLowerCase())
+  const etiquetas = (a.etiquetas ?? []).map((e) => (typeof e === 'string' ? e.toLowerCase() : ''))
   const hallado = nombres.find((n) => {
     const corto = n.toLowerCase()
     return etiquetas.some((e) => corto.includes(e) || e.includes(corto))

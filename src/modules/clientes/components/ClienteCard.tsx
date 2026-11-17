@@ -10,16 +10,23 @@ interface Props {
   onVer: () => void
 }
 
-function iniciales(nombre: string) {
-  return nombre
-    .split(' ')
-    .slice(0, 2)
-    .map((p) => p[0])
-    .join('')
-    .toUpperCase()
+function iniciales(nombre?: string) {
+  if (!nombre) return 'CL'
+  return (
+    nombre
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((p) => p[0])
+      .join('')
+      .toUpperCase() || 'CL'
+  )
 }
 
 export function ClienteCard({ cliente, proyectos, ponderacion, onEditar, onBorrar, onVer }: Props) {
+  const tipoDoc = (cliente.tipoDocumento ?? (cliente as unknown as { tipo_documento?: string }).tipo_documento ?? 'rif').toUpperCase()
+  const doc = cliente.documento || '—'
+
   return (
     <article className="cl-card">
       <div className="cl-card__head">
@@ -28,10 +35,10 @@ export function ClienteCard({ cliente, proyectos, ponderacion, onEditar, onBorra
         </div>
         <div className="cl-card__id">
           <button className="cl-card__nombre cl-card__nombre--btn" onClick={onVer} title="Ver ficha">
-            {cliente.nombre}
+            {cliente.nombre || 'Cliente sin nombre'}
           </button>
           <span className="cl-card__doc">
-            {cliente.tipoDocumento.toUpperCase()} · {cliente.documento}
+            {tipoDoc} · {doc}
           </span>
         </div>
         <div className="cl-card__acciones">

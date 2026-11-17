@@ -46,6 +46,7 @@ const SIN_AUDITAR = new Set<string>(['mensajes'])
 type Accion =
   | { tipo: 'upsert'; coleccion: ColeccionRecord; entidad: { id: string }; actor: string }
   | { tipo: 'eliminar'; coleccion: ColeccionRecord; id: string; actor: string }
+  | { tipo: 'sincronizarColeccion'; coleccion: ColeccionRecord; datos: Record<string, unknown> }
   | { tipo: 'estados'; estados: EstadoProyecto[]; actor: string }
   | { tipo: 'empresa'; empresa: DatosEmpresa; actor: string }
   | { tipo: 'reemplazar'; estado: EstadoDatos; actor: string }
@@ -135,6 +136,13 @@ function reducer(estado: EstadoDatos, accion: Accion): EstadoDatos {
       }
     }
 
+    case 'sincronizarColeccion': {
+      return {
+        ...estado,
+        [accion.coleccion]: accion.datos,
+      } as EstadoDatos
+    }
+
     case 'estados':
       return {
         ...estado,
@@ -222,15 +230,12 @@ export function DatosProvider({
       for (const coleccion of TABLAS_SYNC) {
         if (cancelado) break
         const remotos = await cargarColeccionDesdeSupabase(coleccion)
-        if (remotos && Object.keys(remotos).length > 0 && !cancelado) {
-          for (const item of Object.values(remotos)) {
-            dispatch({
-              tipo: 'upsert',
-              coleccion,
-              entidad: item as { id: string },
-              actor: 'supabase-inicial',
-            })
-          }
+        if (remotos !== null && !cancelado) {
+          dispatch({
+            tipo: 'sincronizarColeccion',
+            coleccion,
+            datos: remotos,
+          })
         }
       }
     }

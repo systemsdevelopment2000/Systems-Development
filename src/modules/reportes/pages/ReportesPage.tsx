@@ -59,15 +59,19 @@ export function ReportesPage() {
     if (tipo === 'clientes') {
       return {
         columnas: ['Cliente', 'Documento', 'Ubicación', 'Teléfono', 'Correo', 'Medio de pago', 'Proyectos'],
-        filas: Object.values(estado.clientes).map((c) => ({
-          Cliente: c.nombre,
-          Documento: `${c.tipoDocumento.toUpperCase()} ${c.documento}`,
-          Ubicación: c.ubicacion ?? '—',
-          Teléfono: c.contacto.telefono ?? '—',
-          Correo: c.contacto.correo ?? '—',
-          'Medio de pago': c.medioPago ?? '—',
-          Proyectos: Object.values(estado.proyectos).filter((p) => p.clienteId === c.id).length,
-        })),
+        filas: Object.values(estado.clientes).map((c) => {
+          const tipoDoc = (c.tipoDocumento ?? (c as unknown as { tipo_documento?: string }).tipo_documento ?? 'rif').toUpperCase()
+          const doc = c.documento || '—'
+          return {
+            Cliente: c.nombre || 'Cliente',
+            Documento: `${tipoDoc} ${doc}`,
+            Ubicación: c.ubicacion ?? '—',
+            Teléfono: c.contacto?.telefono ?? '—',
+            Correo: c.contacto?.correo ?? '—',
+            'Medio de pago': c.medioPago ?? '—',
+            Proyectos: Object.values(estado.proyectos).filter((p) => p.clienteId === c.id).length,
+          }
+        }),
       }
     }
     if (tipo === 'tareas') {

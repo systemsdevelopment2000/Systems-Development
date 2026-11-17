@@ -3,13 +3,13 @@ import { estadoInicial } from './estadoInicial'
 import { PREFIJOS, asignarCodigosFaltantes } from '@/core/lib/codigos'
 import { notificarError } from '@/core/notificaciones'
 
-const CLAVE = 'sd:datos:v5'
+const CLAVE = 'sd:datos:v6'
 
 /**
  * Versión del esquema del store. Súbela cuando cambie la forma de los datos:
  * en la fase front eso re-siembra el estado (descarta datos locales de ejemplo).
  */
-const VERSION = 5
+const VERSION = 6
 
 interface Envoltura {
   v: number
@@ -107,6 +107,8 @@ export function cargar(): EstadoDatos {
   try {
     if (typeof localStorage !== 'undefined') {
       localStorage.removeItem('sd:datos')
+      localStorage.removeItem('sd:datos:v5')
+      localStorage.removeItem('sd:datos:v4')
       localStorage.removeItem('sd:dev-auth-user')
     }
     const raw = localStorage.getItem(CLAVE)

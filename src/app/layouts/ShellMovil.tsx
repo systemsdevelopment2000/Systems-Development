@@ -64,11 +64,11 @@ export function ShellMovil() {
 
   const iniciales = useMemo(() => {
     const n = nombreUsuario.trim()
-    const partes = n.split(/\s+/)
-    if (partes.length >= 2) {
+    const partes = n.split(/\s+/).filter(Boolean)
+    if (partes.length >= 2 && partes[0][0] && partes[1][0]) {
       return (partes[0][0] + partes[1][0]).toUpperCase()
     }
-    return n.slice(0, 2).toUpperCase()
+    return (n.slice(0, 2) || 'US').toUpperCase()
   }, [nombreUsuario])
 
   // Al cambiar de pantalla se cierra la hoja y se sube el scroll: en una app,

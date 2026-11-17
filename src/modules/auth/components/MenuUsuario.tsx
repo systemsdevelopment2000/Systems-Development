@@ -60,11 +60,11 @@ export function MenuUsuario() {
 
   const iniciales = useMemo(() => {
     const n = nombreUsuario.trim()
-    const partes = n.split(/\s+/)
-    if (partes.length >= 2) {
+    const partes = n.split(/\s+/).filter(Boolean)
+    if (partes.length >= 2 && partes[0][0] && partes[1][0]) {
       return (partes[0][0] + partes[1][0]).toUpperCase()
     }
-    return n.slice(0, 2).toUpperCase()
+    return (n.slice(0, 2) || 'US').toUpperCase()
   }, [nombreUsuario])
 
   // Cerrar menú al hacer clic fuera o presionar escape

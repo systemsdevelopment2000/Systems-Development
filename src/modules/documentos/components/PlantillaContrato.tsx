@@ -14,7 +14,7 @@ export function PlantillaContrato({ datos }: { datos: DatosDocumento }) {
         En Puerto Ordaz, a {hoy}, celebran el presente contrato <strong>Systems Development</strong>{' '}
         (en adelante, el prestador) y{' '}
         <strong>{cliente?.nombre ?? 'el cliente'}</strong>
-        {cliente ? ` (${cliente.tipoDocumento.toUpperCase()} ${cliente.documento})` : ''} (en
+        {cliente ? ` (${(cliente.tipoDocumento ?? (cliente as unknown as { tipo_documento?: string }).tipo_documento ?? 'rif').toUpperCase()} ${cliente.documento || ''})` : ''} (en
         adelante, el cliente):
       </p>
 

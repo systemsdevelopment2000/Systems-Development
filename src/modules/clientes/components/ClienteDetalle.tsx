@@ -33,16 +33,20 @@ function Dato({
 export function ClienteDetalle({ cliente, proyectos, ponderacion, onEditar, onVerProyecto }: Props) {
   const r = cliente.responsable
 
+  const tipoDoc = (cliente.tipoDocumento ?? (cliente as unknown as { tipo_documento?: string }).tipo_documento ?? 'rif').toUpperCase()
+  const doc = cliente.documento || '—'
+  const iniciales = (cliente.nombre || 'CL').slice(0, 2).toUpperCase()
+
   return (
     <div className="cd">
       <div className="cd__head">
         <div className="cl-logo cd__logo">
-          {cliente.logo ? <img src={cliente.logo} alt="" /> : <span>{cliente.nombre.slice(0, 2).toUpperCase()}</span>}
+          {cliente.logo ? <img src={cliente.logo} alt="" /> : <span>{iniciales}</span>}
         </div>
         <div>
-          <h3 className="cd__nombre">{cliente.nombre}</h3>
+          <h3 className="cd__nombre">{cliente.nombre || 'Cliente sin nombre'}</h3>
           <span className="cd__doc">
-            {cliente.tipoDocumento.toUpperCase()} · {cliente.documento}
+            {tipoDoc} · {doc}
           </span>
         </div>
         <span className={'cl-pond' + (ponderacion == null ? ' cl-pond--na' : '')}>
@@ -52,8 +56,8 @@ export function ClienteDetalle({ cliente, proyectos, ponderacion, onEditar, onVe
 
       <div className="cd__grid">
         <Dato icono={<MapPin size={12} />} k="Ubicación" v={cliente.ubicacion} />
-        <Dato icono={<Phone size={12} />} k="Teléfono" v={cliente.contacto.telefono} />
-        <Dato icono={<Mail size={12} />} k="Correo" v={cliente.contacto.correo} />
+        <Dato icono={<Phone size={12} />} k="Teléfono" v={cliente.contacto?.telefono} />
+        <Dato icono={<Mail size={12} />} k="Correo" v={cliente.contacto?.correo} />
         <Dato icono={<Wallet size={12} />} k="Medio de pago" v={cliente.medioPago} />
       </div>
 

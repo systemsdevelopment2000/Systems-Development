@@ -20,6 +20,8 @@ import { ConfiguracionPage } from '@/modules/configuracion'
 import { AuditoriaPage } from '@/modules/auditoria'
 import { RrhhPage } from '@/modules/rrhh'
 
+import { RouteErrorBoundary } from './components/ErrorBoundary'
+
 /**
  * Mapa de rutas del monolito. El app-shell sólo CONECTA módulos;
  * no contiene lógica de negocio.
@@ -27,6 +29,7 @@ import { RrhhPage } from '@/modules/rrhh'
 export const router = createBrowserRouter([
   {
     element: <AuthLayout />,
+    errorElement: <RouteErrorBoundary />,
     children: [
       { path: '/', element: <OnePage /> },
       { path: '/home', element: <OnePage /> },
@@ -39,6 +42,7 @@ export const router = createBrowserRouter([
         <RootLayout />
       </RequireAuth>
     ),
+    errorElement: <RouteErrorBoundary />,
     children: [
       { path: '/inicio', element: <InicioMovil /> },
       { path: '/tablero', element: <TableroPage /> },

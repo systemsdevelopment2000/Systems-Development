@@ -107,12 +107,34 @@ export function mapearA_DB(coleccion: string, entidad: Record<string, unknown>):
 /**
  * Convierte una fila de Supabase (snake_case) al formato de la aplicación (camelCase).
  */
-export function mapearDe_DB(_coleccion: string, fila: Record<string, unknown>): Record<string, unknown> {
+export function mapearDe_DB(coleccion: string, fila: Record<string, unknown>): Record<string, unknown> {
   const res: Record<string, unknown> = {}
 
   for (const [clave, valor] of Object.entries(fila)) {
     const claveCamel = aCamelCase(clave)
     res[claveCamel] = valor
+  }
+
+  // Garantizar valores por defecto coherentes para evitar inconsistencias en el frontend
+  if (coleccion === 'clientes') {
+    res.tipoDocumento = res.tipoDocumento ?? res.tipo_documento ?? 'rif'
+    res.documento = res.documento ?? ''
+    res.nombre = res.nombre ?? 'Cliente'
+    if (!res.contacto || typeof res.contacto !== 'object') {
+      res.contacto = {}
+    }
+  } else if (coleccion === 'colaboradores') {
+    res.nombre = res.nombre ?? 'Colaborador'
+    res.rol = res.rol ?? ''
+    if (!res.contacto || typeof res.contacto !== 'object') {
+      res.contacto = {}
+    }
+  } else if (coleccion === 'actividades') {
+    if (!Array.isArray(res.etiquetas)) res.etiquetas = []
+    if (!Array.isArray(res.responsables)) res.responsables = []
+  } else if (coleccion === 'proyectos') {
+    if (!Array.isArray(res.modulos)) res.modulos = []
+    if (!Array.isArray(res.tagIds)) res.tagIds = []
   }
 
   return res
@@ -214,7 +236,8 @@ export function suscribirRealtime(
   onUpsert: (coleccion: ColeccionRecord, entidad: Record<string, unknown>) => void,
   onDelete: (coleccion: ColeccionRecord, id: string) => void,
 ) {
-  const channel = supabase.channel('sd-realtime-global')
+  const canalId = `sd-rt-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
+  const channel = supabase.channel(canalId)
 
   for (const coleccion of TABLAS_SYNC) {
     const tabla = MAPA_COLECCION_A_TABLA[coleccion]
@@ -243,7 +266,7 @@ export function suscribirRealtime(
             }
           }
         } else if (payload.eventType === 'DELETE') {
-          const id = payload.old?.id as string | undefined
+          const id = (payload.old?.id ?? (payload.old as { ID?: string })?.ID) as string | undefined
           if (id) {
             onDelete(coleccion, id)
           }

@@ -176,21 +176,25 @@ export function useBuscadorGlobal() {
       ruta: `/proyectos/${p.id}`,
     }))
 
-    const clientes = Object.values(estado.clientes).map((c) => ({
-      id: c.id,
-      tipo: 'cliente' as const,
-      codigo: c.codigo,
-      titulo: c.nombre,
-      detalle: `${c.tipoDocumento.toUpperCase()} ${c.documento}`,
-      ruta: `/clientes?ver=${c.id}`,
-    }))
+    const clientes = Object.values(estado.clientes).map((c) => {
+      const tipoDoc = (c.tipoDocumento ?? (c as unknown as { tipo_documento?: string }).tipo_documento ?? 'rif').toUpperCase()
+      const doc = c.documento ?? ''
+      return {
+        id: c.id,
+        tipo: 'cliente' as const,
+        codigo: c.codigo,
+        titulo: c.nombre || 'Cliente',
+        detalle: [tipoDoc, doc].filter(Boolean).join(' '),
+        ruta: `/clientes?ver=${c.id}`,
+      }
+    })
 
     const colaboradores = Object.values(estado.colaboradores).map((c) => ({
       id: c.id,
       tipo: 'colaborador' as const,
       codigo: c.codigo,
-      titulo: c.nombre,
-      detalle: [c.rol, c.contacto.correo].filter(Boolean).join(' · '),
+      titulo: c.nombre || 'Colaborador',
+      detalle: [c.rol, c.contacto?.correo].filter(Boolean).join(' · '),
       ruta: `/colaboradores?ver=${c.id}`,
     }))
 
