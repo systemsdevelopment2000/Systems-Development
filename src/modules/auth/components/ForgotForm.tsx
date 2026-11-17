@@ -1,25 +1,32 @@
 import { useState, type FormEvent } from 'react'
-import { Mail, CheckCircle2, ArrowLeft } from 'lucide-react'
+import { Mail, CheckCircle2, ArrowLeft, AlertCircle } from 'lucide-react'
 import { Button } from '@/core/ui'
 import { env } from '@/core/config/env'
+import { esEmailValido } from '@/core/lib/validaciones'
 import { useAuth } from '../hooks/useAuth'
 
 interface Props {
   onIrALogin: () => void
   autoFocus?: boolean
+  mensajeInicial?: string | null
 }
 
-export function ForgotForm({ onIrALogin, autoFocus = false }: Props) {
+export function ForgotForm({ onIrALogin, autoFocus = false, mensajeInicial = null }: Props) {
   const { resetPassword } = useAuth()
   const [email, setEmail] = useState('')
   const [enviado, setEnviado] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(mensajeInicial)
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    if (!email.trim()) {
+    const emailLimpio = email.trim().toLowerCase()
+    if (!emailLimpio) {
       setError('Por favor ingresa tu correo electrónico.')
+      return
+    }
+    if (!esEmailValido(emailLimpio)) {
+      setError('Por favor ingresa un correo electrónico válido (ejemplo: usuario@dominio.com).')
       return
     }
     setError(null)
@@ -29,11 +36,15 @@ export function ForgotForm({ onIrALogin, autoFocus = false }: Props) {
       if (env.authBypass) {
         setEnviado(true)
       } else {
-        await resetPassword(email.trim())
+        await resetPassword(emailLimpio)
         setEnviado(true)
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo enviar el enlace de recuperación.')
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'No se pudo enviar el enlace de recuperación. Intenta nuevamente.',
+      )
     } finally {
       setLoading(false)
     }
@@ -59,8 +70,29 @@ export function ForgotForm({ onIrALogin, autoFocus = false }: Props) {
   return (
     <form className="form" onSubmit={handleSubmit} noValidate>
       <p style={{ margin: '0 0 10px', fontSize: 13.5, color: 'var(--text-muted)', lineHeight: 1.5 }}>
-        Ingresa el correo corporativo vinculado a tu cuenta y te enviaremos un enlace de recuperación seguro.
+        Ingresa el correo vinculado a tu cuenta y te enviaremos un enlace de recuperación seguro.
       </p>
+
+      {error && (
+        <div
+          className="form__error"
+          role="alert"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '10px 12px',
+            marginBottom: 10,
+            borderRadius: 6,
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            fontSize: 13,
+          }}
+        >
+          <AlertCircle size={16} style={{ flexShrink: 0 }} />
+          <span>{error}</span>
+        </div>
+      )}
 
       <label className="field">
         <span className="field__label">Correo corporativo</span>
@@ -71,16 +103,13 @@ export function ForgotForm({ onIrALogin, autoFocus = false }: Props) {
           required
           autoFocus={autoFocus}
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value)
+            if (error) setError(null)
+          }}
           placeholder="tu@systemsdevelopment.com"
         />
       </label>
-
-      {error && (
-        <p className="form__error" role="alert">
-          {error}
-        </p>
-      )}
 
       <Button type="submit" loading={loading} style={{ width: '100%', marginTop: 6 }}>
         <Mail size={16} /> Enviar enlace de recuperación
@@ -96,4 +125,5 @@ export function ForgotForm({ onIrALogin, autoFocus = false }: Props) {
     </form>
   )
 }
+
 

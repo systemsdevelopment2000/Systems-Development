@@ -8,17 +8,15 @@
  * refleja lo que se ve en pantalla (membrete, logo, colores de marca), sin
  * depender de reglas `@media print`.
  *
- * Ambas librerías se cargan de forma diferida (lazy) para no inflar el bundle.
+ * Soporte Multiplataforma (Escritorio y Móvil):
+ * En teléfonos y pantallas angostas, clona el documento en un lienzo fuera de
+ * pantalla con ancho estándar A4 de escritorio (800px / 850px) para que
+ * NUNCA se exporte con el layout estrecho de smartphone, garantizando
+ * proporción A4 formal y fidedigna en cualquier dispositivo.
  */
 
 type DocPdf = Awaited<ReturnType<typeof construirDoc>>
 
-/**
- * Lleva la altura de la hoja al siguiente múltiplo de página antes de
- * rasterizar. Sin esto, el contenido termina a media página y el pie se
- * imprime flotando en mitad del papel: el documento pierde formalidad.
- * Devuelve una función que restaura el estilo original.
- */
 /** Margen del papel, en puntos (~8 mm): zona que la impresora no alcanza. */
 const MARGEN_PDF = 22
 const TOLERANCIA_PDF = 1
@@ -30,27 +28,41 @@ const TOLERANCIA_PDF = 1
  */
 export const RELACION_PAGINA = (841.89 - MARGEN_PDF * 2) / (595.28 - MARGEN_PDF * 2)
 
-function ajustarAPaginas(elemento: HTMLElement): () => void {
-  const anterior = elemento.style.minHeight
-  const ancho = elemento.getBoundingClientRect().width
-  if (!ancho) return () => undefined
+/**
+ * Clona un elemento transfiriendo los valores actuales de inputs, textareas,
+ * selects y el estado de canvas (que cloneNode(true) nativo no transfiere).
+ */
+function clonarElementoParaImpresion(elemento: HTMLElement): HTMLElement {
+  const clon = elemento.cloneNode(true) as HTMLElement
 
-  const restaurar = () => {
-    elemento.style.minHeight = anterior
-  }
+  // Sincronizar inputs / textareas / selects
+  const origInputs = elemento.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(
+    'input, textarea, select',
+  )
+  const clonInputs = clon.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(
+    'input, textarea, select',
+  )
+  origInputs.forEach((orig, idx) => {
+    const dest = clonInputs[idx]
+    if (!dest) return
+    if (orig instanceof HTMLInputElement && (orig.type === 'checkbox' || orig.type === 'radio')) {
+      (dest as HTMLInputElement).checked = orig.checked
+    } else {
+      dest.value = orig.value
+    }
+  })
 
-  // La hoja trae en CSS una altura mínima de página calculada sobre su ancho
-  // máximo (880px). Si en pantalla renderiza más angosta, esa altura ya no
-  // equivale a una página y al medirla saldrían páginas de más, en blanco.
-  // Por eso se anula antes de medir y se recalcula sobre el ancho REAL.
-  elemento.style.minHeight = '0px'
-  const alto = elemento.scrollHeight
+  // Sincronizar canvas
+  const origCanvas = elemento.querySelectorAll<HTMLCanvasElement>('canvas')
+  const clonCanvas = clon.querySelectorAll<HTMLCanvasElement>('canvas')
+  origCanvas.forEach((orig, idx) => {
+    const dest = clonCanvas[idx]
+    if (!dest) return
+    const ctx = dest.getContext('2d')
+    if (ctx) ctx.drawImage(orig, 0, 0)
+  })
 
-  const altoPagina = ancho * RELACION_PAGINA
-  const paginas = Math.max(1, Math.ceil(alto / altoPagina - 0.02))
-  elemento.style.minHeight = `${paginas * altoPagina}px`
-
-  return restaurar
+  return clon
 }
 
 async function construirDoc(elemento: HTMLElement) {
@@ -58,21 +70,84 @@ async function construirDoc(elemento: HTMLElement) {
   const { toPng } = htmlToImage
   const JsPDF = jspdf.jsPDF
 
-  const restaurar = ajustarAPaginas(elemento)
+  // Determinar ancho A4 óptimo según el tipo de documento (.mb membrete o .doc contrato/propuesta)
+  const esMb = elemento.classList.contains('mb') || Boolean(elemento.querySelector('.mb'))
+  const anchoA4 = esMb ? 850 : 800
 
-  // `skipFonts: true` evita que la librería intente leer las hojas de estilo
-  // de Google Fonts (cross-origin → SecurityError y consola sucia). La marca
-  // vive en el logo, los colores y el layout, no en la fuente del cuerpo.
+  // Crear contenedor de renderizado aislado fuera de pantalla (directamente en body,
+  // fuera de cualquier clase .movil o limitaciones de viewport de teléfonos móviles).
+  const contenedor = document.createElement('div')
+  contenedor.className = 'sd-lienzo-export-pdf'
+  contenedor.style.position = 'fixed'
+  contenedor.style.top = '0'
+  contenedor.style.left = '0'
+  contenedor.style.width = `${anchoA4}px`
+  contenedor.style.minWidth = `${anchoA4}px`
+  contenedor.style.maxWidth = `${anchoA4}px`
+  contenedor.style.zIndex = '-9999'
+  contenedor.style.pointerEvents = 'none'
+  contenedor.style.background = '#ffffff'
+  contenedor.style.margin = '0'
+  contenedor.style.padding = '0'
+  contenedor.style.boxSizing = 'border-box'
+  contenedor.style.overflow = 'hidden'
+
+  const clon = clonarElementoParaImpresion(elemento)
+  clon.style.width = `${anchoA4}px`
+  clon.style.minWidth = `${anchoA4}px`
+  clon.style.maxWidth = `${anchoA4}px`
+  clon.style.margin = '0'
+  clon.style.boxSizing = 'border-box'
+  clon.classList.add('doc--exportando', 'doc--imprimiendo')
+
+  contenedor.appendChild(clon)
+  document.body.appendChild(contenedor)
+
   let dataUrl: string
   try {
-    dataUrl = await toPng(elemento, {
+    // Esperar a que las fuentes y las imágenes estén completamente listas
+    if (document.fonts?.ready) {
+      await document.fonts.ready
+    }
+
+    const imagenes = Array.from(clon.querySelectorAll('img'))
+    if (imagenes.length > 0) {
+      await Promise.all(
+        imagenes.map(
+          (img) =>
+            new Promise<void>((resolver) => {
+              if (img.complete && img.naturalWidth !== 0) {
+                resolver()
+              } else {
+                img.onload = () => resolver()
+                img.onerror = () => resolver()
+              }
+            }),
+        ),
+      )
+    }
+
+    // Medir altura real del contenido en formato escritorio A4
+    clon.style.minHeight = '0px'
+    const altoReal = clon.scrollHeight
+    const altoPagina = anchoA4 * RELACION_PAGINA
+    const paginas = Math.max(1, Math.ceil(altoReal / altoPagina - 0.02))
+    const altoTotal = Math.round(paginas * altoPagina)
+    clon.style.minHeight = `${altoTotal}px`
+
+    // Rasterizar a imagen de alta definición (pixelRatio: 2)
+    dataUrl = await toPng(clon, {
+      width: anchoA4,
+      height: altoTotal,
       pixelRatio: 2,
       backgroundColor: '#ffffff',
       cacheBust: true,
       skipFonts: true,
     })
   } finally {
-    restaurar()
+    if (contenedor.parentNode) {
+      contenedor.parentNode.removeChild(contenedor)
+    }
   }
 
   const img = new Image()
@@ -86,17 +161,10 @@ async function construirDoc(elemento: HTMLElement) {
   const anchoPag = pdf.internal.pageSize.getWidth()
   const altoPag = pdf.internal.pageSize.getHeight()
 
-  // La hoja se dibujaba a sangre, pegada al borde del papel. Casi ninguna
-  // impresora imprime hasta el borde, así que recortaba justo la franja de
-  // abajo: el pie de página desaparecía en el papel aunque se viera bien en
-  // la vista previa. Con margen, todo cae dentro del área imprimible.
   const anchoImg = anchoPag - MARGEN_PDF * 2
   const altoUtil = altoPag - MARGEN_PDF * 2
   const altoImg = (img.height / img.width) * anchoImg
 
-  // Si el contenido se pasa de una página por poco, se reduce para que entre:
-  // abrir una segunda hoja casi vacía se ve peor que un 6% menos de tamaño.
-  // Es lo mismo que hace el "ajustar a la página" de cualquier impresora.
   const HOLGURA = 1.07
   if (altoImg > altoUtil && altoImg <= altoUtil * HOLGURA) {
     const escala = altoUtil / altoImg
@@ -105,8 +173,7 @@ async function construirDoc(elemento: HTMLElement) {
   } else if (altoImg <= altoUtil + TOLERANCIA_PDF) {
     pdf.addImage(dataUrl, 'PNG', MARGEN_PDF, MARGEN_PDF, anchoImg, altoImg)
   } else {
-    // Hoja larga: se repite la misma imagen desplazada hacia arriba por página.
-    // La tolerancia evita que un resto de décimas agregue una página vacía.
+    // Hoja multipágina: se divide exactamente por área útil A4
     let posicion = MARGEN_PDF
     let restante = altoImg
     pdf.addImage(dataUrl, 'PNG', MARGEN_PDF, posicion, anchoImg, altoImg)

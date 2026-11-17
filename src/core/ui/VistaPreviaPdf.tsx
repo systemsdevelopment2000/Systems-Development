@@ -1,6 +1,6 @@
 import './vistaPreviaPdf.css'
 import { useEffect, useRef } from 'react'
-import { X, Printer, Download } from 'lucide-react'
+import { X, Printer, Download, ExternalLink } from 'lucide-react'
 import { Button } from './Button'
 
 interface Props {
@@ -40,6 +40,10 @@ export function VistaPreviaPdf({ url, nombre, onDescargar, onCerrar }: Props) {
     window.open(url, '_blank', 'noopener')
   }
 
+  function abrirNuevaVentana() {
+    window.open(url, '_blank', 'noopener')
+  }
+
   return (
     <div className="pdfv" role="presentation" onMouseDown={onCerrar}>
       <div
@@ -61,6 +65,9 @@ export function VistaPreviaPdf({ url, nombre, onDescargar, onCerrar }: Props) {
         <footer className="pdfv__pie">
           <span className="field__hint">Revisa el documento antes de descargarlo.</span>
           <div className="pdfv__acc">
+            <Button type="button" variant="ghost" onClick={abrirNuevaVentana} title="Abrir en pestaña completa">
+              <ExternalLink size={15} /> Abrir
+            </Button>
             <Button type="button" variant="ghost" onClick={imprimir}>
               <Printer size={15} /> Imprimir
             </Button>
@@ -73,3 +80,4 @@ export function VistaPreviaPdf({ url, nombre, onDescargar, onCerrar }: Props) {
     </div>
   )
 }
+

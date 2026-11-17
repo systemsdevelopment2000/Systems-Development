@@ -1,25 +1,72 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Navigate } from 'react-router-dom'
 import { ArrowLeft, ShieldCheck, Smartphone, Monitor } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
+import { supabase } from '@/core/supabase/client'
 import { useVista } from '@/core/vista'
 import { useSonido } from '@/core/sonido'
 import { LoginForm } from '../components/LoginForm'
 import { RegisterForm } from '../components/RegisterForm'
 import { ForgotForm } from '../components/ForgotForm'
+import { ResetPasswordForm } from '../components/ResetPasswordForm'
 import '../styles/onepage.css'
 
-type AuthModo = 'login' | 'registro' | 'recuperar'
+type AuthModo = 'login' | 'registro' | 'recuperar' | 'nueva-clave'
 
 export function LoginPage() {
   const { isAuthenticated } = useAuth()
   const { vista, setVista } = useVista()
   const { sonar } = useSonido()
   const nav = useNavigate()
-  const [modo, setModo] = useState<AuthModo>('login')
+  const [errorRecuperacion, setErrorRecuperacion] = useState<string | null>(null)
 
-  // Si ya está autenticado, llevar al tablero principal
-  if (isAuthenticated) {
+  const [modo, setModo] = useState<AuthModo>(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash
+      const search = window.location.search
+      if (hash.includes('type=recovery') || search.includes('type=recovery')) {
+        return 'nueva-clave'
+      }
+      if (hash.includes('error_description') || search.includes('error_description')) {
+        return 'recuperar'
+      }
+    }
+    return 'login'
+  })
+
+  // Escuchar eventos de autenticación de Supabase (especialmente PASSWORD_RECOVERY)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash
+      const search = window.location.search
+      if (hash.includes('error_description') || search.includes('error_description')) {
+        const raw = hash.includes('error_description') ? hash.slice(1) : search.slice(1)
+        const params = new URLSearchParams(raw)
+        const desc = params.get('error_description')
+        if (desc) {
+          setErrorRecuperacion(
+            'El enlace de recuperación es inválido o ha expirado. Por favor solicita uno nuevo.',
+          )
+          setModo('recuperar')
+        }
+      } else if (hash.includes('type=recovery') || search.includes('type=recovery')) {
+        setModo('nueva-clave')
+      }
+    }
+
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setModo('nueva-clave')
+      }
+    })
+
+    return () => {
+      sub.subscription.unsubscribe()
+    }
+  }, [])
+
+  // Si ya está autenticado, llevar al tablero principal (a menos que esté en el flujo de restablecer contraseña)
+  if (isAuthenticated && modo !== 'nueva-clave') {
     return <Navigate to="/tablero" replace />
   }
 
@@ -35,6 +82,7 @@ export function LoginPage() {
 
   function cambiarModo(nuevoModo: AuthModo) {
     sonar('tap')
+    setErrorRecuperacion(null)
     setModo(nuevoModo)
   }
 
@@ -94,6 +142,16 @@ export function LoginPage() {
           >
             Recuperar
           </button>
+          {modo === 'nueva-clave' && (
+            <button
+              type="button"
+              role="tab"
+              aria-selected={true}
+              className="op-tab is-active"
+            >
+              Nueva Clave
+            </button>
+          )}
         </div>
 
         <div className="login-subhead">
@@ -101,6 +159,7 @@ export function LoginPage() {
             {modo === 'login' && 'Ingresa tus credenciales para acceder a la plataforma operativa.'}
             {modo === 'registro' && 'Completa el registro en 2 pasos para incorporarte al equipo.'}
             {modo === 'recuperar' && 'Te enviaremos un enlace de recuperación seguro a tu correo.'}
+            {modo === 'nueva-clave' && 'Ingresa tu nueva contraseña para actualizar el acceso a tu cuenta.'}
           </p>
         </div>
 
@@ -115,7 +174,26 @@ export function LoginPage() {
 
         {modo === 'registro' && <RegisterForm autoFocus={true} onIrALogin={() => cambiarModo('login')} />}
 
-        {modo === 'recuperar' && <ForgotForm autoFocus={true} onIrALogin={() => cambiarModo('login')} />}
+        {modo === 'recuperar' && (
+          <ForgotForm
+            autoFocus={true}
+            mensajeInicial={errorRecuperacion}
+            onIrALogin={() => cambiarModo('login')}
+          />
+        )}
+
+        {modo === 'nueva-clave' && (
+          <ResetPasswordForm
+            autoFocus={true}
+            onCompletado={() => {
+              if (typeof window !== 'undefined') {
+                window.history.replaceState(null, '', window.location.pathname)
+              }
+              nav('/tablero', { replace: true })
+            }}
+            onIrALogin={() => cambiarModo('login')}
+          />
+        )}
 
         {/* Pie con navegación y conmutador de vista responsivo con hover estético */}
         <div className="login-footer-nav">
@@ -152,3 +230,4 @@ export function LoginPage() {
     </div>
   )
 }
+

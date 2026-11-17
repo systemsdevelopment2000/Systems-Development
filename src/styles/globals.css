@@ -1818,4 +1818,72 @@ select.field__input,
   color: #7dd3fc;
 }
 
+/* ============================================================
+   Lienzo de exportación PDF — Estructura A4 estándar universal
+   Garantiza que la generación de PDF desde smartphones o pantallas
+   angostas conserve el formato formal de 2 columnas, firmas y tablas.
+   ============================================================ */
+.sd-lienzo-export-pdf {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: -9999 !important;
+  pointer-events: none !important;
+  background: #ffffff !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+.sd-lienzo-export-pdf .doc,
+.sd-lienzo-export-pdf .mb {
+  margin: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  box-sizing: border-box !important;
+}
+
+/* Forzar estructura desktop de dos columnas en documentos */
+.sd-lienzo-export-pdf .doc-ficha,
+.doc--imprimiendo .doc-ficha {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+}
+.sd-lienzo-export-pdf .doc-ficha__col + .doc-ficha__col,
+.doc--imprimiendo .doc-ficha__col + .doc-ficha__col {
+  border-top: 0 !important;
+  border-left: 1px solid #dcdcdc !important;
+}
+
+/* Firmas en paralelo (cliente a la izquierda, Systems Development a la derecha) */
+.sd-lienzo-export-pdf .doc-firmas,
+.doc--imprimiendo .doc-firmas {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 40px !important;
+}
+
+/* Tablas con ancho completo y sin recorte horizontal de móvil */
+.sd-lienzo-export-pdf .table,
+.sd-lienzo-export-pdf .pend-tabla,
+.sd-lienzo-export-pdf .aud-cambios {
+  display: table !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: visible !important;
+  white-space: normal !important;
+}
+
+/* Ocultar bordes de edición al imprimir/exportar */
+.sd-lienzo-export-pdf .doc-edit,
+.sd-lienzo-export-pdf .doc-edit--bloque,
+.doc--imprimiendo .doc-edit,
+.doc--imprimiendo .doc-edit--bloque {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
 
