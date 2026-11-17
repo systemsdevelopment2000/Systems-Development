@@ -47,8 +47,38 @@ export function ClienteForm({ inicial, onGuardar, onCancelar }: Props) {
       setError('Debes ingresar el nombre o razón social del cliente.')
       return false
     }
-    if (!documento.trim()) {
-      setError(`Debes ingresar el número de ${tipoDocumento === 'rif' ? 'RIF' : 'cédula'}.`)
+    // Cédula / RIF es opcional. Si se ingresa, se verifica formato mínimo.
+    if (documento.trim()) {
+      const digitos = documento.replace(/\D/g, '')
+      if (digitos.length < 5) {
+        setError(`El número de ${tipoDocumento === 'rif' ? 'RIF' : 'cédula'} debe tener al menos 5 dígitos.`)
+        return false
+      }
+    }
+    setError(null)
+    return true
+  }
+
+  function validarPaso2(): boolean {
+    if (!telefono.trim()) {
+      setError('El número de teléfono institucional es obligatorio.')
+      return false
+    }
+    const telDigitos = telefono.replace(/\D/g, '')
+    if (telDigitos.length < 7) {
+      setError('El número de teléfono debe contener al menos 7 dígitos.')
+      return false
+    }
+    if (correo.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo.trim())) {
+      setError('El correo institucional no tiene un formato válido (ej. contacto@empresa.com).')
+      return false
+    }
+    if (respTel.trim() && respTel.replace(/\D/g, '').length < 7) {
+      setError('El teléfono del responsable debe contener al menos 7 dígitos.')
+      return false
+    }
+    if (respCorreo.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(respCorreo.trim())) {
+      setError('El correo del responsable no tiene un formato válido.')
       return false
     }
     setError(null)
@@ -57,6 +87,7 @@ export function ClienteForm({ inicial, onGuardar, onCancelar }: Props) {
 
   function avanzar() {
     if (paso === 0 && !validarPaso1()) return
+    if (paso === 1 && !validarPaso2()) return
     const siguiente = Math.min(paso + 1, PASOS_CLIENTE.length - 1)
     setPaso(siguiente)
     setMaxPaso((prev) => Math.max(prev, siguiente))
@@ -68,7 +99,8 @@ export function ClienteForm({ inicial, onGuardar, onCancelar }: Props) {
   }
 
   function irAlPaso(n: number) {
-    if (n > paso && !validarPaso1()) return
+    if (n > 0 && !validarPaso1()) return
+    if (n > 1 && !validarPaso2()) return
     setError(null)
     setPaso(n)
   }
@@ -77,6 +109,10 @@ export function ClienteForm({ inicial, onGuardar, onCancelar }: Props) {
     e.preventDefault()
     if (!validarPaso1()) {
       setPaso(0)
+      return
+    }
+    if (!validarPaso2()) {
+      setPaso(1)
       return
     }
 
@@ -132,7 +168,7 @@ export function ClienteForm({ inicial, onGuardar, onCancelar }: Props) {
               autoFocus
               value={nombre}
               onChange={(e) => {
-                setNombre(e.target.value)
+                setNombre(e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9\s.'&-]/g, ''))
                 setError(null)
               }}
               placeholder="Ej. Comercial El Roble, C.A."
@@ -147,24 +183,30 @@ export function ClienteForm({ inicial, onGuardar, onCancelar }: Props) {
                 { valor: 'cedula', etiqueta: 'Cédula (Persona natural)' },
               ]}
               valor={tipoDocumento}
-              onCambio={(v) => setTipoDocumento(v as 'cedula' | 'rif')}
+              onCambio={(v) => {
+                setTipoDocumento(v as 'cedula' | 'rif')
+                setDocumento('')
+              }}
               buscar={false}
             />
           </div>
 
           <label className="field">
             <span className="field__label">
-              Número de documento <b style={{ color: 'var(--brand)' }}>*</b>
+              Número de documento <small style={{ color: 'var(--text-muted)' }}>(Opcional)</small>
             </span>
             <input
               className="field__input"
-              required
               value={documento}
               onChange={(e) => {
-                setDocumento(e.target.value)
+                const val =
+                  tipoDocumento === 'cedula'
+                    ? e.target.value.replace(/\D/g, '')
+                    : e.target.value.replace(/[^jvgJvGeE0-9-]/g, '').toUpperCase()
+                setDocumento(val)
                 setError(null)
               }}
-              placeholder={tipoDocumento === 'rif' ? 'J-12345678-9' : 'V-12345678'}
+              placeholder={tipoDocumento === 'rif' ? 'J-12345678-9' : '12345678'}
             />
           </label>
 
@@ -173,7 +215,7 @@ export function ClienteForm({ inicial, onGuardar, onCancelar }: Props) {
             <input
               className="field__input"
               value={ubicacion}
-              onChange={(e) => setUbicacion(e.target.value)}
+              onChange={(e) => setUbicacion(e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9\s,.-]/g, ''))}
               placeholder="Puerto Ordaz, Bolívar"
             />
           </label>
@@ -184,12 +226,18 @@ export function ClienteForm({ inicial, onGuardar, onCancelar }: Props) {
       {paso === 1 && (
         <div className="form-grid">
           <label className="field">
-            <span className="field__label">Teléfono institucional</span>
+            <span className="field__label">
+              Teléfono institucional <b style={{ color: 'var(--brand)' }}>*</b>
+            </span>
             <input
               className="field__input"
               type="tel"
+              required
               value={telefono}
-              onChange={(e) => setTelefono(e.target.value)}
+              onChange={(e) => {
+                setTelefono(e.target.value.replace(/[^\d+-\s]/g, ''))
+                setError(null)
+              }}
               placeholder="0414-1234567"
             />
           </label>
@@ -200,7 +248,10 @@ export function ClienteForm({ inicial, onGuardar, onCancelar }: Props) {
               className="field__input"
               type="email"
               value={correo}
-              onChange={(e) => setCorreo(e.target.value)}
+              onChange={(e) => {
+                setCorreo(e.target.value.trim())
+                setError(null)
+              }}
               placeholder="contacto@empresa.com"
             />
           </label>
@@ -225,21 +276,27 @@ export function ClienteForm({ inicial, onGuardar, onCancelar }: Props) {
           </div>
 
           <label className="field">
-            <span className="field__label">Nombre del responsable</span>
+            <span className="field__label">Nombre del responsable (solo letras)</span>
             <input
               className="field__input"
               value={respNombre}
-              onChange={(e) => setRespNombre(e.target.value)}
-              placeholder="Ej. Ing. Juan Pérez"
+              onChange={(e) => {
+                setRespNombre(e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s.'-]/g, ''))
+                setError(null)
+              }}
+              placeholder="Ej. Juan Pérez"
             />
           </label>
 
           <label className="field">
-            <span className="field__label">Cargo / Rol</span>
+            <span className="field__label">Cargo / Rol (solo letras)</span>
             <input
               className="field__input"
               value={respCargo}
-              onChange={(e) => setRespCargo(e.target.value)}
+              onChange={(e) => {
+                setRespCargo(e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s,./-]/g, ''))
+                setError(null)
+              }}
               placeholder="Gerente de Operaciones"
             />
           </label>
@@ -250,7 +307,10 @@ export function ClienteForm({ inicial, onGuardar, onCancelar }: Props) {
               className="field__input"
               type="tel"
               value={respTel}
-              onChange={(e) => setRespTel(e.target.value)}
+              onChange={(e) => {
+                setRespTel(e.target.value.replace(/[^\d+-\s]/g, ''))
+                setError(null)
+              }}
               placeholder="0412-9876543"
             />
           </label>

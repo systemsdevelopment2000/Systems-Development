@@ -45,42 +45,42 @@ export function ColaboradorForm({ inicial, onGuardar, onCancelar }: Props) {
       </div>
 
       <label className="field form-grid__full">
-        <span className="field__label">Nombre completo</span>
+        <span className="field__label">Nombre completo (solo letras)</span>
         <input
           className="field__input"
           required
           value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
+          onChange={(e) => setNombre(e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s.'-]/g, ''))}
           placeholder="Carlos González"
         />
       </label>
 
       <label className="field">
-        <span className="field__label">Cédula</span>
+        <span className="field__label">Cédula (números)</span>
         <input
           className="field__input"
           value={cedula}
-          onChange={(e) => setCedula(e.target.value)}
+          onChange={(e) => setCedula(e.target.value.replace(/[^vVeEpP0-9-]/g, '').toUpperCase())}
           placeholder="V-20111222"
         />
       </label>
 
       <label className="field">
-        <span className="field__label">Rol</span>
+        <span className="field__label">Rol (solo letras)</span>
         <input
           className="field__input"
           value={rol}
-          onChange={(e) => setRol(e.target.value)}
+          onChange={(e) => setRol(e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s,./-]/g, ''))}
           placeholder="Arquitecto, Frontend, Backend…"
         />
       </label>
 
       <label className="field form-grid__full">
-        <span className="field__label">Título / profesión</span>
+        <span className="field__label">Título / profesión (solo letras)</span>
         <input
           className="field__input"
           value={titulo}
-          onChange={(e) => setTitulo(e.target.value)}
+          onChange={(e) => setTitulo(e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s,./-]/g, ''))}
           placeholder="Ing. de Sistemas"
         />
       </label>
@@ -91,17 +91,18 @@ export function ColaboradorForm({ inicial, onGuardar, onCancelar }: Props) {
           className="field__input"
           type="email"
           value={correo}
-          onChange={(e) => setCorreo(e.target.value)}
+          onChange={(e) => setCorreo(e.target.value.trim())}
           placeholder="nombre@sd.dev"
         />
       </label>
 
       <label className="field">
-        <span className="field__label">Teléfono</span>
+        <span className="field__label">Teléfono (números)</span>
         <input
           className="field__input"
+          type="tel"
           value={telefono}
-          onChange={(e) => setTelefono(e.target.value)}
+          onChange={(e) => setTelefono(e.target.value.replace(/[^\d+-\s]/g, ''))}
           placeholder="0414-1230000"
         />
       </label>
