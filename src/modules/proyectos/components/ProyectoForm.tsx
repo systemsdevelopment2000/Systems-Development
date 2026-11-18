@@ -2,6 +2,7 @@ import { useState, type FormEvent, type KeyboardEvent } from 'react'
 import { Star, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button, Combobox, SelectorTags, Stepper, type PasoDef } from '@/core/ui'
 import type { Cliente, Colaborador, EstadoProyecto, Tag } from '@/core/datos'
+import { primeraMayuscula } from '@/core/lib/validaciones'
 import type { EntradaProyecto, ProyectoEnriquecido } from '../hooks/useProyectos'
 import type { CategoriaProyecto, ModuloProyecto, TipoDesarrollo } from '@/core/datos'
 import { CATEGORIAS, TIPOS_DESARROLLO, esDesarrollo, modulosSugeridos } from '../lib/modulos'
@@ -97,8 +98,8 @@ export function ProyectoForm({
 
   function handleKeyDown(e: KeyboardEvent<HTMLFormElement>) {
     if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
+      e.preventDefault()
       if (!verTodo && paso < PASOS_PROYECTO.length - 1) {
-        e.preventDefault()
         avanzar()
       }
     }
@@ -151,7 +152,7 @@ export function ProyectoForm({
           autoFocus={!inicial}
           value={nombre}
           onChange={(e) => {
-            setNombre(e.target.value)
+            setNombre(primeraMayuscula(e.target.value))
             setError(null)
           }}
           placeholder="Ej. Rediseño Portal Corporativo"

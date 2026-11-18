@@ -3,6 +3,9 @@ import { createRoot } from 'react-dom/client'
 import { App } from '@/App'
 import '@/styles/globals.css'
 import '@/styles/paletas.css'
+import { inicializarAutoCapitalizacion } from '@/core/lib/autoCapitalizacion'
+
+inicializarAutoCapitalizacion()
 
 const rootEl = document.getElementById('root')
 if (!rootEl) throw new Error('No se encontró el elemento #root en index.html')

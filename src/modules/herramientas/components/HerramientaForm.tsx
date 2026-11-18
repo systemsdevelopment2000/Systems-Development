@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { Button, Combobox, Stepper, type PasoDef } from '@/core/ui'
 import { nuevoId, type CicloPago, type Cliente, type Herramienta, type PropietarioHerramienta, type Proyecto, type AccesoHerramienta } from '@/core/datos'
+import { primeraMayuscula } from '@/core/lib/validaciones'
 import type { EntradaHerramienta } from '../hooks/useHerramientas'
 import { CATEGORIAS_HERRAMIENTA, detectarTipoHerramienta } from '../lib/categoriasHerramientas'
 import { calcularProximoPagoPorDia } from '../hooks/useHerramientas'
@@ -121,8 +122,14 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
   }
 
   function actualizarAcceso(id: string, campo: keyof AccesoHerramienta, valor: unknown) {
+    const valorTratado =
+      campo === 'nombre' || campo === 'notas'
+        ? typeof valor === 'string'
+          ? primeraMayuscula(valor)
+          : valor
+        : valor
     setAccesos((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, [campo]: valor } : a)),
+      prev.map((a) => (a.id === id ? { ...a, [campo]: valorTratado } : a)),
     )
   }
 
@@ -174,8 +181,9 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
 
   function handleKeyDown(e: KeyboardEvent<HTMLFormElement>) {
     if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
+      // Bloquea SIEMPRE el submit automático del navegador por presionar Enter
+      e.preventDefault()
       if (!verTodo && paso < PASOS_HERRAMIENTA.length - 1) {
-        e.preventDefault()
         avanzar()
       }
     }
@@ -183,6 +191,7 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
 
   function submit(e: FormEvent) {
     e.preventDefault()
+    // Si estamos en modo paso a paso y NO estamos en el paso final, solo avanzar
     if (!verTodo && paso < PASOS_HERRAMIENTA.length - 1) {
       avanzar()
       return
@@ -242,7 +251,7 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
           autoFocus={!inicial}
           value={nombre}
           onChange={(e) => {
-            const val = e.target.value
+            const val = primeraMayuscula(e.target.value)
             setNombre(val)
             setError(null)
             if (!inicial && val && !tipoHerramienta) {
@@ -382,7 +391,7 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
         <input
           className="field__input"
           value={metodoPago}
-          onChange={(e) => setMetodoPago(e.target.value)}
+          onChange={(e) => setMetodoPago(primeraMayuscula(e.target.value))}
           placeholder="Tarjeta internacional, PayPal, Zinli…"
         />
       </label>
@@ -392,7 +401,7 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
         <input
           className="field__input"
           value={notas}
-          onChange={(e) => setNotas(e.target.value)}
+          onChange={(e) => setNotas(primeraMayuscula(e.target.value))}
           placeholder="Plan Pro, cupones o condiciones de pago…"
         />
       </label>

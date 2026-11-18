@@ -1,6 +1,7 @@
 import { useState, type FormEvent, type KeyboardEvent } from 'react'
 import { X, ListPlus } from 'lucide-react'
 import { Button, Combobox } from '@/core/ui'
+import { primeraMayuscula } from '@/core/lib/validaciones'
 import type {
   Actividad,
   Colaborador,
@@ -146,7 +147,7 @@ export function TareaForm({
           <input
             className="field__input"
             value={titulo}
-            onChange={(e) => setTitulo(e.target.value)}
+            onChange={(e) => setTitulo(primeraMayuscula(e.target.value))}
             placeholder="Título de la tarea"
             autoFocus
           />

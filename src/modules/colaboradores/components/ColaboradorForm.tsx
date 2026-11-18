@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Button, SubirImagen } from '@/core/ui'
 import type { Colaborador } from '@/core/datos'
+import { soloLetras, soloLetrasTexto, formatoCedula } from '@/core/lib/validaciones'
 import type { EntradaColaborador } from '../hooks/useColaboradores'
 
 interface Props {
@@ -50,7 +51,7 @@ export function ColaboradorForm({ inicial, onGuardar, onCancelar }: Props) {
           className="field__input"
           required
           value={nombre}
-          onChange={(e) => setNombre(e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s.'-]/g, ''))}
+          onChange={(e) => setNombre(soloLetras(e.target.value))}
           placeholder="Carlos González"
         />
       </label>
@@ -60,7 +61,7 @@ export function ColaboradorForm({ inicial, onGuardar, onCancelar }: Props) {
         <input
           className="field__input"
           value={cedula}
-          onChange={(e) => setCedula(e.target.value.replace(/[^vVeEpP0-9-]/g, '').toUpperCase())}
+          onChange={(e) => setCedula(formatoCedula(e.target.value))}
           placeholder="V-20111222"
         />
       </label>
@@ -70,7 +71,7 @@ export function ColaboradorForm({ inicial, onGuardar, onCancelar }: Props) {
         <input
           className="field__input"
           value={rol}
-          onChange={(e) => setRol(e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s,./-]/g, ''))}
+          onChange={(e) => setRol(soloLetrasTexto(e.target.value))}
           placeholder="Arquitecto, Frontend, Backend…"
         />
       </label>
@@ -80,7 +81,7 @@ export function ColaboradorForm({ inicial, onGuardar, onCancelar }: Props) {
         <input
           className="field__input"
           value={titulo}
-          onChange={(e) => setTitulo(e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s,./-]/g, ''))}
+          onChange={(e) => setTitulo(soloLetrasTexto(e.target.value))}
           placeholder="Ing. de Sistemas"
         />
       </label>

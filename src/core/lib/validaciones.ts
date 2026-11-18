@@ -1,16 +1,32 @@
 /**
  * Utilidades centrales de validación y saneamiento de entradas en tiempo real.
- * Garantiza que los campos de números solo admitan números y los de letras solo letras.
+ * Garantiza que los campos de números solo admitan números, los de letras solo letras,
+ * y que por defecto en todos los formularios la primera letra sea mayúscula.
  */
 
-/** Filtra caracteres dejando únicamente letras, espacios, acentos y signos de puntuación de nombres. */
-export function soloLetras(val: string): string {
-  return val.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s.'-]/g, '')
+/** Pone la primera letra alfabética en mayúscula por defecto (respetando espacios o símbolos iniciales). */
+export function primeraMayuscula(val: string): string {
+  if (!val) return val
+  const idx = val.search(/[a-záéíóúñü]/i)
+  if (idx === -1) return val
+  return val.slice(0, idx) + val.charAt(idx).toUpperCase() + val.slice(idx + 1)
 }
 
-/** Filtra caracteres para cargos, títulos o profesiones (letras, espacios, comas, barras). */
+/** Sanitiza texto general garantizando que la primera letra sea mayúscula. */
+export function textoConMayuscula(val: string): string {
+  return primeraMayuscula(val)
+}
+
+/** Filtra caracteres dejando únicamente letras, espacios, acentos y signos de puntuación, con primera letra mayúscula. */
+export function soloLetras(val: string): string {
+  const limpio = val.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s.'-]/g, '')
+  return primeraMayuscula(limpio)
+}
+
+/** Filtra caracteres para cargos, títulos o profesiones (letras, espacios, comas, barras), con primera letra mayúscula. */
 export function soloLetrasTexto(val: string): string {
-  return val.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s,./-]/g, '')
+  const limpio = val.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s,./-]/g, '')
+  return primeraMayuscula(limpio)
 }
 
 /** Filtra estrictamente dígitos numéricos enteros (0-9). */

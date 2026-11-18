@@ -2,6 +2,7 @@ import { useState, type FormEvent, type KeyboardEvent } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button, SubirImagen, Combobox, Stepper, type PasoDef } from '@/core/ui'
 import type { Cliente, MedioComunicacion } from '@/core/datos'
+import { primeraMayuscula } from '@/core/lib/validaciones'
 import type { EntradaCliente } from '../hooks/useClientes'
 
 interface Props {
@@ -107,8 +108,8 @@ export function ClienteForm({ inicial, onGuardar, onCancelar }: Props) {
 
   function handleKeyDown(e: KeyboardEvent<HTMLFormElement>) {
     if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
+      e.preventDefault()
       if (!verTodo && paso < PASOS_CLIENTE.length - 1) {
-        e.preventDefault()
         avanzar()
       }
     }
@@ -172,7 +173,7 @@ export function ClienteForm({ inicial, onGuardar, onCancelar }: Props) {
           autoFocus={!inicial}
           value={nombre}
           onChange={(e) => {
-            setNombre(e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9\s.'&-]/g, ''))
+            setNombre(primeraMayuscula(e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9\s.'&-]/g, '')))
             setError(null)
           }}
           placeholder="Ej. Comercial El Roble, C.A."
@@ -219,7 +220,7 @@ export function ClienteForm({ inicial, onGuardar, onCancelar }: Props) {
         <input
           className="field__input"
           value={ubicacion}
-          onChange={(e) => setUbicacion(e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9\s,.-]/g, ''))}
+          onChange={(e) => setUbicacion(primeraMayuscula(e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9\s,.-]/g, '')))}
           placeholder="Puerto Ordaz, Bolívar"
         />
       </label>
@@ -284,7 +285,7 @@ export function ClienteForm({ inicial, onGuardar, onCancelar }: Props) {
           className="field__input"
           value={respNombre}
           onChange={(e) => {
-            setRespNombre(e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s.'-]/g, ''))
+            setRespNombre(primeraMayuscula(e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s.'-]/g, '')))
             setError(null)
           }}
           placeholder="Ej. Juan Pérez"
@@ -297,7 +298,7 @@ export function ClienteForm({ inicial, onGuardar, onCancelar }: Props) {
           className="field__input"
           value={respCargo}
           onChange={(e) => {
-            setRespCargo(e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s,./-]/g, ''))
+            setRespCargo(primeraMayuscula(e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s,./-]/g, '')))
             setError(null)
           }}
           placeholder="Gerente de Operaciones"
@@ -338,7 +339,7 @@ export function ClienteForm({ inicial, onGuardar, onCancelar }: Props) {
         <input
           className="field__input"
           value={medioPago}
-          onChange={(e) => setMedioPago(e.target.value)}
+          onChange={(e) => setMedioPago(primeraMayuscula(e.target.value))}
           placeholder="Pago Móvil, Transferencia nacional, Zelle, Divisas efectivo…"
         />
       </label>
@@ -349,7 +350,7 @@ export function ClienteForm({ inicial, onGuardar, onCancelar }: Props) {
           className="field__input"
           rows={3}
           value={notas}
-          onChange={(e) => setNotas(e.target.value)}
+          onChange={(e) => setNotas(primeraMayuscula(e.target.value))}
           placeholder="Horarios de atención, requerimientos especiales de facturación…"
         />
       </label>

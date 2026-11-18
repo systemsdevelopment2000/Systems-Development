@@ -134,6 +134,60 @@ export function mapearA_DB(coleccion: string, entidad: Record<string, unknown>):
     res.comunicacion = Number(res.comunicacion) || 0
   } else if (coleccion === 'hechos' || coleccion === 'auditoria') {
     if (!res.fecha) res.fecha = new Date().toISOString()
+  } else if (coleccion === 'herramientas') {
+    // Columnas reales de la tabla public.herramientas en Supabase
+    const COLUMNAS_VALIDAS_HERRAMIENTAS = new Set([
+      'id',
+      'codigo',
+      'nombre',
+      'url',
+      'propietario',
+      'cliente_ids',
+      'proyecto_ids',
+      'reparto',
+      'correo',
+      'contrasena',
+      'ciclo',
+      'precio',
+      'moneda',
+      'metodo_pago',
+      'proximo_pago',
+      'ultimo_pago',
+      'notas',
+      'activa',
+      'creado_en',
+    ])
+
+    // Empaqueta metadatos (tipoHerramienta, diaPagoMes, accesos) en notas de forma segura
+    const meta: Record<string, unknown> = {}
+    if (entidad.tipoHerramienta) meta.tipo = entidad.tipoHerramienta
+    if (entidad.diaPagoMes != null) meta.diaPago = entidad.diaPagoMes
+    if (Array.isArray(entidad.accesos) && entidad.accesos.length > 0) meta.accesos = entidad.accesos
+
+    let textoNotas = typeof res.notas === 'string' ? res.notas : ''
+    textoNotas = textoNotas.replace(/<!--SD_VAULT:.*?-->/s, '').trim()
+    if (Object.keys(meta).length > 0) {
+      const metaStr = `<!--SD_VAULT:${JSON.stringify(meta)}-->`
+      res.notas = textoNotas ? `${textoNotas}\n${metaStr}` : metaStr
+    } else {
+      res.notas = textoNotas || null
+    }
+
+    // Sincroniza correo y contraseña principales para la tabla legacy
+    const primerAcceso = Array.isArray(entidad.accesos)
+      ? (entidad.accesos[0] as Record<string, unknown> | undefined)
+      : undefined
+    if (primerAcceso) {
+      if (primerAcceso.usuario && !res.correo) res.correo = primerAcceso.usuario
+      if (primerAcceso.contrasena && !res.contrasena) res.contrasena = primerAcceso.contrasena
+    }
+
+    // Elimina propiedades que no existen como columnas en Supabase para evitar errores de schema cache
+    for (const k of Object.keys(res)) {
+      if (!COLUMNAS_VALIDAS_HERRAMIENTAS.has(k)) {
+        delete res[k]
+      }
+    }
   }
 
   return res
@@ -194,6 +248,22 @@ export function mapearDe_DB(coleccion: string, fila: Record<string, unknown>): R
   } else if (coleccion === 'herramientas') {
     if (!Array.isArray(res.clienteIds)) res.clienteIds = []
     if (!Array.isArray(res.proyectoIds)) res.proyectoIds = []
+
+    // Desempaqueta metadatos guardados en notas si existen
+    if (typeof res.notas === 'string') {
+      const match = (res.notas as string).match(/<!--SD_VAULT:(.*?)-->/s)
+      if (match) {
+        try {
+          const meta = JSON.parse(match[1])
+          if (meta.tipo && !res.tipoHerramienta) res.tipoHerramienta = meta.tipo
+          if (meta.diaPago != null && res.diaPagoMes === undefined) res.diaPagoMes = meta.diaPago
+          if (Array.isArray(meta.accesos) && (!res.accesos || (res.accesos as unknown[]).length === 0)) {
+            res.accesos = meta.accesos
+          }
+          res.notas = (res.notas as string).replace(/<!--SD_VAULT:.*?-->/s, '').trim()
+        } catch {}
+      }
+    }
   }
 
   return res
