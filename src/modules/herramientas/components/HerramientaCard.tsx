@@ -14,6 +14,8 @@ import {
   BadgeCheck,
   GitBranch,
   ShieldCheck,
+  ChevronDown,
+  Maximize2,
 } from 'lucide-react'
 import { useConfirmar } from '@/core/ui'
 import type { HerramientaVista } from '../hooks/useHerramientas'
@@ -24,6 +26,7 @@ interface Props {
   onEditar: () => void
   onBorrar: () => void
   onPagar: () => void
+  onVerAccesos?: () => void
 }
 
 function etiquetaEstado(h: HerramientaVista) {
@@ -33,13 +36,21 @@ function etiquetaEstado(h: HerramientaVista) {
   return 'Al día'
 }
 
-export function HerramientaCard({ herramienta: h, onEditar, onBorrar, onPagar }: Props) {
+export function HerramientaCard({
+  herramienta: h,
+  onEditar,
+  onBorrar,
+  onPagar,
+  onVerAccesos,
+}: Props) {
+  const [abiertoAccesos, setAbiertoAccesos] = useState(false)
   const [verPassMap, setVerPassMap] = useState<Record<string, boolean>>({})
   const [copiado, setCopiado] = useState('')
   const confirmar = useConfirmar()
 
   const tipoDef = obtenerDefTipoHerramienta(h.tipoHerramienta)
   const listaAccesos = h.accesosNormalizados || []
+  const tieneGit = listaAccesos.some((a) => a.vinculaGit)
 
   function copiar(texto: string, cual: string) {
     if (!texto) return
@@ -55,6 +66,7 @@ export function HerramientaCard({ herramienta: h, onEditar, onBorrar, onPagar }:
 
   return (
     <article className={'hrr-card hrr-' + h.estadoPago}>
+      {/* ── ENCABEZADO ── */}
       <div className="hrr-card__head">
         <div className="hrr-card__id">
           <h3 className="cl-card__nombre">{h.nombre}</h3>
@@ -70,15 +82,30 @@ export function HerramientaCard({ herramienta: h, onEditar, onBorrar, onPagar }:
           </span>
         </div>
         <div className="cl-card__acciones">
-          <button className="icono-btn" onClick={onEditar} aria-label="Editar">
+          {onVerAccesos && (
+            <button
+              className="icono-btn"
+              onClick={onVerAccesos}
+              aria-label="Abrir bóveda de accesos"
+              title="Abrir bóveda de accesos y contraseñas"
+            >
+              <KeyRound size={15} />
+            </button>
+          )}
+          <button className="icono-btn" onClick={onEditar} aria-label="Editar herramienta">
             <Pencil size={15} />
           </button>
-          <button className="icono-btn icono-btn--peligro" onClick={onBorrar} aria-label="Eliminar">
+          <button
+            className="icono-btn icono-btn--peligro"
+            onClick={onBorrar}
+            aria-label="Eliminar herramienta"
+          >
             <Trash2 size={15} />
           </button>
         </div>
       </div>
 
+      {/* ── CLIENTE / PROYECTO ASOCIADO ── */}
       {(h.clienteNombre || h.proyectoNombre) && (
         <p className="hrr-asoc">
           {h.cuantosClientes > 1 && (
@@ -89,17 +116,218 @@ export function HerramientaCard({ herramienta: h, onEditar, onBorrar, onPagar }:
         </p>
       )}
 
+      {/* ── ENLACE OFICIAL DE LA HERRAMIENTA ── */}
       {h.url && (
         <a className="hrr-url" href={h.url} target="_blank" rel="noreferrer">
           <ExternalLink size={13} /> {h.url}
         </a>
       )}
 
-      {/* ── DATOS DE PAGO Y FECHAS ── */}
+      {/* ── DISPARADOR INTERACTIVO: CLIC PARA VER CONTRASEÑAS Y ACCESOS ── */}
+      <div className="hrr-acc-contenedor">
+        <button
+          type="button"
+          className={`hrr-acc-trigger ${abiertoAccesos ? 'is-active' : ''}`}
+          onClick={() => setAbiertoAccesos((v) => !v)}
+          aria-expanded={abiertoAccesos}
+          title={
+            abiertoAccesos
+              ? 'Clic para ocultar las contraseñas'
+              : 'Clic para ver las contraseñas y accesos'
+          }
+        >
+          <div className="hrr-acc-trigger__izq">
+            <span className="hrr-acc-trigger__icono">
+              <ShieldCheck size={14} />
+            </span>
+            <div className="hrr-acc-trigger__info">
+              <span className="hrr-acc-trigger__titulo">
+                {listaAccesos.length === 0
+                  ? 'Sin accesos registrados'
+                  : `${listaAccesos.length} ${
+                      listaAccesos.length === 1
+                        ? 'acceso y contraseña'
+                        : 'accesos y contraseñas'
+                    }`}
+              </span>
+              <span className="hrr-acc-trigger__sub">
+                {abiertoAccesos ? 'Ocultar credenciales' : 'Clic para ver contraseñas'}
+              </span>
+            </div>
+          </div>
+
+          <div className="hrr-acc-trigger__der">
+            {tieneGit && (
+              <span className="hrr-git-badge-mini" title="Vinculado con Git">
+                <GitBranch size={10} /> Git
+              </span>
+            )}
+            <span className="hrr-acc-trigger__accion">
+              {abiertoAccesos ? 'Ocultar' : 'Ver'}
+              <ChevronDown
+                size={14}
+                className={`hrr-acc-trigger__chevron ${abiertoAccesos ? 'is-open' : ''}`}
+              />
+            </span>
+          </div>
+        </button>
+
+        {/* ── CUERPO DESPLEGABLE CON LAS CONTRASEÑAS Y ACCESOS ── */}
+        {abiertoAccesos && (
+          <div className="hrr-acc-desplegable">
+            <div className="hrr-acc-desplegable__head">
+              <span>
+                <KeyRound size={12} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+                Credenciales ({listaAccesos.length})
+              </span>
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                {onVerAccesos && (
+                  <button
+                    type="button"
+                    className="hrr-acc-btn-mini"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onVerAccesos()
+                    }}
+                    title="Ampliar en ventana completa"
+                  >
+                    <Maximize2 size={11} /> Ampliar
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="hrr-acc-btn-mini"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onEditar()
+                  }}
+                  title="Editar o añadir accesos"
+                >
+                  <Pencil size={11} /> Editar
+                </button>
+              </div>
+            </div>
+
+            {listaAccesos.length === 0 ? (
+              <div className="hrr-acc-vacio-box">
+                <p>No hay contraseñas ni tokens registrados.</p>
+                <button type="button" className="hrr-acc-btn-agregar" onClick={onEditar}>
+                  + Añadir primer acceso
+                </button>
+              </div>
+            ) : (
+              <div className="hrr-acc-lista">
+                {listaAccesos.map((acc, idx) => {
+                  const verPass = Boolean(verPassMap[acc.id])
+                  const keyCorreo = `${acc.id}-usr`
+                  const keyPass = `${acc.id}-pass`
+                  const keyToken = `${acc.id}-token`
+
+                  return (
+                    <div key={acc.id || idx} className="hrr-acc-item">
+                      <div className="hrr-acc-item__top">
+                        <span className="hrr-acc-item__nom">
+                          {acc.nombre || `Acceso #${idx + 1}`}
+                        </span>
+                        {acc.vinculaGit && (
+                          <span
+                            className="hrr-git-badge"
+                            title="Vinculado con repositorio Git / GitHub"
+                          >
+                            <GitBranch size={10} /> Vincula Git
+                          </span>
+                        )}
+                      </div>
+
+                      {acc.usuario && (
+                        <div className="hrr-cred__row">
+                          <Mail size={12} />
+                          <span className="hrr-cred__val" title={acc.usuario}>
+                            {acc.usuario}
+                          </span>
+                          <button
+                            type="button"
+                            className="hrr-mini"
+                            onClick={() => copiar(acc.usuario!, keyCorreo)}
+                            title="Copiar usuario o correo"
+                          >
+                            {copiado === keyCorreo ? (
+                              <Check size={11} color="var(--brand-2)" />
+                            ) : (
+                              <Copy size={11} />
+                            )}
+                          </button>
+                        </div>
+                      )}
+
+                      {acc.contrasena && (
+                        <div className="hrr-cred__row">
+                          <KeyRound size={12} />
+                          <span className="hrr-cred__val hrr-pass">
+                            {verPass ? acc.contrasena : '••••••••'}
+                          </span>
+                          <button
+                            type="button"
+                            className="hrr-mini"
+                            onClick={() => toggleVerPass(acc.id)}
+                            title={verPass ? 'Ocultar' : 'Ver'}
+                          >
+                            {verPass ? <EyeOff size={11} /> : <Eye size={11} />}
+                          </button>
+                          <button
+                            type="button"
+                            className="hrr-mini"
+                            onClick={() => copiar(acc.contrasena!, keyPass)}
+                            title="Copiar contraseña"
+                          >
+                            {copiado === keyPass ? (
+                              <Check size={11} color="var(--brand-2)" />
+                            ) : (
+                              <Copy size={11} />
+                            )}
+                          </button>
+                        </div>
+                      )}
+
+                      {acc.token && (
+                        <div className="hrr-acc-item__token">
+                          <KeyRound size={11} style={{ flexShrink: 0 }} />
+                          <span className="hrr-acc-item__token-val" title={acc.token}>
+                            {acc.token}
+                          </span>
+                          <button
+                            type="button"
+                            className="hrr-mini"
+                            onClick={() => copiar(acc.token!, keyToken)}
+                            title="Copiar Access Token"
+                          >
+                            {copiado === keyToken ? (
+                              <Check size={11} color="var(--brand-2)" />
+                            ) : (
+                              <Copy size={11} />
+                            )}
+                          </button>
+                        </div>
+                      )}
+
+                      {acc.notas && (
+                        <p className="hrr-acc-item__notas">{acc.notas}</p>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* ── DATOS DE PAGO Y COSTOS ── */}
       <div className="hrr-pago">
         {h.precio != null && (
           <span className="hrr-precio">
-            {h.precio} {h.moneda ?? ''} <small>/ {h.ciclo === 'mensual' ? 'mes' : 'año'}</small>
+            {h.precio} {h.moneda ?? ''}{' '}
+            <small>/ {h.ciclo === 'mensual' ? 'mes' : 'año'}</small>
             {h.cuantosClientes > 1 && h.precioPorCliente != null && (
               <small className="hrr-precio__reparto">
                 {h.precioPorCliente === 0
@@ -116,6 +344,7 @@ export function HerramientaCard({ herramienta: h, onEditar, onBorrar, onPagar }:
         )}
       </div>
 
+      {/* ── VENCIMIENTO / FECHA DE PAGO ── */}
       <div className="hrr-card__foot">
         <span className="hrr-venc">
           <CalendarClock size={13} />
@@ -139,105 +368,7 @@ export function HerramientaCard({ herramienta: h, onEditar, onBorrar, onPagar }:
         <span className={'hrr-estado hrr-estado--' + h.estadoPago}>{etiquetaEstado(h)}</span>
       </div>
 
-      {/* ── CONTRASEÑAS O ACCESOS QUE PARTEN DE LA HERRAMIENTA ── */}
-      <div className="hrr-accesos-box">
-        <div className="hrr-accesos-box__head">
-          <span>
-            <ShieldCheck size={13} style={{ verticalAlign: 'middle', marginRight: 4 }} />
-            Accesos y Contraseñas ({listaAccesos.length})
-          </span>
-        </div>
-
-        {listaAccesos.length === 0 ? (
-          <span className="field__hint" style={{ fontSize: 11.5 }}>
-            Sin accesos ni credenciales registradas.
-          </span>
-        ) : (
-          listaAccesos.map((acc, idx) => {
-            const verPass = Boolean(verPassMap[acc.id])
-            const keyCorreo = `${acc.id}-usr`
-            const keyPass = `${acc.id}-pass`
-            const keyToken = `${acc.id}-token`
-
-            return (
-              <div key={acc.id || idx} className="hrr-acc-card-item">
-                <div className="hrr-acc-card-item__top">
-                  <span style={{ fontWeight: 600 }}>{acc.nombre || `Acceso #${idx + 1}`}</span>
-                  {acc.vinculaGit ? (
-                    <span className="hrr-git-badge" title="Vinculado con repositorio Git / GitHub">
-                      <GitBranch size={11} /> Vincula Git
-                    </span>
-                  ) : null}
-                </div>
-
-                {acc.usuario && (
-                  <div className="hrr-cred__row">
-                    <Mail size={12} />
-                    <span className="hrr-cred__val" title={acc.usuario}>{acc.usuario}</span>
-                    <button
-                      type="button"
-                      className="hrr-mini"
-                      onClick={() => copiar(acc.usuario!, keyCorreo)}
-                      title="Copiar usuario o correo"
-                    >
-                      {copiado === keyCorreo ? <Check size={11} /> : <Copy size={11} />}
-                    </button>
-                  </div>
-                )}
-
-                {acc.contrasena && (
-                  <div className="hrr-cred__row">
-                    <KeyRound size={12} />
-                    <span className="hrr-cred__val hrr-pass">
-                      {verPass ? acc.contrasena : '••••••••'}
-                    </span>
-                    <button
-                      type="button"
-                      className="hrr-mini"
-                      onClick={() => toggleVerPass(acc.id)}
-                      title={verPass ? 'Ocultar' : 'Ver'}
-                    >
-                      {verPass ? <EyeOff size={11} /> : <Eye size={11} />}
-                    </button>
-                    <button
-                      type="button"
-                      className="hrr-mini"
-                      onClick={() => copiar(acc.contrasena!, keyPass)}
-                      title="Copiar contraseña"
-                    >
-                      {copiado === keyPass ? <Check size={11} /> : <Copy size={11} />}
-                    </button>
-                  </div>
-                )}
-
-                {acc.token && (
-                  <div className="hrr-acc-card-item__token">
-                    <KeyRound size={11} style={{ flexShrink: 0 }} />
-                    <span className="hrr-acc-card-item__token-val" title={acc.token}>
-                      {acc.token}
-                    </span>
-                    <button
-                      type="button"
-                      className="hrr-mini"
-                      onClick={() => copiar(acc.token!, keyToken)}
-                      title="Copiar Access Token"
-                    >
-                      {copiado === keyToken ? <Check size={11} /> : <Copy size={11} />}
-                    </button>
-                  </div>
-                )}
-
-                {acc.notas && (
-                  <p style={{ margin: 0, fontSize: 11, color: 'var(--text-faint)' }}>
-                    {acc.notas}
-                  </p>
-                )}
-              </div>
-            )
-          })
-        )}
-      </div>
-
+      {/* ── REGISTRAR PAGO ── */}
       <button
         className="hrr-pagar"
         onClick={async () => {
@@ -257,7 +388,9 @@ export function HerramientaCard({ herramienta: h, onEditar, onBorrar, onPagar }:
       {h.ultimoPago && (
         <span className="hrr-ultimo">
           Último pago:{' '}
-          {new Date(h.ultimoPago + 'T00:00:00').toLocaleDateString('es-VE', { dateStyle: 'medium' })}
+          {new Date(h.ultimoPago + 'T00:00:00').toLocaleDateString('es-VE', {
+            dateStyle: 'medium',
+          })}
         </span>
       )}
     </article>

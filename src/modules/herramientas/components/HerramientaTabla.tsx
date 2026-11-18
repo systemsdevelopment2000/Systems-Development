@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Eye, EyeOff, Copy, Check, ExternalLink, Pencil, Trash2, GitBranch } from 'lucide-react'
+import { Eye, EyeOff, Copy, Check, ExternalLink, Pencil, Trash2, GitBranch, KeyRound } from 'lucide-react'
 import type { HerramientaVista } from '../hooks/useHerramientas'
 import { obtenerDefTipoHerramienta } from '../lib/categoriasHerramientas'
 
@@ -7,6 +7,7 @@ interface Props {
   herramientas: HerramientaVista[]
   onEditar: (h: HerramientaVista) => void
   onBorrar: (h: HerramientaVista) => void
+  onVerAccesos?: (h: HerramientaVista) => void
 }
 
 /** Copia al portapapeles con respaldo para contextos no seguros. */
@@ -44,7 +45,7 @@ function BotonCopiar({ valor, que }: { valor: string; que: string }) {
   )
 }
 
-export function HerramientaTabla({ herramientas, onEditar, onBorrar }: Props) {
+export function HerramientaTabla({ herramientas, onEditar, onBorrar, onVerAccesos }: Props) {
   const [visibles, setVisibles] = useState<string[]>([])
 
   function alternar(id: string) {
@@ -221,6 +222,17 @@ export function HerramientaTabla({ herramientas, onEditar, onBorrar }: Props) {
                 </td>
 
                 <td className="hrt__acc">
+                  {onVerAccesos && (
+                    <button
+                      type="button"
+                      className="icono-btn"
+                      onClick={() => onVerAccesos(h)}
+                      aria-label={`Ver accesos de ${h.nombre}`}
+                      title="Ver todos los accesos y contraseñas"
+                    >
+                      <KeyRound size={13} />
+                    </button>
+                  )}
                   <button
                     type="button"
                     className="icono-btn"

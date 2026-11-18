@@ -21,6 +21,7 @@ import {
 import { HerramientaTabla } from '../components/HerramientaTabla'
 import { HerramientaCard } from '../components/HerramientaCard'
 import { HerramientaForm } from '../components/HerramientaForm'
+import { BovedaAccesosModal } from '../components/BovedaAccesosModal'
 import {
   CATEGORIAS_HERRAMIENTA,
   IconoCategoria,
@@ -34,6 +35,7 @@ export function HerramientasPage() {
   const { herramientas, clientes, proyectos, guardar, borrar, marcarPagada } = useHerramientas()
   const [abierto, setAbierto] = useState(false)
   const [editando, setEditando] = useState<Herramienta | undefined>(undefined)
+  const [viendoAccesos, setViendoAccesos] = useState<HerramientaVista | undefined>(undefined)
   const [filtro, setFiltro] = useState<Filtro>('todas')
   const [agrupacion, setAgrupacion] = useState<Agrupacion>('tipo')
   const [vista, setVista] = useState<'tarjetas' | 'lista'>('tarjetas')
@@ -312,7 +314,12 @@ export function HerramientasPage() {
           </button>
         </div>
       ) : vista === 'lista' ? (
-        <HerramientaTabla herramientas={visibles} onEditar={editar} onBorrar={onBorrar} />
+        <HerramientaTabla
+          herramientas={visibles}
+          onEditar={editar}
+          onBorrar={onBorrar}
+          onVerAccesos={(h) => setViendoAccesos(h)}
+        />
       ) : agrupacion === 'tipo' ? (
         <div className="hrr-grupos">
           {gruposPorTipo.map((g) => (
@@ -343,6 +350,7 @@ export function HerramientasPage() {
                     onEditar={() => editar(h)}
                     onBorrar={() => onBorrar(h)}
                     onPagar={() => marcarPagada(h.id)}
+                    onVerAccesos={() => setViendoAccesos(h)}
                   />
                 ))}
               </div>
@@ -373,6 +381,7 @@ export function HerramientasPage() {
                     onEditar={() => editar(h)}
                     onBorrar={() => onBorrar(h)}
                     onPagar={() => marcarPagada(h.id)}
+                    onVerAccesos={() => setViendoAccesos(h)}
                   />
                 ))}
               </div>
@@ -388,10 +397,31 @@ export function HerramientasPage() {
               onEditar={() => editar(h)}
               onBorrar={() => onBorrar(h)}
               onPagar={() => marcarPagada(h.id)}
+              onVerAccesos={() => setViendoAccesos(h)}
             />
           ))}
         </div>
       )}
+
+      {/* Modal Bóveda de Accesos y Contraseñas */}
+      <Modal
+        abierto={Boolean(viendoAccesos)}
+        onCerrar={() => setViendoAccesos(undefined)}
+        titulo={`Bóveda de Accesos: ${viendoAccesos?.nombre ?? ''}`}
+        ancho={640}
+      >
+        {viendoAccesos && (
+          <BovedaAccesosModal
+            herramienta={viendoAccesos}
+            onEditar={() => {
+              const target = viendoAccesos
+              setViendoAccesos(undefined)
+              editar(target)
+            }}
+            onCerrar={() => setViendoAccesos(undefined)}
+          />
+        )}
+      </Modal>
 
       <Modal
         abierto={abierto}
