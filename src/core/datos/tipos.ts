@@ -308,12 +308,39 @@ export interface Hecho {
 export type PropietarioHerramienta = 'sd' | 'cliente'
 export type CicloPago = 'mensual' | 'anual'
 
+/** Acceso, credencial o token específico que parte de una herramienta/servicio. */
+export interface AccesoHerramienta {
+  id: ID
+  nombre: string // ej. "Acceso Maestro", "Access Token MGG", "Clave API Producción"
+  usuario?: string // Usuario, correo o identificador
+  contrasena?: string // Contraseña de acceso
+  token?: string // Access token, API Key, Token personal
+  vinculaGit?: boolean // Si se vincula con Git / GitHub
+  urlAcceso?: string // URL o endpoint directo si aplica
+  clienteId?: ID // Cliente específico asignado a este acceso
+  proyectoId?: ID // Proyecto específico asignado a este acceso
+  notas?: string
+}
+
+export type TipoHerramienta =
+  | 'base_datos'
+  | 'hosting_servidores'
+  | 'ia_apis'
+  | 'repositorio_git'
+  | 'dominios_dns'
+  | 'correo_workspace'
+  | 'pasarela_pagos'
+  | 'diseno_multimedia'
+  | 'otro'
+
 /** Herramienta/servicio (propia de SD o de un cliente), con pago y credenciales. */
 export interface Herramienta {
   id: ID
   /** Código correlativo (HER-AAAA-NNNN). */
   codigo?: string
   nombre: string
+  /** Tipo o categoría de herramienta para clasificar y agrupar. */
+  tipoHerramienta?: string
   url?: string
   propietario: PropietarioHerramienta
   /**
@@ -333,7 +360,13 @@ export interface Herramienta {
    * `partes_iguales` divide el precio entre todos; `solo_sd` lo asume SD.
    */
   reparto?: 'partes_iguales' | 'solo_sd'
+  /** Día del mes pactado para el pago recurrente (ej. 15 de cada mes). */
+  diaPagoMes?: number
+  /** Lista de contraseñas, accesos y tokens que parten de esta herramienta. */
+  accesos?: AccesoHerramienta[]
+  /** @deprecated usar `accesos`. Mantenido por retrocompatibilidad. */
   correo?: string
+  /** @deprecated usar `accesos`. Mantenido por retrocompatibilidad. */
   contrasena?: string
   ciclo: CicloPago
   precio?: number

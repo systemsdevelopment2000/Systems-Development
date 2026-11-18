@@ -1,14 +1,19 @@
 import { useState, type FormEvent, type KeyboardEvent } from 'react'
-import { Eye, EyeOff, ChevronLeft, ChevronRight } from 'lucide-react'
+import {
+  Eye,
+  EyeOff,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  Trash2,
+  GitBranch,
+  KeyRound,
+} from 'lucide-react'
 import { Button, Combobox, Stepper, type PasoDef } from '@/core/ui'
-import type {
-  CicloPago,
-  Cliente,
-  Herramienta,
-  PropietarioHerramienta,
-  Proyecto,
-} from '@/core/datos'
+import { nuevoId, type CicloPago, type Cliente, type Herramienta, type PropietarioHerramienta, type Proyecto, type AccesoHerramienta } from '@/core/datos'
 import type { EntradaHerramienta } from '../hooks/useHerramientas'
+import { CATEGORIAS_HERRAMIENTA, detectarTipoHerramienta } from '../lib/categoriasHerramientas'
+import { calcularProximoPagoPorDia } from '../hooks/useHerramientas'
 
 interface Props {
   inicial?: Herramienta
@@ -19,22 +24,29 @@ interface Props {
 }
 
 const PASOS_HERRAMIENTA: PasoDef[] = [
-  { id: 'servicio', titulo: '1. Servicio', descripcion: 'Datos esenciales' },
-  { id: 'asignacion', titulo: '2. Asignación', descripcion: 'Clientes y proyectos' },
-  { id: 'pagos', titulo: '3. Pagos y Claves', descripcion: 'Costos y acceso' },
+  { id: 'servicio', titulo: '1. Herramienta', descripcion: 'Nombre y tipo' },
+  { id: 'pagos', titulo: '2. Pagos y Fechas', descripcion: 'Día de pago y costos' },
+  { id: 'accesos', titulo: '3. Contraseñas y Accesos', descripcion: 'Tokens y vinculación Git' },
 ]
 
 export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCancelar }: Props) {
-  // Al editar, muestra todos los datos por defecto para que las credenciales ("Ni idea") y demás campos sean editables de inmediato.
+  // Al editar, muestra todos los datos por defecto para que nada quede oculto
   const [verTodo, setVerTodo] = useState(Boolean(inicial))
   const [paso, setPaso] = useState(0)
   const [error, setError] = useState<string | null>(null)
 
+  // Datos principales de la herramienta
   const [nombre, setNombre] = useState(inicial?.nombre ?? '')
+  const [tipoHerramienta, setTipoHerramienta] = useState(
+    inicial?.tipoHerramienta ?? (inicial?.nombre ? detectarTipoHerramienta(inicial.nombre, inicial.url) : 'base_datos'),
+  )
   const [url, setUrl] = useState(inicial?.url ?? '')
   const [propietario, setPropietario] = useState<PropietarioHerramienta>(
     inicial?.propietario ?? 'sd',
   )
+  const [activa, setActiva] = useState(inicial?.activa ?? true)
+
+  // Asignación de clientes y proyectos
   const [clienteIds, setClienteIds] = useState<string[]>(
     inicial?.clienteIds ?? (inicial?.clienteId ? [inicial.clienteId] : []),
   )
@@ -42,20 +54,96 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
     inicial?.proyectoIds ?? (inicial?.proyectoId ? [inicial.proyectoId] : []),
   )
   const [reparto, setReparto] = useState(inicial?.reparto ?? 'partes_iguales')
-  const [correo, setCorreo] = useState(inicial?.correo ?? '')
-  const [contrasena, setContrasena] = useState(inicial?.contrasena ?? '')
-  const [verPass, setVerPass] = useState(false)
+
+  // Datos de pago y fecha recurrente
   const [ciclo, setCiclo] = useState<CicloPago>(inicial?.ciclo ?? 'mensual')
+  const [diaPagoMes, setDiaPagoMes] = useState<string>(
+    inicial?.diaPagoMes != null ? String(inicial.diaPagoMes) : '',
+  )
+  const [proximoPago, setProximoPago] = useState(inicial?.proximoPago ?? '')
   const [precio, setPrecio] = useState(inicial?.precio != null ? String(inicial.precio) : '')
   const [moneda, setMoneda] = useState(inicial?.moneda ?? 'USD')
   const [metodoPago, setMetodoPago] = useState(inicial?.metodoPago ?? '')
-  const [proximoPago, setProximoPago] = useState(inicial?.proximoPago ?? '')
   const [notas, setNotas] = useState(inicial?.notas ?? '')
-  const [activa, setActiva] = useState(inicial?.activa ?? true)
+
+  // Contraseñas y Accesos que parten de la herramienta
+  const [accesos, setAccesos] = useState<AccesoHerramienta[]>(() => {
+    if (inicial?.accesos && inicial.accesos.length > 0) {
+      return inicial.accesos
+    }
+    if (inicial?.correo || inicial?.contrasena) {
+      return [
+        {
+          id: nuevoId(),
+          nombre: 'Acceso Principal',
+          usuario: inicial.correo ?? '',
+          contrasena: inicial.contrasena ?? '',
+          token: '',
+          vinculaGit: false,
+        },
+      ]
+    }
+    return [
+      {
+        id: nuevoId(),
+        nombre: 'Acceso Principal',
+        usuario: '',
+        contrasena: '',
+        token: '',
+        vinculaGit: false,
+      },
+    ]
+  })
+
+  // Visibilidad de contraseñas por ID de acceso
+  const [verPassMap, setVerPassMap] = useState<Record<string, boolean>>({})
 
   const proyectosFiltrados = clienteIds.length
     ? proyectos.filter((p) => p.clienteId && clienteIds.includes(p.clienteId))
     : proyectos
+
+  function toggleVerPass(id: string) {
+    setVerPassMap((prev) => ({ ...prev, [id]: !prev[id] }))
+  }
+
+  function agregarAcceso() {
+    setAccesos((prev) => [
+      ...prev,
+      {
+        id: nuevoId(),
+        nombre: `Acceso #${prev.length + 1}`,
+        usuario: '',
+        contrasena: '',
+        token: '',
+        vinculaGit: false,
+      },
+    ])
+  }
+
+  function actualizarAcceso(id: string, campo: keyof AccesoHerramienta, valor: unknown) {
+    setAccesos((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, [campo]: valor } : a)),
+    )
+  }
+
+  function eliminarAcceso(id: string) {
+    if (accesos.length <= 1) return
+    setAccesos((prev) => prev.filter((a) => a.id !== id))
+  }
+
+  function onCambioDiaPago(v: string) {
+    const num = v.replace(/\D/g, '')
+    if (!num) {
+      setDiaPagoMes('')
+      return
+    }
+    const val = Math.min(31, Math.max(1, Number(num)))
+    setDiaPagoMes(String(val))
+    // Si no hay fecha de próximo pago seleccionada o para sugerir, calcula automáticamente
+    if (!proximoPago || proximoPago.length === 10) {
+      setProximoPago(calcularProximoPagoPorDia(val))
+    }
+  }
 
   function validarPaso1(): boolean {
     if (!nombre.trim()) {
@@ -85,7 +173,6 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLFormElement>) {
-    // Evita que pulsar Enter en pasos intermedios cierre o "selle" el formulario antes de tiempo
     if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
       if (!verTodo && paso < PASOS_HERRAMIENTA.length - 1) {
         e.preventDefault()
@@ -106,9 +193,21 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
       return
     }
 
+    // Limpia y normaliza accesos
+    const accesosFinales = accesos.map((a, i) => ({
+      ...a,
+      nombre: a.nombre.trim() || `Acceso #${i + 1}`,
+      usuario: a.usuario?.trim() || undefined,
+      contrasena: a.contrasena || undefined,
+      token: a.token?.trim() || undefined,
+      vinculaGit: Boolean(a.vinculaGit),
+      notas: a.notas?.trim() || undefined,
+    }))
+
     onGuardar({
       id: inicial?.id,
       nombre: nombre.trim(),
+      tipoHerramienta,
       url: url.trim() || undefined,
       propietario,
       clienteIds: propietario === 'cliente' && clienteIds.length ? clienteIds : undefined,
@@ -116,8 +215,10 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
       reparto: propietario === 'cliente' && clienteIds.length > 1 ? reparto : undefined,
       clienteId: undefined,
       proyectoId: undefined,
-      correo: correo.trim() || undefined,
-      contrasena: contrasena || undefined,
+      diaPagoMes: diaPagoMes ? Number(diaPagoMes) : undefined,
+      accesos: accesosFinales,
+      correo: accesosFinales[0]?.usuario || undefined,
+      contrasena: accesosFinales[0]?.contrasena || undefined,
       ciclo,
       precio: precio ? Number(precio) : undefined,
       moneda: moneda || undefined,
@@ -128,11 +229,12 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
     })
   }
 
-  const bloqueServicio = (
+  // ── SECCIÓN 1: DATOS GENERALES DE LA HERRAMIENTA ──
+  const bloqueHerramienta = (
     <div className="form-grid">
       <label className="field form-grid__full">
         <span className="field__label">
-          Nombre de la herramienta / servicio <b style={{ color: 'var(--brand)' }}>*</b>
+          Nombre de la herramienta / plataforma <b style={{ color: 'var(--brand)' }}>*</b>
         </span>
         <input
           className="field__input"
@@ -140,14 +242,32 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
           autoFocus={!inicial}
           value={nombre}
           onChange={(e) => {
-            setNombre(e.target.value)
+            const val = e.target.value
+            setNombre(val)
             setError(null)
+            if (!inicial && val && !tipoHerramienta) {
+              setTipoHerramienta(detectarTipoHerramienta(val, url))
+            }
           }}
-          placeholder="Ej. Vercel Pro, Supabase Pro, Hostinger…"
+          placeholder="Ej. Supabase, Digital Ocean, IA Antigravity, Vercel…"
         />
       </label>
 
-      <label className="field form-grid__full">
+      <div className="field">
+        <span className="field__label">Tipo / Clasificación de la herramienta</span>
+        <Combobox
+          opciones={CATEGORIAS_HERRAMIENTA.map((c) => ({
+            valor: c.id,
+            etiqueta: c.etiqueta,
+            subetiqueta: c.descripcion,
+          }))}
+          valor={tipoHerramienta}
+          onCambio={(v) => setTipoHerramienta(v)}
+          buscar={false}
+        />
+      </div>
+
+      <label className="field">
         <span className="field__label">URL del sitio o panel de control</span>
         <input
           className="field__input"
@@ -185,19 +305,103 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
     </div>
   )
 
-  const bloqueAsignacion = (
+  // ── SECCIÓN 2: PAGOS Y CLIENTES VINCULADOS ──
+  const bloquePagosYClientes = (
     <div className="form-grid">
-      {propietario === 'sd' ? (
-        <div className="form-grid__full" style={{ padding: '16px 12px', textAlign: 'center', color: 'var(--text-muted)' }}>
-          <p style={{ margin: 0 }}>
-            Esta herramienta es de uso interno exclusivo de <strong>Systems Development</strong>. No requiere asignación a clientes específicos.
-          </p>
+      <div className="field">
+        <span className="field__label">Ciclo de facturación</span>
+        <Combobox
+          opciones={[
+            { valor: 'mensual', etiqueta: 'Mensual' },
+            { valor: 'anual', etiqueta: 'Anual' },
+          ]}
+          valor={ciclo}
+          onCambio={(v) => setCiclo(v as CicloPago)}
+          buscar={false}
+        />
+      </div>
+
+      <label className="field">
+        <span className="field__label">
+          Día de pago recurrente <span className="field__hint">(ej. 15 de cada mes)</span>
+        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Día</span>
+          <input
+            className="field__input"
+            type="number"
+            min={1}
+            max={31}
+            value={diaPagoMes}
+            onChange={(e) => onCambioDiaPago(e.target.value)}
+            placeholder="15"
+            style={{ width: 80, textAlign: 'center' }}
+          />
+          <span style={{ fontSize: 12.5, color: 'var(--text-muted)' }}>de cada mes</span>
         </div>
-      ) : (
+      </label>
+
+      <label className="field">
+        <span className="field__label">Próxima fecha de renovación / pago</span>
+        <input
+          className="field__input"
+          type="date"
+          value={proximoPago}
+          onChange={(e) => setProximoPago(e.target.value)}
+        />
+      </label>
+
+      <div className="field">
+        <span className="field__label">Precio estimado</span>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <input
+            className="field__input"
+            type="number"
+            step="0.01"
+            min="0"
+            style={{ flex: 1 }}
+            value={precio}
+            onChange={(e) => setPrecio(e.target.value)}
+            placeholder="0.00"
+          />
+          <select
+            className="field__input"
+            style={{ width: 88 }}
+            value={moneda}
+            onChange={(e) => setMoneda(e.target.value)}
+          >
+            <option value="USD">USD</option>
+            <option value="VES">VES</option>
+            <option value="EUR">EUR</option>
+          </select>
+        </div>
+      </div>
+
+      <label className="field">
+        <span className="field__label">Método de pago habitual</span>
+        <input
+          className="field__input"
+          value={metodoPago}
+          onChange={(e) => setMetodoPago(e.target.value)}
+          placeholder="Tarjeta internacional, PayPal, Zinli…"
+        />
+      </label>
+
+      <label className="field">
+        <span className="field__label">Notas comerciales o de facturación</span>
+        <input
+          className="field__input"
+          value={notas}
+          onChange={(e) => setNotas(e.target.value)}
+          placeholder="Plan Pro, cupones o condiciones de pago…"
+        />
+      </label>
+
+      {propietario === 'cliente' && (
         <>
           <div className="field form-grid__full">
             <span className="field__label">
-              Clientes asignados <span className="field__hint">(selecciona los clientes que usan esta cuenta)</span>
+              Clientes asignados <span className="field__hint">(cuentas o proyectos que comparten el servicio)</span>
             </span>
             <div className="chips-sel">
               {clientes.map((c) => {
@@ -277,114 +481,143 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
     </div>
   )
 
-  const bloquePagosYClaves = (
-    <div className="form-grid">
-      <div className="field">
-        <span className="field__label">Ciclo de pago</span>
-        <Combobox
-          opciones={[
-            { valor: 'mensual', etiqueta: 'Mensual' },
-            { valor: 'anual', etiqueta: 'Anual' },
-          ]}
-          valor={ciclo}
-          onCambio={(v) => setCiclo(v as CicloPago)}
-          buscar={false}
-        />
+  // ── SECCIÓN 3: CONTRASEÑAS Y ACCESOS QUE PARTEN DE LA HERRAMIENTA ──
+  const bloqueAccesos = (
+    <div className="hrr-form-accesos">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+        <p className="field__hint" style={{ margin: 0 }}>
+          Puedes registrar múltiples contraseñas, credenciales o access tokens específicos (ej. por cliente o proyecto).
+        </p>
+        <button
+          type="button"
+          className="btn btn--ghost btn--sm"
+          onClick={agregarAcceso}
+          style={{ gap: 6, fontSize: 12 }}
+        >
+          <Plus size={14} /> Agregar otro acceso
+        </button>
       </div>
 
-      <div className="field">
-        <span className="field__label">Precio estimado</span>
-        <div style={{ display: 'flex', gap: 6 }}>
-          <input
-            className="field__input"
-            type="number"
-            step="0.01"
-            min="0"
-            style={{ flex: 1 }}
-            value={precio}
-            onChange={(e) => setPrecio(e.target.value)}
-            placeholder="0.00"
-          />
-          <select
-            className="field__input"
-            style={{ width: 88 }}
-            value={moneda}
-            onChange={(e) => setMoneda(e.target.value)}
-          >
-            <option value="USD">USD</option>
-            <option value="VES">VES</option>
-            <option value="EUR">EUR</option>
-          </select>
-        </div>
-      </div>
+      {accesos.map((acc, idx) => {
+        const verPass = Boolean(verPassMap[acc.id])
 
-      <label className="field">
-        <span className="field__label">Método de pago habitual</span>
-        <input
-          className="field__input"
-          value={metodoPago}
-          onChange={(e) => setMetodoPago(e.target.value)}
-          placeholder="Tarjeta internacional, PayPal, Zinli…"
-        />
-      </label>
+        return (
+          <div key={acc.id} className="hrr-acc-form-card">
+            <div className="hrr-acc-form-card__head">
+              <span className="hrr-acc-form-card__tit">
+                <KeyRound size={14} />
+                Acceso #{idx + 1}: {acc.nombre || 'Sin título'}
+              </span>
 
-      <label className="field">
-        <span className="field__label">Próxima fecha de renovación</span>
-        <input
-          className="field__input"
-          type="date"
-          value={proximoPago}
-          onChange={(e) => setProximoPago(e.target.value)}
-        />
-      </label>
+              {accesos.length > 1 && (
+                <button
+                  type="button"
+                  className="icono-btn icono-btn--peligro"
+                  onClick={() => eliminarAcceso(acc.id)}
+                  title="Eliminar este acceso"
+                >
+                  <Trash2 size={14} />
+                </button>
+              )}
+            </div>
 
-      <div className="form-seccion form-grid__full">
-        <span className="form-seccion__tit">Credenciales de Acceso (Bóveda)</span>
-      </div>
+            <div className="form-grid">
+              <label className="field">
+                <span className="field__label">
+                  Nombre o Identificador del acceso <b style={{ color: 'var(--brand)' }}>*</b>
+                </span>
+                <input
+                  className="field__input"
+                  required
+                  value={acc.nombre}
+                  onChange={(e) => actualizarAcceso(acc.id, 'nombre', e.target.value)}
+                  placeholder="Ej. Access Tokken SUPABASE MGG, Acceso Principal…"
+                />
+              </label>
 
-      <label className="field">
-        <span className="field__label">Usuario o Correo registrado</span>
-        <input
-          className="field__input"
-          value={correo}
-          onChange={(e) => setCorreo(e.target.value)}
-          placeholder="soporte@sd.dev o ID de usuario"
-        />
-      </label>
+              <div className="field">
+                <span className="field__label">¿Vincula con repositorio Git / GitHub?</span>
+                <label className="toggle" style={{ marginTop: 6 }}>
+                  <input
+                    type="checkbox"
+                    checked={Boolean(acc.vinculaGit)}
+                    onChange={(e) => actualizarAcceso(acc.id, 'vinculaGit', e.target.checked)}
+                  />
+                  <span className="toggle__sw" />
+                  <span className="toggle__txt" style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                    <GitBranch size={13} />
+                    {acc.vinculaGit ? 'Sí, vinculado a Git' : 'No vinculado'}
+                  </span>
+                </label>
+              </div>
 
-      <div className="field">
-        <span className="field__label">Contraseña de acceso</span>
-        <div style={{ position: 'relative' }}>
-          <input
-            className="field__input"
-            type={verPass ? 'text' : 'password'}
-            style={{ width: '100%', paddingRight: 36 }}
-            value={contrasena}
-            onChange={(e) => setContrasena(e.target.value)}
-            placeholder="••••••••••••"
-          />
-          <button
-            type="button"
-            className="icono-btn"
-            style={{ position: 'absolute', right: 4, top: 4 }}
-            onClick={() => setVerPass((v) => !v)}
-            title={verPass ? 'Ocultar' : 'Ver'}
-          >
-            {verPass ? <EyeOff size={15} /> : <Eye size={15} />}
-          </button>
-        </div>
-      </div>
+              <label className="field">
+                <span className="field__label">Usuario o Correo registrado</span>
+                <input
+                  className="field__input"
+                  value={acc.usuario ?? ''}
+                  onChange={(e) => actualizarAcceso(acc.id, 'usuario', e.target.value)}
+                  placeholder="soporte@sd.dev o ID de usuario"
+                />
+              </label>
 
-      <label className="field form-grid__full">
-        <span className="field__label">Notas u observaciones</span>
-        <textarea
-          className="field__input"
-          rows={2}
-          value={notas}
-          onChange={(e) => setNotas(e.target.value)}
-          placeholder="Datos de recuperación, 2FA, planes de migración…"
-        />
-      </label>
+              <div className="field">
+                <span className="field__label">Contraseña de acceso</span>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    className="field__input"
+                    type={verPass ? 'text' : 'password'}
+                    style={{ width: '100%', paddingRight: 36 }}
+                    value={acc.contrasena ?? ''}
+                    onChange={(e) => actualizarAcceso(acc.id, 'contrasena', e.target.value)}
+                    placeholder="••••••••••••"
+                  />
+                  <button
+                    type="button"
+                    className="icono-btn"
+                    style={{ position: 'absolute', right: 4, top: 4 }}
+                    onClick={() => toggleVerPass(acc.id)}
+                    title={verPass ? 'Ocultar' : 'Ver'}
+                  >
+                    {verPass ? <EyeOff size={15} /> : <Eye size={15} />}
+                  </button>
+                </div>
+              </div>
+
+              <label className="field form-grid__full">
+                <span className="field__label">
+                  Access Token / Clave API <span className="field__hint">(token personal, secret key o API key)</span>
+                </span>
+                <input
+                  className="field__input mono"
+                  style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 12.5 }}
+                  value={acc.token ?? ''}
+                  onChange={(e) => actualizarAcceso(acc.id, 'token', e.target.value)}
+                  placeholder="sbp_xxxx o token personal de acceso…"
+                />
+              </label>
+
+              <label className="field form-grid__full">
+                <span className="field__label">Notas específicas de este acceso</span>
+                <input
+                  className="field__input"
+                  value={acc.notas ?? ''}
+                  onChange={(e) => actualizarAcceso(acc.id, 'notas', e.target.value)}
+                  placeholder="Roles, permisos asignados, fecha de expiración del token…"
+                />
+              </label>
+            </div>
+          </div>
+        )
+      })}
+
+      <button
+        type="button"
+        className="hrr-btn-agregar-acc"
+        onClick={agregarAcceso}
+      >
+        <Plus size={15} /> Agregar otra contraseña o access token
+      </button>
     </div>
   )
 
@@ -402,30 +635,30 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div id="seccion-paso-servicio">
             <div className="form-seccion form-grid__full" style={{ marginTop: 0, paddingTop: 4, borderTop: 'none' }}>
-              <span className="form-seccion__tit">1. Datos del Servicio y Propietario</span>
+              <span className="form-seccion__tit">1. Herramienta y Clasificación de Servicio</span>
             </div>
-            {bloqueServicio}
-          </div>
-
-          <div id="seccion-paso-asignacion">
-            <div className="form-seccion form-grid__full">
-              <span className="form-seccion__tit">2. Asignación a Clientes y Proyectos</span>
-            </div>
-            {bloqueAsignacion}
+            {bloqueHerramienta}
           </div>
 
           <div id="seccion-paso-pagos">
             <div className="form-seccion form-grid__full">
-              <span className="form-seccion__tit">3. Costos y Credenciales de Acceso (Bóveda)</span>
+              <span className="form-seccion__tit">2. Datos de Pago, Fechas y Asignación</span>
             </div>
-            {bloquePagosYClaves}
+            {bloquePagosYClientes}
+          </div>
+
+          <div id="seccion-paso-accesos">
+            <div className="form-seccion form-grid__full">
+              <span className="form-seccion__tit">3. Contraseñas y Accesos que parten de la herramienta</span>
+            </div>
+            {bloqueAccesos}
           </div>
         </div>
       ) : (
         <>
-          {paso === 0 && bloqueServicio}
-          {paso === 1 && bloqueAsignacion}
-          {paso === 2 && bloquePagosYClaves}
+          {paso === 0 && bloqueHerramienta}
+          {paso === 1 && bloquePagosYClientes}
+          {paso === 2 && bloqueAccesos}
         </>
       )}
 

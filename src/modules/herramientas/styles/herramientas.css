@@ -697,3 +697,256 @@
   gap: 4px;
   justify-content: flex-end;
 }
+
+/* ============================================================
+   Nuevas clases: Agrupación por Tipo, Accesos y Contraseñas
+   ============================================================ */
+
+/* Badges de Tipo de Herramienta */
+.hrr-tipo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--brand-2, #05e4fd);
+}
+
+/* Badge de vinculación con Git */
+.hrr-git-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(249, 115, 22, 0.14);
+  border: 1px solid rgba(249, 115, 22, 0.35);
+  color: #fb923c;
+  letter-spacing: 0.02em;
+}
+
+.hrr-git-badge--off {
+  background: var(--surface-2);
+  border-color: var(--border);
+  color: var(--text-muted);
+}
+
+/* Selector de agrupación en la barra de herramientas */
+.hrr-agrupador {
+  display: inline-flex;
+  background: var(--surface);
+  border: var(--borde-grosor) solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+  gap: 2px;
+}
+
+.hrr-agrupador button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  padding: 5px 11px;
+  border-radius: var(--radius-xs, 4px);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.hrr-agrupador button:hover {
+  color: var(--text);
+}
+
+.hrr-agrupador button.is-on {
+  color: var(--brand-2, #05e4fd);
+  background: var(--surface-2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Secciones agrupadas por Tipo de Herramienta */
+.hrr-grupos {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.hrr-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.hrr-grupo__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.hrr-grupo__tit {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.hrr-grupo__icono {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--brand) 15%, transparent);
+  color: var(--brand-2, #05e4fd);
+}
+
+.hrr-grupo__badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+}
+
+/* Contenedor de múltiples accesos dentro de la tarjeta de herramienta */
+.hrr-accesos-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+  padding: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.hrr-accesos-box__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.hrr-acc-card-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs, 4px);
+  transition: border-color 0.15s ease;
+}
+
+.hrr-acc-card-item:hover {
+  border-color: color-mix(in srgb, var(--brand) 50%, var(--border));
+}
+
+.hrr-acc-card-item__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.hrr-acc-card-item__token {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 7px;
+  background: rgba(5, 228, 253, 0.06);
+  border: 1px dashed rgba(5, 228, 253, 0.25);
+  border-radius: 4px;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  color: var(--brand-2, #05e4fd);
+}
+
+.hrr-acc-card-item__token-val {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Gestor de Accesos en el Formulario */
+.hrr-form-accesos {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hrr-acc-form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  position: relative;
+}
+
+.hrr-acc-form-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.hrr-acc-form-card__tit {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--brand-2, #05e4fd);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hrr-btn-agregar-acc {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 16px;
+  background: var(--surface-2);
+  border: 1px dashed var(--brand);
+  border-radius: var(--radius-sm);
+  color: var(--brand-2, #05e4fd);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.hrr-btn-agregar-acc:hover {
+  background: color-mix(in srgb, var(--brand) 15%, transparent);
+  border-style: solid;
+}
+

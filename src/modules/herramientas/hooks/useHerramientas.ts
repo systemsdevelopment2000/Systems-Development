@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
-import { useDatos, nuevoId, type Herramienta } from '@/core/datos'
+import { useDatos, nuevoId, type Herramienta, type AccesoHerramienta } from '@/core/datos'
+import { detectarTipoHerramienta } from '../lib/categoriasHerramientas'
 
 export type EntradaHerramienta = Omit<Herramienta, 'id' | 'creadoEn'> & { id?: string }
 
@@ -14,6 +15,8 @@ export interface HerramientaVista extends Herramienta {
   precioPorCliente?: number
   dias: number | null
   estadoPago: EstadoPago
+  /** Lista normalizada de accesos garantizada. */
+  accesosNormalizados: AccesoHerramienta[]
 }
 
 /** Días hasta la fecha (negativo si ya pasó). */
@@ -32,6 +35,24 @@ function clasificar(dias: number | null): EstadoPago {
   return 'normal'
 }
 
+/** Calcula la próxima fecha para un día fijo de cada mes (ej. 15 de cada mes). */
+export function calcularProximoPagoPorDia(diaMes: number): string {
+  const hoy = new Date()
+  hoy.setHours(0, 0, 0, 0)
+  const año = hoy.getFullYear()
+  const mes = hoy.getMonth()
+  const ultimoDia = new Date(año, mes + 1, 0).getDate()
+  const diaReal = Math.min(diaMes, ultimoDia)
+  const tentativa = new Date(año, mes, diaReal)
+  if (tentativa < hoy) {
+    const proxMes = mes + 1
+    const ultDiaProx = new Date(año, proxMes + 1, 0).getDate()
+    const d = new Date(año, proxMes, Math.min(diaMes, ultDiaProx))
+    return d.toISOString().slice(0, 10)
+  }
+  return tentativa.toISOString().slice(0, 10)
+}
+
 export function useHerramientas() {
   const { estado, upsert, eliminar } = useDatos()
 
@@ -39,8 +60,27 @@ export function useHerramientas() {
     return Object.values(estado.herramientas)
       .map((h) => {
         const dias = diasHasta(h.proximoPago)
+        const tipoHerramienta = h.tipoHerramienta || detectarTipoHerramienta(h.nombre, h.url)
+        const accesosNormalizados: AccesoHerramienta[] =
+          h.accesos && h.accesos.length > 0
+            ? h.accesos
+            : h.correo || h.contrasena
+            ? [
+                {
+                  id: 'acc-1',
+                  nombre: 'Acceso Principal',
+                  usuario: h.correo,
+                  contrasena: h.contrasena,
+                  vinculaGit: false,
+                },
+              ]
+            : []
+
         return {
           ...h,
+          tipoHerramienta,
+          accesos: accesosNormalizados,
+          accesosNormalizados,
           // Puede estar compartida por varios clientes: se muestran todos, y
           // el costo por cliente se divide si así se pactó.
           clienteNombre: nombresDe(
@@ -71,8 +111,15 @@ export function useHerramientas() {
 
   function guardar(datos: EntradaHerramienta): Herramienta {
     const hoy = new Date().toISOString().slice(0, 10)
+    // Sincroniza correo y contrasena primarios para retrocompatibilidad
+    const primerAcceso = datos.accesos?.[0]
+    const correoSync = primerAcceso?.usuario ?? datos.correo
+    const contrasenaSync = primerAcceso?.contrasena ?? datos.contrasena
+
     const h: Herramienta = {
       ...datos,
+      correo: correoSync,
+      contrasena: contrasenaSync,
       id: datos.id ?? nuevoId(),
       creadoEn: datos.id ? (estado.herramientas[datos.id]?.creadoEn ?? hoy) : hoy,
     }
