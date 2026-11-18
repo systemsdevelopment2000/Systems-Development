@@ -40,18 +40,28 @@ export function Modal({
   if (!abierto) return null
 
   return (
-    <div className="modal" role="presentation" onMouseDown={onCerrar}>
+    <div
+      className="modal"
+      role="presentation"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onCerrar()
+        }
+      }}
+    >
       <div
         className="modal__panel"
         role="dialog"
         aria-modal="true"
         aria-label={titulo}
         style={{ maxWidth: ancho }}
+        onClick={(e) => e.stopPropagation()}
         onMouseDown={(e) => e.stopPropagation()}
+        onMouseUp={(e) => e.stopPropagation()}
       >
         <header className="modal__head">
           <h2 className="modal__title">{titulo}</h2>
-          <button className="modal__close" onClick={onCerrar} aria-label="Cerrar">
+          <button type="button" className="modal__close" onClick={onCerrar} aria-label="Cerrar">
             <X size={18} />
           </button>
         </header>

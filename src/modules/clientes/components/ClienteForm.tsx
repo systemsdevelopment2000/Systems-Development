@@ -109,6 +109,7 @@ export function ClienteForm({ inicial, onGuardar, onCancelar }: Props) {
   function handleKeyDown(e: KeyboardEvent<HTMLFormElement>) {
     if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
       e.preventDefault()
+      e.stopPropagation()
       if (!verTodo && paso < PASOS_CLIENTE.length - 1) {
         avanzar()
       }
@@ -117,6 +118,7 @@ export function ClienteForm({ inicial, onGuardar, onCancelar }: Props) {
 
   function submit(e: FormEvent) {
     e.preventDefault()
+    e.stopPropagation()
     if (!verTodo && paso < PASOS_CLIENTE.length - 1) {
       avanzar()
       return

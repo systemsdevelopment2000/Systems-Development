@@ -38,7 +38,11 @@ export function Stepper({
               role="tab"
               aria-selected={verTodo}
               className={'stepper__tab-btn' + (verTodo ? ' is-active' : '')}
-              onClick={() => onToggleVerTodo(true)}
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                onToggleVerTodo(true)
+              }}
               title="Mostrar todos los campos a la vez para editar libremente"
             >
               <Layers size={13} /> Mostrar todos los datos
@@ -48,7 +52,11 @@ export function Stepper({
               role="tab"
               aria-selected={!verTodo}
               className={'stepper__tab-btn' + (!verTodo ? ' is-active' : '')}
-              onClick={() => onToggleVerTodo(false)}
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                onToggleVerTodo(false)
+              }}
               title="Guiar por pasos ordenados"
             >
               <ListOrdered size={13} /> Paso a paso
@@ -64,7 +72,9 @@ export function Stepper({
               key={p.id}
               type="button"
               className="stepper__pill-btn"
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
                 const el = document.getElementById(`seccion-paso-${p.id}`)
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
                 onPasoClick?.(idx)
@@ -90,7 +100,11 @@ export function Stepper({
                     (esActivo ? ' stepper__item--activo' : '') +
                     (esCompletado ? ' stepper__item--completado' : '')
                   }
-                  onClick={() => sePuedeNavegar && onPasoClick?.(idx)}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    if (sePuedeNavegar) onPasoClick?.(idx)
+                  }}
                   disabled={!sePuedeNavegar}
                   aria-current={esActivo ? 'step' : undefined}
                 >

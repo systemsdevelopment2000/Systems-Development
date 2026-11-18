@@ -183,6 +183,7 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
     if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
       // Bloquea SIEMPRE el submit automático del navegador por presionar Enter
       e.preventDefault()
+      e.stopPropagation()
       if (!verTodo && paso < PASOS_HERRAMIENTA.length - 1) {
         avanzar()
       }
@@ -191,6 +192,7 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
 
   function submit(e: FormEvent) {
     e.preventDefault()
+    e.stopPropagation()
     // Si estamos en modo paso a paso y NO estamos en el paso final, solo avanzar
     if (!verTodo && paso < PASOS_HERRAMIENTA.length - 1) {
       avanzar()
@@ -707,7 +709,7 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
             <div className="form-acciones__grupo">
               {paso < PASOS_HERRAMIENTA.length - 1 ? (
                 <Button type="button" onClick={avanzar}>
-                  Siguiente <ChevronRight size={16} />
+                  {paso === 0 ? 'Siguiente: Pagos y Fechas' : 'Siguiente: Contraseñas y Accesos'} <ChevronRight size={16} />
                 </Button>
               ) : (
                 <Button type="submit">

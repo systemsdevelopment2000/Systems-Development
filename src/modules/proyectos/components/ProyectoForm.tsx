@@ -99,6 +99,7 @@ export function ProyectoForm({
   function handleKeyDown(e: KeyboardEvent<HTMLFormElement>) {
     if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
       e.preventDefault()
+      e.stopPropagation()
       if (!verTodo && paso < PASOS_PROYECTO.length - 1) {
         avanzar()
       }
@@ -107,6 +108,7 @@ export function ProyectoForm({
 
   function submit(e: FormEvent) {
     e.preventDefault()
+    e.stopPropagation()
     if (!verTodo && paso < PASOS_PROYECTO.length - 1) {
       avanzar()
       return
