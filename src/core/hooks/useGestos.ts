@@ -32,6 +32,16 @@ const RATIO = 1.6
 /** Ancho de la zona de borde que activa el "volver", en px. */
 const BORDE = 28
 
+/**
+ * Un toque que empieza dentro de un modal pertenece al modal, no a la pantalla:
+ * si se tratara como gesto de la cáscara, un simple deslizamiento al tocar
+ * "Siguiente" sacaría al usuario del formulario y perdería lo que lleva escrito.
+ */
+export function esDentroDeDialogo(destino: EventTarget | null): boolean {
+  const n = destino as Element | null
+  return typeof n?.closest === 'function' && Boolean(n.closest('[role="dialog"], .modal'))
+}
+
 export function useGestos<T extends HTMLElement>(opciones: Opciones) {
   const ref = useRef<T>(null)
   const inicio = useRef<{ x: number; y: number; desdeBorde: boolean } | null>(null)
@@ -58,7 +68,7 @@ export function useGestos<T extends HTMLElement>(opciones: Opciones) {
         return
       }
       const t = e.touches[0]
-      if (enScrollHorizontal(e.target)) {
+      if (esDentroDeDialogo(e.target) || enScrollHorizontal(e.target)) {
         inicio.current = null
         return
       }
