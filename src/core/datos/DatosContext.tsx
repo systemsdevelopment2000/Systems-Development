@@ -135,9 +135,13 @@ function reducer(estado: EstadoDatos, accion: Accion): EstadoDatos {
     }
 
     case 'sincronizarColeccion': {
+      const actuales = (estado[accion.coleccion] as Record<string, { id: string }>) || {}
       return {
         ...estado,
-        [accion.coleccion]: accion.datos,
+        [accion.coleccion]: {
+          ...actuales,
+          ...accion.datos,
+        },
       } as EstadoDatos
     }
 
@@ -234,6 +238,17 @@ export function DatosProvider({
             coleccion,
             datos: remotos,
           })
+
+          // Si existen registros locales que no estaban en Supabase (ej. creados offline o fallo previo de sync),
+          // los enviamos a Supabase para que no queden fuera de la base de datos remota
+          const locales = estado[coleccion] as Record<string, { id: string }> | undefined
+          if (locales) {
+            for (const [idLoc, entLoc] of Object.entries(locales)) {
+              if (!remotos[idLoc]) {
+                void guardarEnSupabase(coleccion, entLoc)
+              }
+            }
+          }
         }
       }
 

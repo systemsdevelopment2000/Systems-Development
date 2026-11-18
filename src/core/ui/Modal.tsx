@@ -10,6 +10,7 @@ interface Props {
   ancho?: number
   cabeceraExtra?: ReactNode
   pie?: ReactNode
+  cerrarAlClickFondo?: boolean
 }
 
 export function Modal({
@@ -20,6 +21,7 @@ export function Modal({
   ancho = 580,
   cabeceraExtra,
   pie,
+  cerrarAlClickFondo = false,
 }: Props) {
   useEffect(() => {
     if (!abierto) return
@@ -44,7 +46,7 @@ export function Modal({
       className="modal"
       role="presentation"
       onClick={(e) => {
-        if (e.target === e.currentTarget) {
+        if (cerrarAlClickFondo && e.target === e.currentTarget) {
           onCerrar()
         }
       }}

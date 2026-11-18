@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type KeyboardEvent } from 'react'
+import { useState, type KeyboardEvent } from 'react'
 import {
   Eye,
   EyeOff,
@@ -161,14 +161,22 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
     return true
   }
 
-  function avanzar() {
+  function avanzar(e?: React.MouseEvent) {
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
     if (paso === 0 && !validarPaso1()) return
     const siguiente = Math.min(paso + 1, PASOS_HERRAMIENTA.length - 1)
     setPaso(siguiente)
     setError(null)
   }
 
-  function retroceder() {
+  function retroceder(e?: React.MouseEvent) {
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
     setError(null)
     setPaso((prev) => Math.max(prev - 1, 0))
   }
@@ -179,24 +187,23 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
     setPaso(n)
   }
 
-  function handleKeyDown(e: KeyboardEvent<HTMLFormElement>) {
+  function handleKeyDown(e: KeyboardEvent<HTMLDivElement>) {
     if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
       // Bloquea SIEMPRE el submit automático del navegador por presionar Enter
       e.preventDefault()
       e.stopPropagation()
       if (!verTodo && paso < PASOS_HERRAMIENTA.length - 1) {
         avanzar()
+      } else if (verTodo || paso === PASOS_HERRAMIENTA.length - 1) {
+        guardarFinal()
       }
     }
   }
 
-  function submit(e: FormEvent) {
-    e.preventDefault()
-    e.stopPropagation()
-    // Si estamos en modo paso a paso y NO estamos en el paso final, solo avanzar
-    if (!verTodo && paso < PASOS_HERRAMIENTA.length - 1) {
-      avanzar()
-      return
+  function guardarFinal(e?: React.MouseEvent) {
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
     }
 
     if (!validarPaso1()) {
@@ -633,7 +640,7 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
   )
 
   return (
-    <form onSubmit={submit} onKeyDown={handleKeyDown} noValidate>
+    <div className="herramienta-form" onKeyDown={handleKeyDown}>
       <Stepper
         pasos={PASOS_HERRAMIENTA}
         pasoActual={paso}
@@ -687,7 +694,7 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
               Cancelar
             </Button>
             <div className="form-acciones__grupo">
-              <Button type="submit">
+              <Button type="button" onClick={guardarFinal}>
                 {inicial ? 'Guardar cambios' : 'Registrar herramienta'}
               </Button>
             </div>
@@ -696,7 +703,7 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
           <>
             <div>
               {paso > 0 ? (
-                <Button type="button" variant="ghost" onClick={retroceder}>
+                <Button type="button" variant="ghost" onClick={(e) => retroceder(e)}>
                   <ChevronLeft size={16} /> Anterior
                 </Button>
               ) : (
@@ -708,11 +715,11 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
 
             <div className="form-acciones__grupo">
               {paso < PASOS_HERRAMIENTA.length - 1 ? (
-                <Button type="button" onClick={avanzar}>
+                <Button type="button" onClick={(e) => avanzar(e)}>
                   {paso === 0 ? 'Siguiente: Pagos y Fechas' : 'Siguiente: Contraseñas y Accesos'} <ChevronRight size={16} />
                 </Button>
               ) : (
-                <Button type="submit">
+                <Button type="button" onClick={guardarFinal}>
                   {inicial ? 'Guardar cambios' : 'Registrar herramienta'}
                 </Button>
               )}
@@ -720,6 +727,6 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
           </>
         )}
       </footer>
-    </form>
+    </div>
   )
 }
