@@ -18,6 +18,7 @@ import {
   Maximize2,
 } from 'lucide-react'
 import { useConfirmar } from '@/core/ui'
+import type { AccesoHerramienta } from '@/core/datos'
 import type { HerramientaVista } from '../hooks/useHerramientas'
 import { obtenerDefTipoHerramienta } from '../lib/categoriasHerramientas'
 
@@ -27,6 +28,7 @@ interface Props {
   onBorrar: () => void
   onPagar: () => void
   onVerAccesos?: () => void
+  onEditarAcceso?: (acceso: AccesoHerramienta) => void
 }
 
 function etiquetaEstado(h: HerramientaVista) {
@@ -42,6 +44,7 @@ export function HerramientaCard({
   onBorrar,
   onPagar,
   onVerAccesos,
+  onEditarAcceso,
 }: Props) {
   const [abiertoAccesos, setAbiertoAccesos] = useState(false)
   const [verPassMap, setVerPassMap] = useState<Record<string, boolean>>({})
@@ -229,14 +232,27 @@ export function HerramientaCard({
                         <span className="hrr-acc-item__nom">
                           {acc.nombre || `Acceso #${idx + 1}`}
                         </span>
-                        {acc.vinculaGit && (
-                          <span
-                            className="hrr-git-badge"
-                            title="Vinculado con repositorio Git / GitHub"
-                          >
-                            <GitBranch size={10} /> Vincula Git
-                          </span>
-                        )}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                          {acc.vinculaGit && (
+                            <span
+                              className="hrr-git-badge"
+                              title="Vinculado con repositorio Git / GitHub"
+                            >
+                              <GitBranch size={10} /> Vincula Git
+                            </span>
+                          )}
+                          {onEditarAcceso && (
+                            <button
+                              type="button"
+                              className="hrr-mini"
+                              onClick={() => onEditarAcceso(acc)}
+                              title="Editar solo esta credencial"
+                              aria-label={`Editar credencial ${acc.nombre || `Acceso #${idx + 1}`}`}
+                            >
+                              <Pencil size={12} />
+                            </button>
+                          )}
+                        </div>
                       </div>
 
                       {acc.usuario && (

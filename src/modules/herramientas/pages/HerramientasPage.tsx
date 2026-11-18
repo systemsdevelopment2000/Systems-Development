@@ -12,7 +12,7 @@ import {
   Users,
 } from 'lucide-react'
 import { Combobox, Modal, useConfirmar } from '@/core/ui'
-import type { Herramienta } from '@/core/datos'
+import type { AccesoHerramienta, Herramienta } from '@/core/datos'
 import {
   useHerramientas,
   type EntradaHerramienta,
@@ -22,6 +22,8 @@ import { HerramientaTabla } from '../components/HerramientaTabla'
 import { HerramientaCard } from '../components/HerramientaCard'
 import { HerramientaForm } from '../components/HerramientaForm'
 import { BovedaAccesosModal } from '../components/BovedaAccesosModal'
+import { EditarAccesoModal } from '../components/EditarAccesoModal'
+import { reemplazarAcceso } from '../lib/accesos'
 import {
   CATEGORIAS_HERRAMIENTA,
   IconoCategoria,
@@ -36,6 +38,9 @@ export function HerramientasPage() {
   const [abierto, setAbierto] = useState(false)
   const [editando, setEditando] = useState<Herramienta | undefined>(undefined)
   const [viendoAccesos, setViendoAccesos] = useState<HerramientaVista | undefined>(undefined)
+  const [editandoAcceso, setEditandoAcceso] = useState<
+    { herramienta: HerramientaVista; acceso: AccesoHerramienta } | undefined
+  >(undefined)
   const [filtro, setFiltro] = useState<Filtro>('todas')
   const [agrupacion, setAgrupacion] = useState<Agrupacion>('tipo')
   const [vista, setVista] = useState<'tarjetas' | 'lista'>('tarjetas')
@@ -156,6 +161,30 @@ export function HerramientasPage() {
     guardar(d)
     setAbierto(false)
   }
+
+  /** Abre el editor de una sola credencial, sin pasar por el formulario completo. */
+  function editarAcceso(h: HerramientaVista, acceso: AccesoHerramienta) {
+    setViendoAccesos(undefined)
+    setEditandoAcceso({ herramienta: h, acceso })
+  }
+
+  function onGuardarAcceso(accesoEditado: AccesoHerramienta) {
+    if (!editandoAcceso) return
+    const h = editandoAcceso.herramienta
+    const idx = h.accesosNormalizados.findIndex((a) => a.id === accesoEditado.id)
+    const accesos = reemplazarAcceso(h.accesosNormalizados, accesoEditado)
+    const actualizada: HerramientaVista = {
+      ...h,
+      accesos,
+      accesosNormalizados: accesos,
+      correo: accesos[0]?.usuario,
+      contrasena: accesos[0]?.contrasena,
+    }
+    guardar(actualizada)
+    setEditandoAcceso(undefined)
+    setViendoAccesos(idx >= 0 ? actualizada : undefined)
+  }
+
   async function onBorrar(h: HerramientaVista) {
     const ok = await confirmar({
       titulo: `¿Eliminar "${h.nombre}"?`,
@@ -319,6 +348,7 @@ export function HerramientasPage() {
           onEditar={editar}
           onBorrar={onBorrar}
           onVerAccesos={(h) => setViendoAccesos(h)}
+          onEditarAcceso={(h, acc) => editarAcceso(h, acc)}
         />
       ) : agrupacion === 'tipo' ? (
         <div className="hrr-grupos">
@@ -351,6 +381,7 @@ export function HerramientasPage() {
                     onBorrar={() => onBorrar(h)}
                     onPagar={() => marcarPagada(h.id)}
                     onVerAccesos={() => setViendoAccesos(h)}
+                    onEditarAcceso={(acc) => editarAcceso(h, acc)}
                   />
                 ))}
               </div>
@@ -382,6 +413,7 @@ export function HerramientasPage() {
                     onBorrar={() => onBorrar(h)}
                     onPagar={() => marcarPagada(h.id)}
                     onVerAccesos={() => setViendoAccesos(h)}
+                    onEditarAcceso={(acc) => editarAcceso(h, acc)}
                   />
                 ))}
               </div>
@@ -398,6 +430,7 @@ export function HerramientasPage() {
               onBorrar={() => onBorrar(h)}
               onPagar={() => marcarPagada(h.id)}
               onVerAccesos={() => setViendoAccesos(h)}
+              onEditarAcceso={(acc) => editarAcceso(h, acc)}
             />
           ))}
         </div>
@@ -418,7 +451,24 @@ export function HerramientasPage() {
               setViendoAccesos(undefined)
               editar(target)
             }}
+            onEditarAcceso={(acc) => editarAcceso(viendoAccesos, acc)}
             onCerrar={() => setViendoAccesos(undefined)}
+          />
+        )}
+      </Modal>
+
+      {/* Modal para editar UNA credencial, sin buscarla en el formulario grande */}
+      <Modal
+        abierto={Boolean(editandoAcceso)}
+        onCerrar={() => setEditandoAcceso(undefined)}
+        titulo={`Editar credencial: ${editandoAcceso?.acceso.nombre ?? ''}`}
+        ancho={520}
+      >
+        {editandoAcceso && (
+          <EditarAccesoModal
+            acceso={editandoAcceso.acceso}
+            onGuardar={onGuardarAcceso}
+            onCancelar={() => setEditandoAcceso(undefined)}
           />
         )}
       </Modal>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Eye, EyeOff, Copy, Check, ExternalLink, Pencil, Trash2, GitBranch, KeyRound } from 'lucide-react'
+import type { AccesoHerramienta } from '@/core/datos'
 import type { HerramientaVista } from '../hooks/useHerramientas'
 import { obtenerDefTipoHerramienta } from '../lib/categoriasHerramientas'
 
@@ -8,6 +9,7 @@ interface Props {
   onEditar: (h: HerramientaVista) => void
   onBorrar: (h: HerramientaVista) => void
   onVerAccesos?: (h: HerramientaVista) => void
+  onEditarAcceso?: (h: HerramientaVista, acceso: AccesoHerramienta) => void
 }
 
 /** Copia al portapapeles con respaldo para contextos no seguros. */
@@ -45,7 +47,7 @@ function BotonCopiar({ valor, que }: { valor: string; que: string }) {
   )
 }
 
-export function HerramientaTabla({ herramientas, onEditar, onBorrar, onVerAccesos }: Props) {
+export function HerramientaTabla({ herramientas, onEditar, onBorrar, onVerAccesos, onEditarAcceso }: Props) {
   const [visibles, setVisibles] = useState<string[]>([])
 
   function alternar(id: string) {
@@ -125,11 +127,24 @@ export function HerramientaTabla({ herramientas, onEditar, onBorrar, onVerAcceso
                               <span style={{ fontWeight: 600, color: 'var(--text)' }}>
                                 {acc.nombre || `Acceso #${idx + 1}`}
                               </span>
-                              {acc.vinculaGit && (
-                                <span className="hrr-git-badge" style={{ fontSize: 9, padding: '1px 5px' }}>
-                                  <GitBranch size={10} /> Git ✓
-                                </span>
-                              )}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                {acc.vinculaGit && (
+                                  <span className="hrr-git-badge" style={{ fontSize: 9, padding: '1px 5px' }}>
+                                    <GitBranch size={10} /> Git ✓
+                                  </span>
+                                )}
+                                {onEditarAcceso && (
+                                  <button
+                                    type="button"
+                                    className="hrt-copiar"
+                                    onClick={() => onEditarAcceso(h, acc)}
+                                    title="Editar solo esta credencial"
+                                    aria-label={`Editar credencial ${acc.nombre || `Acceso #${idx + 1}`}`}
+                                  >
+                                    <Pencil size={11} />
+                                  </button>
+                                )}
+                              </div>
                             </div>
 
                             {acc.usuario && (

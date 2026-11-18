@@ -13,16 +13,18 @@ import {
   CalendarClock,
   Wallet,
 } from 'lucide-react'
+import type { AccesoHerramienta } from '@/core/datos'
 import type { HerramientaVista } from '../hooks/useHerramientas'
 import { obtenerDefTipoHerramienta, IconoCategoria } from '../lib/categoriasHerramientas'
 
 interface Props {
   herramienta: HerramientaVista
   onEditar: () => void
+  onEditarAcceso: (acceso: AccesoHerramienta) => void
   onCerrar: () => void
 }
 
-export function BovedaAccesosModal({ herramienta: h, onEditar, onCerrar }: Props) {
+export function BovedaAccesosModal({ herramienta: h, onEditar, onEditarAcceso, onCerrar }: Props) {
   const [verPassMap, setVerPassMap] = useState<Record<string, boolean>>({})
   const [copiado, setCopiado] = useState<string>('')
 
@@ -149,11 +151,22 @@ export function BovedaAccesosModal({ herramienta: h, onEditar, onCerrar }: Props
                       {acc.nombre || `Acceso #${idx + 1}`}
                     </strong>
                   </div>
-                  {acc.vinculaGit ? (
-                    <span className="hrr-git-badge" title="Vinculado con repositorio Git / GitHub">
-                      <GitBranch size={12} /> Vincula Git
-                    </span>
-                  ) : null}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    {acc.vinculaGit ? (
+                      <span className="hrr-git-badge" title="Vinculado con repositorio Git / GitHub">
+                        <GitBranch size={12} /> Vincula Git
+                      </span>
+                    ) : null}
+                    <button
+                      type="button"
+                      className="hrr-mini"
+                      onClick={() => onEditarAcceso(acc)}
+                      title="Editar solo esta credencial"
+                      aria-label={`Editar credencial ${acc.nombre || `Acceso #${idx + 1}`}`}
+                    >
+                      <Pencil size={13} />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="bov-modal__campos">
