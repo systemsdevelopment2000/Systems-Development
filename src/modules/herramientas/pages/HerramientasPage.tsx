@@ -441,7 +441,7 @@ export function HerramientasPage() {
         abierto={Boolean(viendoAccesos)}
         onCerrar={() => setViendoAccesos(undefined)}
         titulo={`Bóveda de Accesos: ${viendoAccesos?.nombre ?? ''}`}
-        ancho={640}
+        ancho={980}
       >
         {viendoAccesos && (
           <BovedaAccesosModal

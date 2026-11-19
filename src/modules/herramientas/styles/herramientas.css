@@ -589,6 +589,24 @@
   color: var(--text);
 }
 
+/* El nombre de la herramienta abre su bóveda de accesos. */
+.hrr-nombre-link {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.hrr-nombre-link:hover {
+  color: var(--brand-2, #05e4fd);
+  text-decoration: underline;
+}
+
 .hrt__url {
   display: inline-flex;
   align-items: center;
@@ -1161,17 +1179,22 @@
   letter-spacing: 0.04em;
 }
 
+/* Accesos uno al lado del otro, con scroll lateral si no caben todos. */
 .bov-modal__lista {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: stretch;
   gap: 12px;
   max-height: 52vh;
+  overflow-x: auto;
   overflow-y: auto;
-  padding-right: 4px;
+  padding: 2px 4px 8px;
+  scroll-snap-type: x proximity;
 }
 
 .bov-modal__item {
   display: flex;
+  flex: 0 0 288px;
   flex-direction: column;
   gap: 10px;
   padding: 14px;
@@ -1179,6 +1202,29 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   border-left: 3px solid var(--brand);
+  scroll-snap-align: start;
+}
+
+@media (max-width: 700px) {
+  .bov-modal__item {
+    flex-basis: 82vw;
+    max-width: 300px;
+  }
+}
+
+.bov-modal__flujo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.bov-modal__flujo-herramienta {
+  color: var(--text);
+}
+
+.bov-modal__flujo-flecha {
+  color: var(--brand-2, #05e4fd);
 }
 
 .bov-modal__item-head {

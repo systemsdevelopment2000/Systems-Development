@@ -12,6 +12,7 @@ import {
   Pencil,
   CalendarClock,
   Wallet,
+  ArrowRight,
 } from 'lucide-react'
 import type { AccesoHerramienta } from '@/core/datos'
 import type { HerramientaVista } from '../hooks/useHerramientas'
@@ -122,9 +123,11 @@ export function BovedaAccesosModal({ herramienta: h, onEditar, onEditarAcceso, o
       </div>
 
       {/* ── LISTA DE CONTRASEÑAS Y ACCESOS ── */}
-      <div className="bov-modal__seccion-tit">
+      <div className="bov-modal__seccion-tit bov-modal__flujo">
         <ShieldCheck size={16} />
-        <span>Contraseñas y Accesos que parten de la herramienta ({listaAccesos.length})</span>
+        <span className="bov-modal__flujo-herramienta">{h.nombre}</span>
+        <ArrowRight className="bov-modal__flujo-flecha" size={17} aria-hidden="true" />
+        <span>Accesos y contraseñas ({listaAccesos.length})</span>
       </div>
 
       {listaAccesos.length === 0 ? (

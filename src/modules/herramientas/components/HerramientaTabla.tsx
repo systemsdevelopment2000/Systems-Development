@@ -80,7 +80,21 @@ export function HerramientaTabla({ herramientas, onEditar, onBorrar, onVerAcceso
               <tr key={h.id} className={h.activa ? '' : 'is-inactiva'}>
                 <td>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                    <span className="hrt__nombre">{h.nombre}</span>
+                    <span className="hrt__nombre">
+                      {onVerAccesos ? (
+                        <button
+                          type="button"
+                          className="hrr-nombre-link"
+                          onClick={() => onVerAccesos(h)}
+                          title={`Ver accesos y contraseñas de ${h.nombre}`}
+                          aria-label={`Ver accesos y contraseñas de ${h.nombre}`}
+                        >
+                          {h.nombre}
+                        </button>
+                      ) : (
+                        h.nombre
+                      )}
+                    </span>
                     <span
                       className="hrr-tipo-badge"
                       style={{

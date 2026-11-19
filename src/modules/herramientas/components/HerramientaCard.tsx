@@ -72,7 +72,21 @@ export function HerramientaCard({
       {/* ── ENCABEZADO ── */}
       <div className="hrr-card__head">
         <div className="hrr-card__id">
-          <h3 className="cl-card__nombre">{h.nombre}</h3>
+          <h3 className="cl-card__nombre">
+            {onVerAccesos ? (
+              <button
+                type="button"
+                className="hrr-nombre-link"
+                onClick={onVerAccesos}
+                title={`Ver accesos y contraseñas de ${h.nombre}`}
+                aria-label={`Ver accesos y contraseñas de ${h.nombre}`}
+              >
+                {h.nombre}
+              </button>
+            ) : (
+              h.nombre
+            )}
+          </h3>
           <span
             className="hrr-tipo-badge"
             style={{ color: tipoDef.color, borderColor: colorMix(tipoDef.color, 35) }}
