@@ -30,6 +30,18 @@ assert.match(
 )
 assert.match(css, /\.hrr-card--clicable\s*\{[\s\S]{0,100}cursor:\s*pointer/, 'La tarjeta debe verse clicable')
 
+// La URL es texto: si fuera un enlace, su clic abriría la web y no el modal.
+assert.match(
+  tarjeta,
+  /<span className="hrr-url"[^>]*>[\s\S]{0,120}\{h\.url\}/,
+  'La URL debe mostrarse como texto dentro de la tarjeta',
+)
+assert.doesNotMatch(
+  tarjeta,
+  /<a className="hrr-url"/,
+  'La tarjeta no debe tener un enlace que se coma el clic',
+)
+
 // Nombre + número de accesos siguen visibles en la tarjeta.
 assert.match(tarjeta, /className="cl-card__nombre"/, 'Debe mostrarse el nombre de la herramienta')
 assert.match(

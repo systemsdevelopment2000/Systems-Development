@@ -124,11 +124,13 @@ export function HerramientaCard({
         </p>
       )}
 
-      {/* ── ENLACE OFICIAL DE LA HERRAMIENTA ── */}
+      {/* ── ENLACE OFICIAL DE LA HERRAMIENTA ──
+          Se muestra como texto para que el clic en toda la tarjeta abra el
+          modal de accesos. El enlace real está dentro de la bóveda. */}
       {h.url && (
-        <a className="hrr-url" href={h.url} target="_blank" rel="noreferrer">
+        <span className="hrr-url" title="Haz clic en la tarjeta para ver los accesos">
           <ExternalLink size={13} /> {h.url}
-        </a>
+        </span>
       )}
 
       {/* ── DATOS DE PAGO Y COSTOS ── */}
