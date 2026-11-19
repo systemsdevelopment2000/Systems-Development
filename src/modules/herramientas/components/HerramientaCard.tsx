@@ -78,16 +78,18 @@ export function HerramientaCard({
             )}
             <ChevronRight size={14} className="hrr-card__titulo-flecha" />
           </button>
-          <span
-            className="hrr-tipo-badge"
-            style={{ color: tipoDef.color, borderColor: colorMix(tipoDef.color, 35) }}
-            title={tipoDef.descripcion}
-          >
-            {tipoDef.etiqueta}
-          </span>
-          <span className={'hrr-prop hrr-prop--' + (h.propietario === 'sd' ? 'sd' : 'cli')}>
-            {h.propietario === 'sd' ? 'Propia (SD)' : 'Cliente'}
-          </span>
+          <div className="hrr-card__badges">
+            <span
+              className="hrr-tipo-badge"
+              style={{ color: tipoDef.color, borderColor: colorMix(tipoDef.color, 35) }}
+              title={tipoDef.descripcion}
+            >
+              {tipoDef.etiqueta}
+            </span>
+            <span className={'hrr-prop hrr-prop--' + (h.propietario === 'sd' ? 'sd' : 'cli')}>
+              {h.propietario === 'sd' ? 'Propia (SD)' : 'Cliente'}
+            </span>
+          </div>
         </div>
         <div className="cl-card__acciones">
           {onVerAccesos && (

@@ -87,10 +87,18 @@
 }
 .hrr-card__id {
   display: flex;
-  align-items: center;
-  gap: 9px;
-  flex-wrap: wrap;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
   min-width: 0;
+}
+
+.hrr-card__badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 .hrr-prop {
   font-size: 10px;
@@ -598,8 +606,9 @@
   display: flex;
   align-items: center;
   gap: 7px;
+  width: 100%;
   min-width: 0;
-  flex: 1;
+  flex: none;
   margin: 0;
   padding: 0;
   font: inherit;
@@ -612,6 +621,8 @@
 
 .hrr-card__titulo-btn .cl-card__nombre {
   display: block;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .hrr-card__titulo-btn:hover .cl-card__nombre {
@@ -626,6 +637,7 @@
   padding: 2px 8px;
   font-size: 10.5px;
   font-weight: 700;
+  white-space: nowrap;
   color: var(--brand-2, #05e4fd);
   background: color-mix(in srgb, var(--brand) 15%, transparent);
   border-radius: 999px;

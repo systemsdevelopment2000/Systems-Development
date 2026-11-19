@@ -50,6 +50,33 @@ assert.match(
   'Debe mostrarse el número de accesos',
 )
 
+// Nombre + accesos en una fila; etiquetas de tipo/propietario debajo, sin solaparse.
+assert.match(
+  tarjeta,
+  /<div className="hrr-card__badges">[\s\S]{0,500}<span[\s\S]{0,200}hrr-tipo-badge/,
+  'Las etiquetas deben ir agrupadas debajo del nombre',
+)
+assert.match(
+  css,
+  /\.hrr-card__id\s*\{[\s\S]{0,180}flex-direction:\s*column/,
+  'La cabecera debe apilar nombre y etiquetas en dos filas',
+)
+assert.match(
+  css,
+  /\.hrr-card__badges\s*\{[\s\S]{0,120}flex-wrap:\s*wrap/,
+  'Las etiquetas deben poder pasar a otra línea sin solaparse',
+)
+assert.match(
+  css,
+  /\.hrr-card__titulo-btn \.cl-card__nombre\s*\{[\s\S]{0,120}flex:\s*1 1 auto/,
+  'El nombre debe encogerse con puntos suspensivos antes de chocar con el contador',
+)
+assert.match(
+  css,
+  /\.hrr-card__num-accesos\s*\{[\s\S]{0,180}white-space:\s*nowrap/,
+  'El contador de accesos no debe partirse en dos líneas',
+)
+
 // Ya no hay vistas internas ni acordeón dentro de la tarjeta.
 assert.doesNotMatch(tarjeta, /vista ===|setVista|abiertoAccesos|hrr-acc-desplegable|Ampliar/, 'La tarjeta debe quedar simple')
 
