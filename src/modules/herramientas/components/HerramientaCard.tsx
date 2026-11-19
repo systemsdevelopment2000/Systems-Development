@@ -1,13 +1,8 @@
-import { useState } from 'react'
+import type { MouseEvent } from 'react'
 import {
   Pencil,
   Trash2,
   ExternalLink,
-  Eye,
-  EyeOff,
-  Copy,
-  Check,
-  Mail,
   KeyRound,
   CalendarClock,
   Wallet,
@@ -15,11 +10,8 @@ import {
   GitBranch,
   ShieldCheck,
   ChevronRight,
-  ChevronLeft,
-  Maximize2,
 } from 'lucide-react'
 import { useConfirmar } from '@/core/ui'
-import type { AccesoHerramienta } from '@/core/datos'
 import type { HerramientaVista } from '../hooks/useHerramientas'
 import { obtenerDefTipoHerramienta } from '../lib/categoriasHerramientas'
 
@@ -29,7 +21,6 @@ interface Props {
   onBorrar: () => void
   onPagar: () => void
   onVerAccesos?: () => void
-  onEditarAcceso?: (acceso: AccesoHerramienta) => void
 }
 
 function etiquetaEstado(h: HerramientaVista) {
@@ -45,44 +36,35 @@ export function HerramientaCard({
   onBorrar,
   onPagar,
   onVerAccesos,
-  onEditarAcceso,
 }: Props) {
-  const [vista, setVista] = useState<'herramienta' | 'accesos'>('herramienta')
-  const [verPassMap, setVerPassMap] = useState<Record<string, boolean>>({})
-  const [copiado, setCopiado] = useState('')
   const confirmar = useConfirmar()
 
   const tipoDef = obtenerDefTipoHerramienta(h.tipoHerramienta)
   const listaAccesos = h.accesosNormalizados || []
   const tieneGit = listaAccesos.some((a) => a.vinculaGit)
 
-  function copiar(texto: string, cual: string) {
-    if (!texto) return
-    navigator.clipboard?.writeText(texto).then(() => {
-      setCopiado(cual)
-      setTimeout(() => setCopiado(''), 1400)
-    })
-  }
-
-  function toggleVerPass(id: string) {
-    setVerPassMap((prev) => ({ ...prev, [id]: !prev[id] }))
+  /** Clic en cualquier parte de la tarjeta abre el modal con los accesos. */
+  function abrirModal(e: MouseEvent<HTMLElement>) {
+    const destino = e.target as HTMLElement
+    if (destino.closest('button, a, input, textarea, select, label')) return
+    onVerAccesos?.()
   }
 
   return (
-    <article className={'hrr-card hrr-' + h.estadoPago}>
+    <article
+      className={
+        'hrr-card hrr-' + h.estadoPago + (onVerAccesos ? ' hrr-card--clicable' : '')
+      }
+      onClick={abrirModal}
+    >
       {/* ── ENCABEZADO ── */}
       <div className="hrr-card__head">
         <div className="hrr-card__id">
           <button
             type="button"
             className="hrr-card__titulo-btn"
-            onClick={() => setVista(vista === 'accesos' ? 'herramienta' : 'accesos')}
-            aria-expanded={vista === 'accesos'}
-            title={
-              vista === 'accesos'
-                ? `Volver a la herramienta ${h.nombre}`
-                : `Ver los accesos de ${h.nombre}`
-            }
+            onClick={onVerAccesos}
+            title={`Ver accesos y contraseñas de ${h.nombre}`}
           >
             <span className="cl-card__nombre">{h.nombre}</span>
             <span className="hrr-card__num-accesos">
@@ -94,11 +76,7 @@ export function HerramientaCard({
                 <GitBranch size={10} /> Git
               </span>
             )}
-            {vista === 'accesos' ? (
-              <ChevronLeft size={14} className="hrr-card__titulo-flecha" />
-            ) : (
-              <ChevronRight size={14} className="hrr-card__titulo-flecha" />
-            )}
+            <ChevronRight size={14} className="hrr-card__titulo-flecha" />
           </button>
           <span
             className="hrr-tipo-badge"
@@ -112,14 +90,16 @@ export function HerramientaCard({
           </span>
         </div>
         <div className="cl-card__acciones">
-          <button
-            className="icono-btn"
-            onClick={() => setVista('accesos')}
-            aria-label={`Ampliar accesos de ${h.nombre}`}
-            title="Ampliar: ver los accesos dentro de esta tarjeta"
-          >
-            <Maximize2 size={15} />
-          </button>
+          {onVerAccesos && (
+            <button
+              className="icono-btn"
+              onClick={onVerAccesos}
+              aria-label="Abrir bóveda de accesos"
+              title="Abrir bóveda de accesos y contraseñas"
+            >
+              <KeyRound size={15} />
+            </button>
+          )}
           <button className="icono-btn" onClick={onEditar} aria-label="Editar herramienta">
             <Pencil size={15} />
           </button>
@@ -133,196 +113,24 @@ export function HerramientaCard({
         </div>
       </div>
 
-      {vista === 'herramienta' && (
-        <>
-          {/* ── CLIENTE / PROYECTO ASOCIADO ── */}
-          {(h.clienteNombre || h.proyectoNombre) && (
-            <p className="hrr-asoc">
-              {h.cuantosClientes > 1 && (
-                <span className="hrr-compartida">compartida · {h.cuantosClientes}</span>
-              )}
-              {h.clienteNombre}
-              {h.proyectoNombre ? ` · ${h.proyectoNombre}` : ''}
-            </p>
+      {/* ── CLIENTE / PROYECTO ASOCIADO ── */}
+      {(h.clienteNombre || h.proyectoNombre) && (
+        <p className="hrr-asoc">
+          {h.cuantosClientes > 1 && (
+            <span className="hrr-compartida">compartida · {h.cuantosClientes}</span>
           )}
-
-          {/* ── ENLACE OFICIAL DE LA HERRAMIENTA ── */}
-          {h.url && (
-            <a className="hrr-url" href={h.url} target="_blank" rel="noreferrer">
-              <ExternalLink size={13} /> {h.url}
-            </a>
-          )}
-        </>
+          {h.clienteNombre}
+          {h.proyectoNombre ? ` · ${h.proyectoNombre}` : ''}
+        </p>
       )}
 
-      {/* ── VISTA DE ACCESOS DENTRO DE LA MISMA TARJETA ── */}
-      <div className="hrr-acc-contenedor">
-        {vista === 'accesos' && (
-          <div className="hrr-acc-desplegable">
-            <div className="hrr-acc-desplegable__head">
-              <span>
-                <KeyRound size={12} style={{ verticalAlign: 'middle', marginRight: 4 }} />
-                Accesos de {h.nombre} ({listaAccesos.length})
-              </span>
-              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                {onVerAccesos && (
-                  <button
-                    type="button"
-                    className="hrr-acc-btn-mini"
-                    onClick={onVerAccesos}
-                    title="Ver la bóveda completa en grande"
-                  >
-                    <Maximize2 size={11} /> Ver en grande
-                  </button>
-                )}
-                <button
-                  type="button"
-                  className="hrr-acc-btn-mini"
-                  onClick={onEditar}
-                  title="Editar o añadir accesos"
-                >
-                  <Pencil size={11} /> Editar
-                </button>
-                <button
-                  type="button"
-                  className="hrr-acc-btn-mini"
-                  onClick={() => setVista('herramienta')}
-                  title="Volver a la herramienta"
-                >
-                  <ChevronLeft size={11} /> Volver
-                </button>
-              </div>
-            </div>
+      {/* ── ENLACE OFICIAL DE LA HERRAMIENTA ── */}
+      {h.url && (
+        <a className="hrr-url" href={h.url} target="_blank" rel="noreferrer">
+          <ExternalLink size={13} /> {h.url}
+        </a>
+      )}
 
-            {listaAccesos.length === 0 ? (
-              <div className="hrr-acc-vacio-box">
-                <p>No hay contraseñas ni tokens registrados.</p>
-                <button type="button" className="hrr-acc-btn-agregar" onClick={onEditar}>
-                  + Añadir primer acceso
-                </button>
-              </div>
-            ) : (
-              <div className="hrr-acc-lista">
-                {listaAccesos.map((acc, idx) => {
-                  const verPass = Boolean(verPassMap[acc.id])
-                  const keyCorreo = `${acc.id}-usr`
-                  const keyPass = `${acc.id}-pass`
-                  const keyToken = `${acc.id}-token`
-
-                  return (
-                    <div key={acc.id || idx} className="hrr-acc-item">
-                      <div className="hrr-acc-item__top">
-                        <span className="hrr-acc-item__nom">
-                          {acc.nombre || `Acceso #${idx + 1}`}
-                        </span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                          {acc.vinculaGit && (
-                            <span
-                              className="hrr-git-badge"
-                              title="Vinculado con repositorio Git / GitHub"
-                            >
-                              <GitBranch size={10} /> Vincula Git
-                            </span>
-                          )}
-                          {onEditarAcceso && (
-                            <button
-                              type="button"
-                              className="hrr-mini"
-                              onClick={() => onEditarAcceso(acc)}
-                              title="Editar solo esta credencial"
-                              aria-label={`Editar credencial ${acc.nombre || `Acceso #${idx + 1}`}`}
-                            >
-                              <Pencil size={12} />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-
-                      {acc.usuario && (
-                        <div className="hrr-cred__row">
-                          <Mail size={12} />
-                          <span className="hrr-cred__val" title={acc.usuario}>
-                            {acc.usuario}
-                          </span>
-                          <button
-                            type="button"
-                            className="hrr-mini"
-                            onClick={() => copiar(acc.usuario!, keyCorreo)}
-                            title="Copiar usuario o correo"
-                          >
-                            {copiado === keyCorreo ? (
-                              <Check size={11} color="var(--brand-2)" />
-                            ) : (
-                              <Copy size={11} />
-                            )}
-                          </button>
-                        </div>
-                      )}
-
-                      {acc.contrasena && (
-                        <div className="hrr-cred__row">
-                          <KeyRound size={12} />
-                          <span className="hrr-cred__val hrr-pass">
-                            {verPass ? acc.contrasena : '••••••••'}
-                          </span>
-                          <button
-                            type="button"
-                            className="hrr-mini"
-                            onClick={() => toggleVerPass(acc.id)}
-                            title={verPass ? 'Ocultar' : 'Ver'}
-                          >
-                            {verPass ? <EyeOff size={11} /> : <Eye size={11} />}
-                          </button>
-                          <button
-                            type="button"
-                            className="hrr-mini"
-                            onClick={() => copiar(acc.contrasena!, keyPass)}
-                            title="Copiar contraseña"
-                          >
-                            {copiado === keyPass ? (
-                              <Check size={11} color="var(--brand-2)" />
-                            ) : (
-                              <Copy size={11} />
-                            )}
-                          </button>
-                        </div>
-                      )}
-
-                      {acc.token && (
-                        <div className="hrr-acc-item__token">
-                          <KeyRound size={11} style={{ flexShrink: 0 }} />
-                          <span className="hrr-acc-item__token-val" title={acc.token}>
-                            {acc.token}
-                          </span>
-                          <button
-                            type="button"
-                            className="hrr-mini"
-                            onClick={() => copiar(acc.token!, keyToken)}
-                            title="Copiar Access Token"
-                          >
-                            {copiado === keyToken ? (
-                              <Check size={11} color="var(--brand-2)" />
-                            ) : (
-                              <Copy size={11} />
-                            )}
-                          </button>
-                        </div>
-                      )}
-
-                      {acc.notas && (
-                        <p className="hrr-acc-item__notas">{acc.notas}</p>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {vista === 'herramienta' && (
-        <>
       {/* ── DATOS DE PAGO Y COSTOS ── */}
       <div className="hrr-pago">
         {h.precio != null && (
@@ -393,8 +201,6 @@ export function HerramientaCard({
             dateStyle: 'medium',
           })}
         </span>
-      )}
-        </>
       )}
     </article>
   )

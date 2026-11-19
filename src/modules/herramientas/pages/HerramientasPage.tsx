@@ -381,7 +381,6 @@ export function HerramientasPage() {
                     onBorrar={() => onBorrar(h)}
                     onPagar={() => marcarPagada(h.id)}
                     onVerAccesos={() => setViendoAccesos(h)}
-                    onEditarAcceso={(acc) => editarAcceso(h, acc)}
                   />
                 ))}
               </div>
@@ -413,7 +412,6 @@ export function HerramientasPage() {
                     onBorrar={() => onBorrar(h)}
                     onPagar={() => marcarPagada(h.id)}
                     onVerAccesos={() => setViendoAccesos(h)}
-                    onEditarAcceso={(acc) => editarAcceso(h, acc)}
                   />
                 ))}
               </div>
@@ -430,7 +428,6 @@ export function HerramientasPage() {
               onBorrar={() => onBorrar(h)}
               onPagar={() => marcarPagada(h.id)}
               onVerAccesos={() => setViendoAccesos(h)}
-              onEditarAcceso={(acc) => editarAcceso(h, acc)}
             />
           ))}
         </div>

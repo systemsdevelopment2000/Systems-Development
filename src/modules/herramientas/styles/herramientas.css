@@ -65,6 +65,10 @@
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.32);
   transform: translateY(-2px);
 }
+
+.hrr-card--clicable {
+  cursor: pointer;
+}
 .hrr-vencida {
   border-left-color: #ff5a5a;
 }

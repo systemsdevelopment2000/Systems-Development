@@ -61,7 +61,7 @@ assert.deepEqual(
   'Si no coincide el id, no se cambia nada',
 )
 
-// Las tres vistas donde se ven credenciales deben ofrecer la edición individual.
+// La bóveda y la tabla ofrecen edición individual; la tarjeta abre la bóveda.
 const boveda = readFileSync('src/modules/herramientas/components/BovedaAccesosModal.tsx', 'utf8')
 const tarjeta = readFileSync('src/modules/herramientas/components/HerramientaCard.tsx', 'utf8')
 const tabla = readFileSync('src/modules/herramientas/components/HerramientaTabla.tsx', 'utf8')
@@ -70,7 +70,6 @@ const editor = readFileSync('src/modules/herramientas/components/EditarAccesoMod
 
 for (const [nombre, texto] of [
   ['bóveda', boveda],
-  ['tarjetas', tarjeta],
   ['tabla', tabla],
 ]) {
   assert.match(
@@ -81,7 +80,24 @@ for (const [nombre, texto] of [
   assert.match(texto, /type="button"[\s\S]{0,200}onEditarAcceso/, `${nombre}: el botón no debe enviar un formulario`)
 }
 
-assert.match(pagina, /onEditarAcceso=\{\(acc\) => editarAcceso\(h, acc\)\}/, 'La página debe conectar el editor')
+assert.match(
+  tarjeta,
+  /<article[\s\S]{0,300}onClick=\{abrirModal\}/,
+  'La tarjeta completa debe abrir el modal de accesos',
+)
+assert.match(
+  tarjeta,
+  /hrr-card__titulo-btn[\s\S]{0,200}onClick=\{onVerAccesos\}/,
+  'El nombre de la tarjeta debe abrir el modal',
+)
+assert.doesNotMatch(tarjeta, /onEditarAcceso/, 'La tarjeta ya no edita accesos en línea: los muestra el modal')
+
+assert.match(pagina, /onEditarAcceso=\{\(h, acc\) => editarAcceso\(h, acc\)\}/, 'La tabla debe conectar el editor')
+assert.match(
+  pagina,
+  /onEditarAcceso=\{\(acc\) => editarAcceso\(viendoAccesos, acc\)\}/,
+  'La bóveda debe conectar el editor',
+)
 assert.match(pagina, /<EditarAccesoModal/, 'Debe renderizarse el modal del editor individual')
 assert.match(pagina, /reemplazarAcceso\(h\.accesosNormalizados, accesoEditado\)/, 'Debe reemplazarse solo el acceso elegido')
 const inicioGuardar = pagina.indexOf('function onGuardarAcceso')
@@ -91,4 +107,4 @@ const bloqueGuardar = pagina.slice(inicioGuardar, finGuardar)
 assert.doesNotMatch(bloqueGuardar, /\bborrar\(/, 'Editar una credencial no debe borrar nada')
 assert.match(editor, /type="submit"[^>]*>[\s\S]{0,80}Guardar credencial/, 'El guardado del editor debe ser explícito')
 
-console.log('OK: editar una credencial no altera las demás y está disponible en las 3 vistas')
+console.log('OK: editar una credencial no altera las demás; la tarjeta abre la bóveda')
