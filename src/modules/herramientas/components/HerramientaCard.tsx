@@ -14,7 +14,8 @@ import {
   BadgeCheck,
   GitBranch,
   ShieldCheck,
-  ChevronDown,
+  ChevronRight,
+  ChevronLeft,
   Maximize2,
 } from 'lucide-react'
 import { useConfirmar } from '@/core/ui'
@@ -46,7 +47,7 @@ export function HerramientaCard({
   onVerAccesos,
   onEditarAcceso,
 }: Props) {
-  const [abiertoAccesos, setAbiertoAccesos] = useState(false)
+  const [vista, setVista] = useState<'herramienta' | 'accesos'>('herramienta')
   const [verPassMap, setVerPassMap] = useState<Record<string, boolean>>({})
   const [copiado, setCopiado] = useState('')
   const confirmar = useConfirmar()
@@ -75,12 +76,12 @@ export function HerramientaCard({
           <button
             type="button"
             className="hrr-card__titulo-btn"
-            onClick={() => setAbiertoAccesos((v) => !v)}
-            aria-expanded={abiertoAccesos}
+            onClick={() => setVista(vista === 'accesos' ? 'herramienta' : 'accesos')}
+            aria-expanded={vista === 'accesos'}
             title={
-              abiertoAccesos
-                ? `Ocultar accesos de ${h.nombre}`
-                : `Ver accesos de ${h.nombre}`
+              vista === 'accesos'
+                ? `Volver a la herramienta ${h.nombre}`
+                : `Ver los accesos de ${h.nombre}`
             }
           >
             <span className="cl-card__nombre">{h.nombre}</span>
@@ -93,10 +94,11 @@ export function HerramientaCard({
                 <GitBranch size={10} /> Git
               </span>
             )}
-            <ChevronDown
-              size={14}
-              className={`hrr-acc-trigger__chevron ${abiertoAccesos ? 'is-open' : ''}`}
-            />
+            {vista === 'accesos' ? (
+              <ChevronLeft size={14} className="hrr-card__titulo-flecha" />
+            ) : (
+              <ChevronRight size={14} className="hrr-card__titulo-flecha" />
+            )}
           </button>
           <span
             className="hrr-tipo-badge"
@@ -110,16 +112,14 @@ export function HerramientaCard({
           </span>
         </div>
         <div className="cl-card__acciones">
-          {onVerAccesos && (
-            <button
-              className="icono-btn"
-              onClick={onVerAccesos}
-              aria-label="Abrir bóveda de accesos"
-              title="Abrir bóveda de accesos y contraseñas"
-            >
-              <KeyRound size={15} />
-            </button>
-          )}
+          <button
+            className="icono-btn"
+            onClick={() => setVista('accesos')}
+            aria-label={`Ampliar accesos de ${h.nombre}`}
+            title="Ampliar: ver los accesos dentro de esta tarjeta"
+          >
+            <Maximize2 size={15} />
+          </button>
           <button className="icono-btn" onClick={onEditar} aria-label="Editar herramienta">
             <Pencil size={15} />
           </button>
@@ -133,58 +133,63 @@ export function HerramientaCard({
         </div>
       </div>
 
-      {/* ── CLIENTE / PROYECTO ASOCIADO ── */}
-      {(h.clienteNombre || h.proyectoNombre) && (
-        <p className="hrr-asoc">
-          {h.cuantosClientes > 1 && (
-            <span className="hrr-compartida">compartida · {h.cuantosClientes}</span>
+      {vista === 'herramienta' && (
+        <>
+          {/* ── CLIENTE / PROYECTO ASOCIADO ── */}
+          {(h.clienteNombre || h.proyectoNombre) && (
+            <p className="hrr-asoc">
+              {h.cuantosClientes > 1 && (
+                <span className="hrr-compartida">compartida · {h.cuantosClientes}</span>
+              )}
+              {h.clienteNombre}
+              {h.proyectoNombre ? ` · ${h.proyectoNombre}` : ''}
+            </p>
           )}
-          {h.clienteNombre}
-          {h.proyectoNombre ? ` · ${h.proyectoNombre}` : ''}
-        </p>
+
+          {/* ── ENLACE OFICIAL DE LA HERRAMIENTA ── */}
+          {h.url && (
+            <a className="hrr-url" href={h.url} target="_blank" rel="noreferrer">
+              <ExternalLink size={13} /> {h.url}
+            </a>
+          )}
+        </>
       )}
 
-      {/* ── ENLACE OFICIAL DE LA HERRAMIENTA ── */}
-      {h.url && (
-        <a className="hrr-url" href={h.url} target="_blank" rel="noreferrer">
-          <ExternalLink size={13} /> {h.url}
-        </a>
-      )}
-
-      {/* ── DISPARADOR INTERACTIVO: CLIC PARA VER CONTRASEÑAS Y ACCESOS ── */}
+      {/* ── VISTA DE ACCESOS DENTRO DE LA MISMA TARJETA ── */}
       <div className="hrr-acc-contenedor">
-        {/* ── CUERPO DESPLEGABLE CON LAS CONTRASEÑAS Y ACCESOS ── */}
-        {abiertoAccesos && (
+        {vista === 'accesos' && (
           <div className="hrr-acc-desplegable">
             <div className="hrr-acc-desplegable__head">
               <span>
                 <KeyRound size={12} style={{ verticalAlign: 'middle', marginRight: 4 }} />
-                Credenciales ({listaAccesos.length})
+                Accesos de {h.nombre} ({listaAccesos.length})
               </span>
               <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                 {onVerAccesos && (
                   <button
                     type="button"
                     className="hrr-acc-btn-mini"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      onVerAccesos()
-                    }}
-                    title="Ampliar en ventana completa"
+                    onClick={onVerAccesos}
+                    title="Ver la bóveda completa en grande"
                   >
-                    <Maximize2 size={11} /> Ampliar
+                    <Maximize2 size={11} /> Ver en grande
                   </button>
                 )}
                 <button
                   type="button"
                   className="hrr-acc-btn-mini"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onEditar()
-                  }}
+                  onClick={onEditar}
                   title="Editar o añadir accesos"
                 >
                   <Pencil size={11} /> Editar
+                </button>
+                <button
+                  type="button"
+                  className="hrr-acc-btn-mini"
+                  onClick={() => setVista('herramienta')}
+                  title="Volver a la herramienta"
+                >
+                  <ChevronLeft size={11} /> Volver
                 </button>
               </div>
             </div>
@@ -316,6 +321,8 @@ export function HerramientaCard({
         )}
       </div>
 
+      {vista === 'herramienta' && (
+        <>
       {/* ── DATOS DE PAGO Y COSTOS ── */}
       <div className="hrr-pago">
         {h.precio != null && (
@@ -386,6 +393,8 @@ export function HerramientaCard({
             dateStyle: 'medium',
           })}
         </span>
+      )}
+        </>
       )}
     </article>
   )

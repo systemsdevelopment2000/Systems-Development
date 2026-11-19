@@ -627,6 +627,15 @@
   border-radius: 999px;
 }
 
+.hrr-card__titulo-flecha {
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
+.hrr-card__titulo-btn:hover .hrr-card__titulo-flecha {
+  color: var(--brand-2, #05e4fd);
+}
+
 .hrt__url {
   display: inline-flex;
   align-items: center;
