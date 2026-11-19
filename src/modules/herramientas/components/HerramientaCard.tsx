@@ -72,21 +72,32 @@ export function HerramientaCard({
       {/* ── ENCABEZADO ── */}
       <div className="hrr-card__head">
         <div className="hrr-card__id">
-          <h3 className="cl-card__nombre">
-            {onVerAccesos ? (
-              <button
-                type="button"
-                className="hrr-nombre-link"
-                onClick={onVerAccesos}
-                title={`Ver accesos y contraseñas de ${h.nombre}`}
-                aria-label={`Ver accesos y contraseñas de ${h.nombre}`}
-              >
-                {h.nombre}
-              </button>
-            ) : (
-              h.nombre
+          <button
+            type="button"
+            className="hrr-card__titulo-btn"
+            onClick={() => setAbiertoAccesos((v) => !v)}
+            aria-expanded={abiertoAccesos}
+            title={
+              abiertoAccesos
+                ? `Ocultar accesos de ${h.nombre}`
+                : `Ver accesos de ${h.nombre}`
+            }
+          >
+            <span className="cl-card__nombre">{h.nombre}</span>
+            <span className="hrr-card__num-accesos">
+              <ShieldCheck size={12} />
+              {listaAccesos.length} {listaAccesos.length === 1 ? 'acceso' : 'accesos'}
+            </span>
+            {tieneGit && (
+              <span className="hrr-git-badge-mini" title="Vinculado con Git">
+                <GitBranch size={10} /> Git
+              </span>
             )}
-          </h3>
+            <ChevronDown
+              size={14}
+              className={`hrr-acc-trigger__chevron ${abiertoAccesos ? 'is-open' : ''}`}
+            />
+          </button>
           <span
             className="hrr-tipo-badge"
             style={{ color: tipoDef.color, borderColor: colorMix(tipoDef.color, 35) }}
@@ -142,53 +153,6 @@ export function HerramientaCard({
 
       {/* ── DISPARADOR INTERACTIVO: CLIC PARA VER CONTRASEÑAS Y ACCESOS ── */}
       <div className="hrr-acc-contenedor">
-        <button
-          type="button"
-          className={`hrr-acc-trigger ${abiertoAccesos ? 'is-active' : ''}`}
-          onClick={() => setAbiertoAccesos((v) => !v)}
-          aria-expanded={abiertoAccesos}
-          title={
-            abiertoAccesos
-              ? 'Clic para ocultar las contraseñas'
-              : 'Clic para ver las contraseñas y accesos'
-          }
-        >
-          <div className="hrr-acc-trigger__izq">
-            <span className="hrr-acc-trigger__icono">
-              <ShieldCheck size={14} />
-            </span>
-            <div className="hrr-acc-trigger__info">
-              <span className="hrr-acc-trigger__titulo">
-                {listaAccesos.length === 0
-                  ? 'Sin accesos registrados'
-                  : `${listaAccesos.length} ${
-                      listaAccesos.length === 1
-                        ? 'acceso y contraseña'
-                        : 'accesos y contraseñas'
-                    }`}
-              </span>
-              <span className="hrr-acc-trigger__sub">
-                {abiertoAccesos ? 'Ocultar credenciales' : 'Clic para ver contraseñas'}
-              </span>
-            </div>
-          </div>
-
-          <div className="hrr-acc-trigger__der">
-            {tieneGit && (
-              <span className="hrr-git-badge-mini" title="Vinculado con Git">
-                <GitBranch size={10} /> Git
-              </span>
-            )}
-            <span className="hrr-acc-trigger__accion">
-              {abiertoAccesos ? 'Ocultar' : 'Ver'}
-              <ChevronDown
-                size={14}
-                className={`hrr-acc-trigger__chevron ${abiertoAccesos ? 'is-open' : ''}`}
-              />
-            </span>
-          </div>
-        </button>
-
         {/* ── CUERPO DESPLEGABLE CON LAS CONTRASEÑAS Y ACCESOS ── */}
         {abiertoAccesos && (
           <div className="hrr-acc-desplegable">

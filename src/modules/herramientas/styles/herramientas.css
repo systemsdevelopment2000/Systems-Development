@@ -589,9 +589,13 @@
   color: var(--text);
 }
 
-/* El nombre de la herramienta abre su bóveda de accesos. */
-.hrr-nombre-link {
-  display: inline;
+/* Cabecera de la tarjeta: clic para desplegar los accesos dentro de ella. */
+.hrr-card__titulo-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  flex: 1;
   margin: 0;
   padding: 0;
   font: inherit;
@@ -602,9 +606,25 @@
   cursor: pointer;
 }
 
-.hrr-nombre-link:hover {
+.hrr-card__titulo-btn .cl-card__nombre {
+  display: block;
+}
+
+.hrr-card__titulo-btn:hover .cl-card__nombre {
   color: var(--brand-2, #05e4fd);
-  text-decoration: underline;
+}
+
+.hrr-card__num-accesos {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  padding: 2px 8px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--brand-2, #05e4fd);
+  background: color-mix(in srgb, var(--brand) 15%, transparent);
+  border-radius: 999px;
 }
 
 .hrt__url {
@@ -1016,12 +1036,16 @@
 
 .hrr-acc-lista {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scroll-snap-type: x proximity;
 }
 
 .hrr-acc-item {
   display: flex;
+  flex: 0 0 190px;
   flex-direction: column;
   gap: 5px;
   padding: 8px 10px;
@@ -1029,6 +1053,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-xs, 4px);
   transition: border-color 0.15s ease;
+  scroll-snap-align: start;
 }
 
 .hrr-acc-item:hover {
