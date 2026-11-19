@@ -86,20 +86,10 @@
   gap: 10px;
 }
 .hrr-card__id {
-  display: flex;
   flex: 1;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
   min-width: 0;
 }
 
-.hrr-card__badges {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
 .hrr-prop {
   font-size: 10px;
   font-weight: 600;

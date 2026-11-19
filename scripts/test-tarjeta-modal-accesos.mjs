@@ -50,21 +50,11 @@ assert.match(
   'Debe mostrarse el número de accesos',
 )
 
-// Nombre + accesos en una fila; etiquetas de tipo/propietario debajo, sin solaparse.
-assert.match(
+// La cabecera queda solo con el nombre y la cantidad de accesos.
+assert.doesNotMatch(
   tarjeta,
-  /<div className="hrr-card__badges">[\s\S]{0,500}<span[\s\S]{0,200}hrr-tipo-badge/,
-  'Las etiquetas deben ir agrupadas debajo del nombre',
-)
-assert.match(
-  css,
-  /\.hrr-card__id\s*\{[\s\S]{0,180}flex-direction:\s*column/,
-  'La cabecera debe apilar nombre y etiquetas en dos filas',
-)
-assert.match(
-  css,
-  /\.hrr-card__badges\s*\{[\s\S]{0,120}flex-wrap:\s*wrap/,
-  'Las etiquetas deben poder pasar a otra línea sin solaparse',
+  /hrr-tipo-badge|hrr-prop|hrr-card__badges|obtenerDefTipoHerramienta/,
+  'La tarjeta no debe mostrar etiquetas adicionales junto al contador',
 )
 assert.match(
   css,

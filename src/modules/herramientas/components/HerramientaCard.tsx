@@ -13,7 +13,6 @@ import {
 } from 'lucide-react'
 import { useConfirmar } from '@/core/ui'
 import type { HerramientaVista } from '../hooks/useHerramientas'
-import { obtenerDefTipoHerramienta } from '../lib/categoriasHerramientas'
 
 interface Props {
   herramienta: HerramientaVista
@@ -39,7 +38,6 @@ export function HerramientaCard({
 }: Props) {
   const confirmar = useConfirmar()
 
-  const tipoDef = obtenerDefTipoHerramienta(h.tipoHerramienta)
   const listaAccesos = h.accesosNormalizados || []
   const tieneGit = listaAccesos.some((a) => a.vinculaGit)
 
@@ -78,18 +76,6 @@ export function HerramientaCard({
             )}
             <ChevronRight size={14} className="hrr-card__titulo-flecha" />
           </button>
-          <div className="hrr-card__badges">
-            <span
-              className="hrr-tipo-badge"
-              style={{ color: tipoDef.color, borderColor: colorMix(tipoDef.color, 35) }}
-              title={tipoDef.descripcion}
-            >
-              {tipoDef.etiqueta}
-            </span>
-            <span className={'hrr-prop hrr-prop--' + (h.propietario === 'sd' ? 'sd' : 'cli')}>
-              {h.propietario === 'sd' ? 'Propia (SD)' : 'Cliente'}
-            </span>
-          </div>
         </div>
         <div className="cl-card__acciones">
           {onVerAccesos && (
@@ -208,8 +194,4 @@ export function HerramientaCard({
       )}
     </article>
   )
-}
-
-function colorMix(hex: string, alpha: number): string {
-  return `color-mix(in srgb, ${hex} ${alpha}%, transparent)`
 }
