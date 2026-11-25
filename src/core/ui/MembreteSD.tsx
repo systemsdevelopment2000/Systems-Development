@@ -16,7 +16,7 @@ export function CabeceraSD({ datos }: { datos?: DatosEmpresa } = {}) {
   return (
     <div className="sdcab-wrap">
       <div className="sdcab">
-        <img className="sdcab__logo" src={e.logo} alt={e.nombre} />
+        {e.logo ? <img className="sdcab__logo" src={e.logo} alt={e.nombre} /> : <div />}
         <ul className="sdcab__cont">
           {e.telefonos && (
             <li>

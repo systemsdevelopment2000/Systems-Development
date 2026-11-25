@@ -29,7 +29,7 @@ interface Props {
 
 const TABS = [
   { id: 'general', label: '1. General', icon: Info },
-  { id: 'logos', label: '2. Logos & Diagramas', icon: ImageIcon },
+  { id: 'logos', label: '2. Logos & Datos SD', icon: ImageIcon },
   { id: 'fases', label: '3. Fases & Entregables', icon: Layers },
   { id: 'principios', label: '4. Principios & Calidad', icon: CheckCircle2 },
 ] as const
@@ -51,9 +51,26 @@ export function MetodologiaForm({ inicial, clientes, onGuardar, onCancelar, onPr
   const [clienteId, setClienteId] = useState(inicial?.clienteId ?? '')
   const [activa, setActiva] = useState(inicial?.activa ?? true)
 
-  // Logos
+  // Identidad y Datos de Systems Development
   const [mostrarLogoSD, setMostrarLogoSD] = useState(inicial?.mostrarLogoSD ?? true)
+  const [mostrarDatosSD, setMostrarDatosSD] = useState(inicial?.mostrarDatosSD ?? true)
+  const [mostrarFirmaSD, setMostrarFirmaSD] = useState(inicial?.mostrarFirmaSD ?? true)
+  const [personalizarDatosSD, setPersonalizarDatosSD] = useState(
+    Boolean(
+      inicial?.datosContactoSD?.telefonos ||
+        inicial?.datosContactoSD?.correo ||
+        inicial?.datosContactoSD?.ubicacion,
+    ),
+  )
+  const [telefonosSD, setTelefonosSD] = useState(inicial?.datosContactoSD?.telefonos ?? '')
+  const [ubicacionSD, setUbicacionSD] = useState(inicial?.datosContactoSD?.ubicacion ?? '')
+  const [correoSD, setCorreoSD] = useState(inicial?.datosContactoSD?.correo ?? '')
+
+  // Logo de Cliente y Tamaño
   const [logoCliente, setLogoCliente] = useState(inicial?.logoCliente ?? '')
+  const [tamanoLogoCliente, setTamanoLogoCliente] = useState<'normal' | 'grande' | 'extra_grande'>(
+    inicial?.tamanoLogoCliente ?? 'grande',
+  )
 
   // Imágenes / Diagramas
   const [imagenes, setImagenes] = useState<ImagenMetodologia[]>(inicial?.imagenes ?? [])
@@ -240,7 +257,18 @@ export function MetodologiaForm({ inicial, clientes, onGuardar, onCancelar, onPr
       clienteId: clienteId || undefined,
       clienteNombre: clienteObj?.nombre,
       mostrarLogoSD,
+      mostrarDatosSD,
+      mostrarFirmaSD,
+      datosContactoSD:
+        personalizarDatosSD && (telefonosSD || ubicacionSD || correoSD)
+          ? {
+              telefonos: telefonosSD.trim() || undefined,
+              ubicacion: ubicacionSD.trim() || undefined,
+              correo: correoSD.trim() || undefined,
+            }
+          : undefined,
       logoCliente: logoCliente || undefined,
+      tamanoLogoCliente,
       fases,
       imagenes,
       principios,
@@ -263,7 +291,18 @@ export function MetodologiaForm({ inicial, clientes, onGuardar, onCancelar, onPr
       clienteId,
       clienteNombre: clienteObj?.nombre,
       mostrarLogoSD,
+      mostrarDatosSD,
+      mostrarFirmaSD,
+      datosContactoSD:
+        personalizarDatosSD && (telefonosSD || ubicacionSD || correoSD)
+          ? {
+              telefonos: telefonosSD.trim() || undefined,
+              ubicacion: ubicacionSD.trim() || undefined,
+              correo: correoSD.trim() || undefined,
+            }
+          : undefined,
       logoCliente,
+      tamanoLogoCliente,
       fases,
       imagenes,
       principios,
@@ -421,45 +460,106 @@ export function MetodologiaForm({ inicial, clientes, onGuardar, onCancelar, onPr
           </div>
         )}
 
-        {/* TAB 2: LOGOS E IMÁGENES */}
+        {/* TAB 2: LOGOS Y DATOS SD */}
         {tab === 'logos' && (
           <div className="met-form-seccion">
             <h3 className="met-form-subtitulo">
-              <ImageIcon size={16} /> Control de Logos en el Documento & PDF
+              <ImageIcon size={16} /> Identidad Visual & Control de Datos de SD
             </h3>
 
             <div className="met-logos-control-grid">
-              {/* Logo de Systems Development */}
+              {/* Identidad y Datos de Systems Development */}
               <div className="met-logo-caja">
                 <div className="met-logo-caja__header">
-                  <strong>Logo Systems Development</strong>
+                  <strong>Datos de Systems Development (SD)</strong>
+                </div>
+                <p className="met-logo-caja__desc">
+                  Controla individualmente si deseas mostrar u ocultar el logo, los datos de contacto y la firma de SD en el documento.
+                </p>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}>
                   <label className="met-switch-label">
                     <input
                       type="checkbox"
                       checked={mostrarLogoSD}
                       onChange={(e) => setMostrarLogoSD(e.target.checked)}
                     />
-                    <span>{mostrarLogoSD ? 'Mostrar en cabecera' : 'Oculto'}</span>
+                    <span>{mostrarLogoSD ? '✓ Logo SD visible en cabecera' : 'Logo SD oculto'}</span>
+                  </label>
+
+                  <label className="met-switch-label">
+                    <input
+                      type="checkbox"
+                      checked={mostrarDatosSD}
+                      onChange={(e) => setMostrarDatosSD(e.target.checked)}
+                    />
+                    <span>{mostrarDatosSD ? '✓ Datos de contacto de SD visibles (Teléfonos, Correo, Ubicación)' : 'Datos de contacto de SD ocultos'}</span>
+                  </label>
+
+                  <label className="met-switch-label">
+                    <input
+                      type="checkbox"
+                      checked={mostrarFirmaSD}
+                      onChange={(e) => setMostrarFirmaSD(e.target.checked)}
+                    />
+                    <span>{mostrarFirmaSD ? '✓ Bloque de firma y pie de SD visible' : 'Firma y pie de SD ocultos'}</span>
                   </label>
                 </div>
-                <p className="met-logo-caja__desc">
-                  Muestra el membrete oficial con datos de contacto y la marca registrada de Systems Development.
-                </p>
-                {mostrarLogoSD ? (
-                  <div className="met-logo-preview met-logo-preview--activo">
-                    <span>✓ Logo SD activo en cabecera y pie de página</span>
-                  </div>
-                ) : (
-                  <div className="met-logo-preview met-logo-preview--inactivo">
-                    <span>Sin membrete oficial SD (Hoja blanca neutra)</span>
+
+                {/* Personalización opcional de los datos de contacto de SD */}
+                {mostrarDatosSD && (
+                  <div style={{ marginTop: 14 }}>
+                    <label className="met-switch-label" style={{ fontSize: 12, color: '#94a3b8' }}>
+                      <input
+                        type="checkbox"
+                        checked={personalizarDatosSD}
+                        onChange={(e) => setPersonalizarDatosSD(e.target.checked)}
+                      />
+                      <span>Personalizar teléfonos / correo de SD para este documento</span>
+                    </label>
+
+                    {personalizarDatosSD && (
+                      <div className="met-sd-contacto-campos">
+                        <div className="field">
+                          <label className="field__label">Teléfonos de contacto</label>
+                          <input
+                            type="text"
+                            className="field__input"
+                            placeholder="0414-8983663 / 0412-4249441"
+                            value={telefonosSD}
+                            onChange={(e) => setTelefonosSD(e.target.value)}
+                          />
+                        </div>
+                        <div className="field">
+                          <label className="field__label">Ubicación / Ciudad</label>
+                          <input
+                            type="text"
+                            className="field__input"
+                            placeholder="Puerto Ordaz, Bolívar"
+                            value={ubicacionSD}
+                            onChange={(e) => setUbicacionSD(e.target.value)}
+                          />
+                        </div>
+                        <div className="field">
+                          <label className="field__label">Correo electrónico</label>
+                          <input
+                            type="text"
+                            className="field__input"
+                            placeholder="systemsdevelopment2000@gmail.com"
+                            value={correoSD}
+                            onChange={(e) => setCorreoSD(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
 
-              {/* Logo del Cliente */}
+              {/* Logo del Cliente y Tamaño */}
               <div className="met-logo-caja">
                 <div className="met-logo-caja__header">
-                  <strong>Logo del Cliente / Homologación</strong>
+                  <strong>Logo del Cliente / Empresa</strong>
                   {logoCliente && (
                     <button
                       type="button"
@@ -471,19 +571,53 @@ export function MetodologiaForm({ inicial, clientes, onGuardar, onCancelar, onPr
                   )}
                 </div>
                 <p className="met-logo-caja__desc">
-                  Agrega el logo de la empresa cliente para generar el PDF co-brandeado oficial.
+                  Agrega el logo de la empresa cliente para el documento. Puedes ajustar su tamaño para que se vea más grande o estándar.
                 </p>
 
                 {logoCliente ? (
-                  <div className="met-logo-cliente-muestra">
-                    <img src={logoCliente} alt="Logo Cliente" />
-                    <button
-                      type="button"
-                      className="btn btn--ghost btn--sm"
-                      onClick={() => setLogoCliente('')}
-                    >
-                      <X size={14} /> Quitar
-                    </button>
+                  <div>
+                    <div className="met-logo-cliente-muestra">
+                      <img
+                        src={logoCliente}
+                        alt="Logo Cliente"
+                        className={`met-logo-preview--${tamanoLogoCliente}`}
+                      />
+                      <button
+                        type="button"
+                        className="btn btn--ghost btn--sm"
+                        onClick={() => setLogoCliente('')}
+                      >
+                        <X size={14} /> Quitar
+                      </button>
+                    </div>
+
+                    {/* Selector de Tamaño del Logo */}
+                    <div style={{ marginTop: 12 }}>
+                      <span className="met-fase-subseccion__lbl">Tamaño del logo en el documento:</span>
+                      <div className="met-tamano-selector">
+                        <button
+                          type="button"
+                          className={`met-btn-tamano ${tamanoLogoCliente === 'normal' ? 'is-active' : ''}`}
+                          onClick={() => setTamanoLogoCliente('normal')}
+                        >
+                          Normal
+                        </button>
+                        <button
+                          type="button"
+                          className={`met-btn-tamano ${tamanoLogoCliente === 'grande' ? 'is-active' : ''}`}
+                          onClick={() => setTamanoLogoCliente('grande')}
+                        >
+                          Grande
+                        </button>
+                        <button
+                          type="button"
+                          className={`met-btn-tamano ${tamanoLogoCliente === 'extra_grande' ? 'is-active' : ''}`}
+                          onClick={() => setTamanoLogoCliente('extra_grande')}
+                        >
+                          Extra Grande
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 ) : (
                   <div className="met-logo-subir-box">

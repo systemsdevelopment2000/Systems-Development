@@ -1,6 +1,7 @@
 import { forwardRef } from 'react'
 import type { MetodologiaTrabajo } from '@/core/datos/tipos'
 import { CabeceraSD, PieSD } from '@/core/ui/MembreteSD'
+import { useDatos } from '@/core/datos'
 import { CheckCircle2, Layers, Calendar, Clock, ShieldCheck } from 'lucide-react'
 
 interface Props {
@@ -11,6 +12,8 @@ export const MetodologiaDocumento = forwardRef<HTMLDivElement, Props>(function M
   { metodologia },
   ref,
 ) {
+  const { estado } = useDatos()
+
   const {
     codigo,
     titulo,
@@ -20,7 +23,11 @@ export const MetodologiaDocumento = forwardRef<HTMLDivElement, Props>(function M
     objetivo,
     alcance,
     mostrarLogoSD = true,
+    mostrarDatosSD = true,
+    mostrarFirmaSD = true,
+    datosContactoSD,
     logoCliente,
+    tamanoLogoCliente = 'grande',
     clienteNombre,
     fases = [],
     imagenes = [],
@@ -41,11 +48,20 @@ export const MetodologiaDocumento = forwardRef<HTMLDivElement, Props>(function M
         year: 'numeric',
       })
 
+  // Configuración de cabecera según los interruptores de SD
+  const datosCabecera = {
+    ...estado.empresa,
+    logo: mostrarLogoSD ? estado.empresa.logo : '',
+    telefonos: mostrarDatosSD ? (datosContactoSD?.telefonos ?? estado.empresa.telefonos) : '',
+    ubicacion: mostrarDatosSD ? (datosContactoSD?.ubicacion ?? estado.empresa.ubicacion) : '',
+    correo: mostrarDatosSD ? (datosContactoSD?.correo ?? estado.empresa.correo) : '',
+  }
+
   return (
     <div ref={ref} className="met-doc-a4">
-      {/* Membrete oficial Systems Development (si está activo el logo SD) */}
-      {mostrarLogoSD ? (
-        <CabeceraSD />
+      {/* Membrete oficial Systems Development (según si están activos el logo o los datos) */}
+      {mostrarLogoSD || mostrarDatosSD ? (
+        <CabeceraSD datos={datosCabecera} />
       ) : (
         <div className="met-doc-sin-logo-sd">
           <span className="met-doc-sin-logo-sd__linea" />
@@ -74,11 +90,14 @@ export const MetodologiaDocumento = forwardRef<HTMLDivElement, Props>(function M
           )}
         </div>
 
-        {/* Logo adicional del cliente si se configuró */}
+        {/* Logo adicional del cliente si se configuró (sin texto 'Homologado con' y con tamaño configurable) */}
         {logoCliente && (
-          <div className="met-doc-logo-cliente-box">
-            <span className="met-doc-logo-cliente-lbl">Homologado con</span>
-            <img src={logoCliente} alt={clienteNombre || 'Cliente'} className="met-doc-logo-cliente-img" />
+          <div className={`met-doc-logo-cliente-box met-doc-logo-cliente-box--${tamanoLogoCliente}`}>
+            <img
+              src={logoCliente}
+              alt={clienteNombre || 'Cliente'}
+              className={`met-doc-logo-cliente-img met-doc-logo-cliente-img--${tamanoLogoCliente}`}
+            />
           </div>
         )}
       </div>
@@ -224,22 +243,24 @@ export const MetodologiaDocumento = forwardRef<HTMLDivElement, Props>(function M
         </section>
       )}
 
-      {/* Bloque de Firmas y Homologación */}
+      {/* Bloque de Firmas */}
       <section className="met-doc-firmas">
+        {mostrarFirmaSD && (
+          <div className="met-doc-firma-col">
+            <div className="met-doc-firma-linea" />
+            <span className="met-doc-firma-cargo">Director de Ingeniería & Arquitectura</span>
+            <span className="met-doc-firma-empresa">Systems Development C.A.</span>
+          </div>
+        )}
         <div className="met-doc-firma-col">
           <div className="met-doc-firma-linea" />
-          <span className="met-doc-firma-cargo">Director de Ingeniería & Arquitectura</span>
-          <span className="met-doc-firma-empresa">Systems Development C.A.</span>
-        </div>
-        <div className="met-doc-firma-col">
-          <div className="met-doc-firma-linea" />
-          <span className="met-doc-firma-cargo">Aprobación de Metodología / Cliente</span>
+          <span className="met-doc-firma-cargo">Aprobación / Contraparte</span>
           <span className="met-doc-firma-empresa">{clienteNombre || 'Contraparte Autorizada'}</span>
         </div>
       </section>
 
       {/* Pie de página oficial Systems Development */}
-      {mostrarLogoSD && <PieSD />}
+      {mostrarLogoSD && mostrarDatosSD && mostrarFirmaSD && <PieSD datos={datosCabecera} />}
     </div>
   )
 })

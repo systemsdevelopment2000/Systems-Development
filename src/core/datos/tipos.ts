@@ -823,7 +823,15 @@ export interface MetodologiaTrabajo {
   alcance?: string
   logo?: string
   mostrarLogoSD?: boolean
+  mostrarDatosSD?: boolean
+  mostrarFirmaSD?: boolean
+  datosContactoSD?: {
+    telefonos?: string
+    ubicacion?: string
+    correo?: string
+  }
   logoCliente?: string
+  tamanoLogoCliente?: 'normal' | 'grande' | 'extra_grande'
   clienteId?: string
   clienteNombre?: string
   fases: FaseMetodologia[]

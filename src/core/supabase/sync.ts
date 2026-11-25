@@ -195,6 +195,9 @@ export function mapearA_DB(coleccion: string, entidad: Record<string, unknown>):
     if (!Array.isArray(res.imagenes)) res.imagenes = []
     if (!Array.isArray(res.principios)) res.principios = []
     if (res.mostrar_logo_sd === undefined) res.mostrar_logo_sd = true
+    if (res.mostrar_datos_sd === undefined) res.mostrar_datos_sd = true
+    if (res.mostrar_firma_sd === undefined) res.mostrar_firma_sd = true
+    if (!res.datos_contacto_sd) res.datos_contacto_sd = {}
     if (res.activa === undefined) res.activa = true
     if (!res.tipo) res.tipo = 'desarrollo'
     if (!res.descripcion) res.descripcion = ''
@@ -281,6 +284,18 @@ export function mapearDe_DB(coleccion: string, fila: Record<string, unknown>): R
     if (!Array.isArray(res.principios)) res.principios = []
     if (res.mostrarLogoSD === undefined) {
       res.mostrarLogoSD = res.mostrar_logo_sd !== undefined ? Boolean(res.mostrar_logo_sd) : true
+    }
+    if (res.mostrarDatosSD === undefined) {
+      res.mostrarDatosSD = res.mostrar_datos_sd !== undefined ? Boolean(res.mostrar_datos_sd) : true
+    }
+    if (res.mostrarFirmaSD === undefined) {
+      res.mostrarFirmaSD = res.mostrar_firma_sd !== undefined ? Boolean(res.mostrar_firma_sd) : true
+    }
+    if (res.tamanoLogoCliente === undefined) {
+      res.tamanoLogoCliente = (res.tamano_logo_cliente as string) || 'grande'
+    }
+    if (!res.datosContactoSD && res.datos_contacto_sd && typeof res.datos_contacto_sd === 'object') {
+      res.datosContactoSD = res.datos_contacto_sd
     }
     if (res.activa === undefined) res.activa = true
     if (!res.tipo) res.tipo = 'desarrollo'
