@@ -16,6 +16,7 @@ import {
   Download,
   Printer,
   Search,
+  Edit2,
 } from 'lucide-react'
 import '../styles/metodologia.css'
 
@@ -266,6 +267,17 @@ export function MetodologiaPage() {
         cabeceraExtra={
           viendoDoc && (
             <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+              <button
+                type="button"
+                className="btn btn--ghost btn--sm btn--icono"
+                onClick={() => {
+                  const m = viendoDoc
+                  setViendoDoc(null)
+                  iniciarEditar(m)
+                }}
+              >
+                <Edit2 size={14} /> Editar
+              </button>
               <button
                 type="button"
                 className="btn btn--primary btn--sm btn--icono"

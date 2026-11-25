@@ -33,7 +33,7 @@ const TABS = [
   { id: 'general', label: '1. General', icon: Info },
   { id: 'logos', label: '2. Logos & Firmas', icon: ImageIcon },
   { id: 'fases', label: '3. Fases & Entregables', icon: Layers },
-  { id: 'principios', label: '4. Principios & Calidad', icon: CheckCircle2 },
+  { id: 'principios', label: '4. Principios y Reglas', icon: CheckCircle2 },
 ] as const
 
 type TabId = (typeof TABS)[number]['id']
@@ -77,18 +77,39 @@ export function MetodologiaForm({ inicial, clientes, onGuardar, onCancelar, onPr
   // Firmas de Aprobación (hasta 2 personas)
   const [mostrarFirmas, setMostrarFirmas] = useState(inicial?.mostrarFirmas ?? true)
   const [firmas, setFirmas] = useState<FirmaMetodologia[]>(() => {
-    if (inicial?.firmas && inicial.firmas.length > 0) return inicial.firmas
+    if (inicial?.firmas && inicial.firmas.length > 0) {
+      return inicial.firmas.map((f) => {
+        // Limpiar cargos antiguos que se hayan guardado por error en el campo de nombre
+        if (f.nombre === 'Director de Ingeniería & Arquitectura') {
+          return {
+            ...f,
+            nombre: '',
+            cargo: f.cargo || 'Director de Ingeniería & Arquitectura',
+            empresa: f.empresa || 'Systems Development C.A.',
+          }
+        }
+        if (f.nombre === 'Aprobación / Contraparte') {
+          return {
+            ...f,
+            nombre: '',
+            cargo: f.cargo || 'Representante Autorizado',
+            empresa: f.empresa || inicial?.clienteNombre || '',
+          }
+        }
+        return f
+      })
+    }
     const clienteObj = clientes.find((c) => c.id === (inicial?.clienteId ?? ''))
     return [
       {
         id: nuevoId(),
-        nombre: 'Director de Ingeniería & Arquitectura',
-        cargo: 'Líder Técnico',
+        nombre: '',
+        cargo: 'Director de Ingeniería & Arquitectura',
         empresa: 'Systems Development C.A.',
       },
       {
         id: nuevoId(),
-        nombre: 'Aprobación / Contraparte',
+        nombre: '',
         cargo: 'Representante Autorizado',
         empresa: clienteObj?.nombre || inicial?.clienteNombre || '',
       },
@@ -791,33 +812,33 @@ export function MetodologiaForm({ inicial, clientes, onGuardar, onCancelar, onPr
                       </div>
 
                       <div className="field">
-                        <label className="field__label">Nombre y Apellido *</label>
+                        <label className="field__label">A nombre de quién firma (Nombre y Apellido) *</label>
                         <input
                           type="text"
                           className="field__input"
-                          placeholder="Ej: Ing. Pedro Pérez"
+                          placeholder="Ej: Ing. Carlos Mendoza / Pedro Pérez"
                           value={firma.nombre}
                           onChange={(e) => actualizarFirma(idx, 'nombre', e.target.value)}
                         />
                       </div>
 
                       <div className="field">
-                        <label className="field__label">Cargo / Función</label>
+                        <label className="field__label">Cargo / Rol de la firma</label>
                         <input
                           type="text"
                           className="field__input"
-                          placeholder="Ej: Director de Operaciones / Líder Técnico"
+                          placeholder="Ej: Director de Ingeniería & Arquitectura / Líder Técnico"
                           value={firma.cargo || ''}
                           onChange={(e) => actualizarFirma(idx, 'cargo', e.target.value)}
                         />
                       </div>
 
                       <div className="field">
-                        <label className="field__label">Empresa / Entidad</label>
+                        <label className="field__label">Empresa / Organización</label>
                         <input
                           type="text"
                           className="field__input"
-                          placeholder="Ej: Systems Development C.A."
+                          placeholder="Ej: Systems Development C.A. o Empresa Cliente"
                           value={firma.empresa || ''}
                           onChange={(e) => actualizarFirma(idx, 'empresa', e.target.value)}
                         />
@@ -1083,11 +1104,11 @@ export function MetodologiaForm({ inicial, clientes, onGuardar, onCancelar, onPr
           </div>
         )}
 
-        {/* TAB 4: PRINCIPIOS Y CALIDAD */}
+        {/* TAB 4: PRINCIPIOS Y REGLAS */}
         {tab === 'principios' && (
           <div className="met-form-seccion">
             <h3 className="met-form-subtitulo">
-              <CheckCircle2 size={16} /> Principios y Reglas de Calidad
+              <CheckCircle2 size={16} /> Principios y Reglas
             </h3>
             <p className="met-logo-caja__desc">
               Pautas no negociables que rigen esta metodología (ej. compilación limpia, RLS de seguridad, atención oportuna, etc.). Puedes ver y redactar cada principio completo.

@@ -79,23 +79,23 @@ export const MetodologiaDocumento = forwardRef<HTMLDivElement, Props>(function M
       (f.empresa && f.empresa.trim()),
   )
 
-  const firmasAFirmar =
-    firmasConfiguradas.length > 0
-      ? firmasConfiguradas.slice(0, 2)
-      : mostrarFirmaSD
-        ? [
-            {
-              nombre: 'Director de Ingeniería & Arquitectura',
-              cargo: 'Líder Técnico',
-              empresa: 'Systems Development C.A.',
-            },
-            {
-              nombre: 'Aprobación / Contraparte',
-              cargo: 'Contraparte Autorizada',
-              empresa: clienteNombre || 'Empresa Cliente',
-            },
-          ]
-        : []
+  const tieneFirmasDefinidas = firmas !== undefined && Array.isArray(firmas) && firmas.length > 0
+  const firmasAFirmar = tieneFirmasDefinidas
+    ? firmasConfiguradas.slice(0, 2)
+    : mostrarFirmaSD
+      ? [
+          {
+            nombre: '',
+            cargo: 'Director de Ingeniería & Arquitectura',
+            empresa: 'Systems Development C.A.',
+          },
+          {
+            nombre: '',
+            cargo: 'Aprobación / Contraparte',
+            empresa: clienteNombre || 'Empresa Cliente',
+          },
+        ]
+      : []
 
   return (
     <div ref={ref} className="met-doc-a4">
@@ -172,13 +172,11 @@ export const MetodologiaDocumento = forwardRef<HTMLDivElement, Props>(function M
         </div>
       )}
 
-      {/* Principios de Calidad (si está vacío, no se muestra) */}
-      {/* Principios y Reglas de Calidad (si está vacío, no se muestra) */}
+      {/* Principios y Reglas (si está vacío, no se muestra) */}
       {principiosValidos.length > 0 && (
         <section className="met-doc-seccion">
           <h2 className="met-doc-seccion__titulo">
-            <ShieldCheck size={14} /> 2. Principios y Estándares de Ingeniería
-            <ShieldCheck size={14} /> 2. Principios y Reglas de Calidad
+            <ShieldCheck size={14} /> 2. Principios y Reglas
           </h2>
           <ul className="met-doc-principios-lista">
             {principiosValidos.map((p, i) => (
@@ -305,9 +303,15 @@ export const MetodologiaDocumento = forwardRef<HTMLDivElement, Props>(function M
           {firmasAFirmar.map((f, i) => (
             <div key={f.id || i} className="met-doc-firma-col">
               <div className="met-doc-firma-linea" />
-              {f.nombre && <strong className="met-doc-firma-nombre">{f.nombre}</strong>}
-              {f.cargo && <span className="met-doc-firma-cargo">{f.cargo}</span>}
-              {f.empresa && <span className="met-doc-firma-empresa">{f.empresa}</span>}
+              {f.nombre && f.nombre.trim() ? (
+                <strong className="met-doc-firma-nombre">{f.nombre}</strong>
+              ) : null}
+              {f.cargo && f.cargo.trim() ? (
+                <span className="met-doc-firma-cargo">{f.cargo}</span>
+              ) : null}
+              {f.empresa && f.empresa.trim() ? (
+                <span className="met-doc-firma-empresa">{f.empresa}</span>
+              ) : null}
             </div>
           ))}
         </section>
