@@ -5,6 +5,7 @@ import type {
   FaseMetodologia,
   ImagenMetodologia,
   Cliente,
+  FirmaMetodologia,
 } from '@/core/datos/tipos'
 import { nuevoId } from '@/core/datos'
 import {
@@ -17,6 +18,7 @@ import {
   Eye,
   Info,
   X,
+  UserCheck,
 } from 'lucide-react'
 
 interface Props {
@@ -29,7 +31,7 @@ interface Props {
 
 const TABS = [
   { id: 'general', label: '1. General', icon: Info },
-  { id: 'logos', label: '2. Logos & Datos SD', icon: ImageIcon },
+  { id: 'logos', label: '2. Logos & Firmas', icon: ImageIcon },
   { id: 'fases', label: '3. Fases & Entregables', icon: Layers },
   { id: 'principios', label: '4. Principios & Calidad', icon: CheckCircle2 },
 ] as const
@@ -72,6 +74,27 @@ export function MetodologiaForm({ inicial, clientes, onGuardar, onCancelar, onPr
     inicial?.tamanoLogoCliente ?? 'grande',
   )
 
+  // Firmas de Aprobación (hasta 2 personas)
+  const [mostrarFirmas, setMostrarFirmas] = useState(inicial?.mostrarFirmas ?? true)
+  const [firmas, setFirmas] = useState<FirmaMetodologia[]>(() => {
+    if (inicial?.firmas && inicial.firmas.length > 0) return inicial.firmas
+    const clienteObj = clientes.find((c) => c.id === (inicial?.clienteId ?? ''))
+    return [
+      {
+        id: nuevoId(),
+        nombre: 'Director de Ingeniería & Arquitectura',
+        cargo: 'Líder Técnico',
+        empresa: 'Systems Development C.A.',
+      },
+      {
+        id: nuevoId(),
+        nombre: 'Aprobación / Contraparte',
+        cargo: 'Representante Autorizado',
+        empresa: clienteObj?.nombre || inicial?.clienteNombre || '',
+      },
+    ]
+  })
+
   // Imágenes / Diagramas
   const [imagenes, setImagenes] = useState<ImagenMetodologia[]>(inicial?.imagenes ?? [])
 
@@ -109,6 +132,33 @@ export function MetodologiaForm({ inicial, clientes, onGuardar, onCancelar, onPr
           'Control estricto de seguridad en Supabase y políticas RLS.',
         ],
   )
+
+  // ----------------------------------------------------
+  // Manejadores de Firmas
+  // ----------------------------------------------------
+  function agregarFirma() {
+    if (firmas.length >= 2) return
+    const clienteObj = clientes.find((c) => c.id === clienteId)
+    setFirmas((prev) => [
+      ...prev,
+      {
+        id: nuevoId(),
+        nombre: '',
+        cargo: 'Representante Autorizado',
+        empresa: clienteObj?.nombre || '',
+      },
+    ])
+  }
+
+  function eliminarFirma(idx: number) {
+    setFirmas((prev) => prev.filter((_, i) => i !== idx))
+  }
+
+  function actualizarFirma(idx: number, campo: keyof FirmaMetodologia, valor: string) {
+    setFirmas((prev) =>
+      prev.map((f, i) => (i === idx ? { ...f, [campo]: valor } : f)),
+    )
+  }
 
   // ----------------------------------------------------
   // Manejadores de Fases
@@ -152,6 +202,46 @@ export function MetodologiaForm({ inicial, clientes, onGuardar, onCancelar, onPr
       prev.map((f) =>
         f.id === faseId
           ? { ...f, entregables: (f.entregables || []).filter((_, i) => i !== idx) }
+          : f,
+      ),
+    )
+  }
+
+  function agregarRol(faseId: string, texto: string) {
+    const val = texto.trim()
+    if (!val) return
+    setFases((prev) =>
+      prev.map((f) =>
+        f.id === faseId ? { ...f, roles: [...(f.roles || []), val] } : f,
+      ),
+    )
+  }
+
+  function quitarRol(faseId: string, idx: number) {
+    setFases((prev) =>
+      prev.map((f) =>
+        f.id === faseId
+          ? { ...f, roles: (f.roles || []).filter((_, i) => i !== idx) }
+          : f,
+      ),
+    )
+  }
+
+  function agregarHerramienta(faseId: string, texto: string) {
+    const val = texto.trim()
+    if (!val) return
+    setFases((prev) =>
+      prev.map((f) =>
+        f.id === faseId ? { ...f, herramientas: [...(f.herramientas || []), val] } : f,
+      ),
+    )
+  }
+
+  function quitarHerramienta(faseId: string, idx: number) {
+    setFases((prev) =>
+      prev.map((f) =>
+        f.id === faseId
+          ? { ...f, herramientas: (f.herramientas || []).filter((_, i) => i !== idx) }
           : f,
       ),
     )
@@ -259,6 +349,8 @@ export function MetodologiaForm({ inicial, clientes, onGuardar, onCancelar, onPr
       mostrarLogoSD,
       mostrarDatosSD,
       mostrarFirmaSD,
+      mostrarFirmas,
+      firmas,
       datosContactoSD:
         personalizarDatosSD && (telefonosSD || ubicacionSD || correoSD)
           ? {
@@ -293,6 +385,8 @@ export function MetodologiaForm({ inicial, clientes, onGuardar, onCancelar, onPr
       mostrarLogoSD,
       mostrarDatosSD,
       mostrarFirmaSD,
+      mostrarFirmas,
+      firmas,
       datosContactoSD:
         personalizarDatosSD && (telefonosSD || ubicacionSD || correoSD)
           ? {
@@ -460,7 +554,7 @@ export function MetodologiaForm({ inicial, clientes, onGuardar, onCancelar, onPr
           </div>
         )}
 
-        {/* TAB 2: LOGOS Y DATOS SD */}
+        {/* TAB 2: LOGOS Y FIRMAS */}
         {tab === 'logos' && (
           <div className="met-form-seccion">
             <h3 className="met-form-subtitulo">
@@ -502,7 +596,7 @@ export function MetodologiaForm({ inicial, clientes, onGuardar, onCancelar, onPr
                       checked={mostrarFirmaSD}
                       onChange={(e) => setMostrarFirmaSD(e.target.checked)}
                     />
-                    <span>{mostrarFirmaSD ? '✓ Bloque de firma y pie de SD visible' : 'Firma y pie de SD ocultos'}</span>
+                    <span>{mostrarFirmaSD ? '✓ Bloque de pie de página de SD visible' : 'Pie de página de SD oculto'}</span>
                   </label>
                 </div>
 
@@ -644,6 +738,96 @@ export function MetodologiaForm({ inicial, clientes, onGuardar, onCancelar, onPr
               </div>
             </div>
 
+            {/* Bloque de Firmas y Responsables (Hasta 2 Personas) */}
+            <div className="met-firmas-seccion-form">
+              <div className="met-firmas-seccion-form__head">
+                <div>
+                  <h3 className="met-form-subtitulo" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <UserCheck size={16} /> Firmas de Aprobación ({firmas.length} de máx. 2)
+                  </h3>
+                  <p className="met-logo-caja__desc" style={{ marginTop: 4, marginBottom: 0 }}>
+                    Configura el nombre y apellido de las personas que firmarán este documento oficial (hasta 2 firmas).
+                  </p>
+                </div>
+
+                {firmas.length < 2 && mostrarFirmas && (
+                  <button
+                    type="button"
+                    className="btn btn--primary btn--sm btn--icono"
+                    onClick={agregarFirma}
+                  >
+                    <Plus size={14} /> Añadir Segunda Firma
+                  </button>
+                )}
+              </div>
+
+              <label className="met-switch-label" style={{ margin: '12px 0' }}>
+                <input
+                  type="checkbox"
+                  checked={mostrarFirmas}
+                  onChange={(e) => setMostrarFirmas(e.target.checked)}
+                />
+                <span>{mostrarFirmas ? '✓ Bloque de firmas visible en el documento final' : 'Bloque de firmas oculto en el documento'}</span>
+              </label>
+
+              {mostrarFirmas && (
+                <div className="met-firmas-editor-grid">
+                  {firmas.map((firma, idx) => (
+                    <div key={firma.id || idx} className="met-firma-caja">
+                      <div className="met-firma-caja__head">
+                        <strong>
+                          Firma {idx + 1} {idx === 0 ? '(Responsable 1 / SD)' : '(Responsable 2 / Contraparte)'}
+                        </strong>
+                        {firmas.length > 1 && (
+                          <button
+                            type="button"
+                            className="btn-icono-rojo"
+                            title="Quitar esta firma"
+                            onClick={() => eliminarFirma(idx)}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="field">
+                        <label className="field__label">Nombre y Apellido *</label>
+                        <input
+                          type="text"
+                          className="field__input"
+                          placeholder="Ej: Ing. Pedro Pérez"
+                          value={firma.nombre}
+                          onChange={(e) => actualizarFirma(idx, 'nombre', e.target.value)}
+                        />
+                      </div>
+
+                      <div className="field">
+                        <label className="field__label">Cargo / Función</label>
+                        <input
+                          type="text"
+                          className="field__input"
+                          placeholder="Ej: Director de Operaciones / Líder Técnico"
+                          value={firma.cargo || ''}
+                          onChange={(e) => actualizarFirma(idx, 'cargo', e.target.value)}
+                        />
+                      </div>
+
+                      <div className="field">
+                        <label className="field__label">Empresa / Entidad</label>
+                        <input
+                          type="text"
+                          className="field__input"
+                          placeholder="Ej: Systems Development C.A."
+                          value={firma.empresa || ''}
+                          onChange={(e) => actualizarFirma(idx, 'empresa', e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Diagramas de Flujo e Imágenes */}
             <div className="met-diagramas-header">
               <div>
@@ -745,10 +929,10 @@ export function MetodologiaForm({ inicial, clientes, onGuardar, onCancelar, onPr
             <div className="met-fases-head">
               <div>
                 <h3 className="met-form-subtitulo">
-                  <Layers size={16} /> Fases del Ciclo de Trabajo ({fases.length} fases)
+                  <Layers size={16} /> Fases del Proceso Operacional ({fases.length} fases)
                 </h3>
                 <p className="met-logo-caja__desc">
-                  Define, agrega, edita y quita las etapas de ejecución, sus entregables y herramientas.
+                  Define, agrega, edita y quita las etapas de ejecución, sus entregables, roles y herramientas.
                 </p>
               </div>
               <button
@@ -803,7 +987,7 @@ export function MetodologiaForm({ inicial, clientes, onGuardar, onCancelar, onPr
 
                   {/* Entregables */}
                   <div className="met-fase-subseccion">
-                    <span className="met-fase-subseccion__lbl">Entregables:</span>
+                    <span className="met-fase-subseccion__lbl">Entregables clave:</span>
                     <div className="met-fase-chips">
                       {(f.entregables || []).map((ent, entIdx) => (
                         <span key={entIdx} className="met-chip">
@@ -831,6 +1015,68 @@ export function MetodologiaForm({ inicial, clientes, onGuardar, onCancelar, onPr
                       />
                     </div>
                   </div>
+
+                  {/* Responsables / Roles */}
+                  <div className="met-fase-subseccion">
+                    <span className="met-fase-subseccion__lbl">Responsables / Roles:</span>
+                    <div className="met-fase-chips">
+                      {(f.roles || []).map((rol, rolIdx) => (
+                        <span key={rolIdx} className="met-chip">
+                          {rol}
+                          <button
+                            type="button"
+                            onClick={() => quitarRol(f.id, rolIdx)}
+                            className="met-chip__x"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                      <input
+                        type="text"
+                        className="met-chip-input"
+                        placeholder="+ Añadir rol (ej: Desarrollador) y presionar Enter"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault()
+                            agregarRol(f.id, (e.target as HTMLInputElement).value)
+                            ;(e.target as HTMLInputElement).value = ''
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Herramientas / Plataformas */}
+                  <div className="met-fase-subseccion">
+                    <span className="met-fase-subseccion__lbl">Herramientas / Plataformas:</span>
+                    <div className="met-fase-chips">
+                      {(f.herramientas || []).map((her, herIdx) => (
+                        <span key={herIdx} className="met-chip">
+                          {her}
+                          <button
+                            type="button"
+                            onClick={() => quitarHerramienta(f.id, herIdx)}
+                            className="met-chip__x"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                      <input
+                        type="text"
+                        className="met-chip-input"
+                        placeholder="+ Añadir herramienta (ej: TypeScript) y presionar Enter"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault()
+                            agregarHerramienta(f.id, (e.target as HTMLInputElement).value)
+                            ;(e.target as HTMLInputElement).value = ''
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -844,17 +1090,18 @@ export function MetodologiaForm({ inicial, clientes, onGuardar, onCancelar, onPr
               <CheckCircle2 size={16} /> Principios y Reglas de Calidad
             </h3>
             <p className="met-logo-caja__desc">
-              Pautas no negociables que rigen esta metodología (ej. compilación limpia, RLS de seguridad, etc.).
+              Pautas no negociables que rigen esta metodología (ej. compilación limpia, RLS de seguridad, atención oportuna, etc.). Puedes ver y redactar cada principio completo.
             </p>
 
             <div className="met-principios-lista-editor">
               {principios.map((p, idx) => (
                 <div key={idx} className="met-principio-fila">
-                  <CheckCircle2 size={16} className="met-check-icono" />
-                  <input
-                    type="text"
-                    className="field__input"
+                  <CheckCircle2 size={18} className="met-check-icono" style={{ marginTop: 10 }} />
+                  <textarea
+                    className="field__input met-principio-textarea"
+                    rows={2}
                     value={p}
+                    placeholder="Describe el principio o regla de calidad..."
                     onChange={(e) => {
                       const nuevo = e.target.value
                       setPrincipios((prev) => prev.map((item, i) => (i === idx ? nuevo : item)))
@@ -863,41 +1110,42 @@ export function MetodologiaForm({ inicial, clientes, onGuardar, onCancelar, onPr
                   <button
                     type="button"
                     className="btn-icono-rojo"
+                    style={{ marginTop: 8 }}
                     onClick={() => eliminarPrincipio(idx)}
                     title="Quitar principio"
                   >
-                    <Trash2 size={15} />
+                    <Trash2 size={16} />
                   </button>
                 </div>
               ))}
             </div>
 
             <div className="met-principio-agregar">
-              <input
+              <textarea
                 id="input-nuevo-principio"
-                type="text"
-                className="field__input"
-                placeholder="Escribe un principio y haz clic en Agregar (o pulsa Enter)..."
+                className="field__input met-principio-textarea-nuevo"
+                rows={2}
+                placeholder="Escribe un principio o regla de calidad completa y haz clic en Agregar (o pulsa Enter)..."
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
+                  if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault()
-                    agregarPrincipio((e.target as HTMLInputElement).value)
-                    ;(e.target as HTMLInputElement).value = ''
+                    agregarPrincipio((e.target as HTMLTextAreaElement).value)
+                    ;(e.target as HTMLTextAreaElement).value = ''
                   }
                 }}
               />
               <button
                 type="button"
-                className="btn btn--ghost btn--icono"
+                className="btn btn--primary btn--icono met-btn-agregar-principio"
                 onClick={() => {
-                  const el = document.getElementById('input-nuevo-principio') as HTMLInputElement
+                  const el = document.getElementById('input-nuevo-principio') as HTMLTextAreaElement
                   if (el?.value) {
                     agregarPrincipio(el.value)
                     el.value = ''
                   }
                 }}
               >
-                <Plus size={14} /> Agregar
+                <Plus size={15} /> Agregar
               </button>
             </div>
           </div>

@@ -812,6 +812,13 @@ export interface ImagenMetodologia {
   pie?: string
 }
 
+export interface FirmaMetodologia {
+  id?: string
+  nombre: string
+  cargo?: string
+  empresa?: string
+}
+
 export interface MetodologiaTrabajo {
   id: ID
   codigo: string
@@ -837,6 +844,8 @@ export interface MetodologiaTrabajo {
   fases: FaseMetodologia[]
   imagenes: ImagenMetodologia[]
   principios?: string[]
+  mostrarFirmas?: boolean
+  firmas?: FirmaMetodologia[]
   version?: string
   activa: boolean
   creadoEn: string

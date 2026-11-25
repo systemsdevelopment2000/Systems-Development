@@ -85,11 +85,11 @@ export function MetodologiaCard({
         {subtitulo && <p className="met-card__subtitulo">{subtitulo}</p>}
 
         <div className="met-card__stats">
-          <span className="met-stat" title={`${fases.length} fases definidas`}>
-            <Layers size={13} /> {fases.length} fases
+          <span className="met-stat" title={`${fases.length} ${fases.length === 1 ? 'fase definida' : 'fases definidas'}`}>
+            <Layers size={13} /> {fases.length} {fases.length === 1 ? 'fase' : 'fases'}
           </span>
-          <span className="met-stat" title={`${imagenes.length} diagramas adjuntos`}>
-            <ImageIcon size={13} /> {imagenes.length} diagramas
+          <span className="met-stat" title={`${imagenes.length} ${imagenes.length === 1 ? 'diagrama adjunto' : 'diagramas adjuntos'}`}>
+            <ImageIcon size={13} /> {imagenes.length} {imagenes.length === 1 ? 'diagrama' : 'diagramas'}
           </span>
           <span className="met-stat" title="Identidad visual">
             <Shield size={13} /> {mostrarLogoSD ? 'Logo SD' : 'Sin logo SD'}

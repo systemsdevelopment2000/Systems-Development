@@ -25,6 +25,8 @@ export const MetodologiaDocumento = forwardRef<HTMLDivElement, Props>(function M
     mostrarLogoSD = true,
     mostrarDatosSD = true,
     mostrarFirmaSD = true,
+    mostrarFirmas = true,
+    firmas = [],
     datosContactoSD,
     logoCliente,
     tamanoLogoCliente = 'grande',
@@ -56,6 +58,44 @@ export const MetodologiaDocumento = forwardRef<HTMLDivElement, Props>(function M
     ubicacion: mostrarDatosSD ? (datosContactoSD?.ubicacion ?? estado.empresa.ubicacion) : '',
     correo: mostrarDatosSD ? (datosContactoSD?.correo ?? estado.empresa.correo) : '',
   }
+
+  // Filtrar fases válidas (si está vacía, no se muestra)
+  const fasesValidas = (fases || []).filter(
+    (f) =>
+      (f.nombre && f.nombre.trim()) ||
+      (f.descripcion && f.descripcion.trim()) ||
+      (f.entregables && f.entregables.length > 0) ||
+      (f.roles && f.roles.length > 0) ||
+      (f.herramientas && f.herramientas.length > 0),
+  )
+
+  const principiosValidos = (principios || []).filter((p) => p && p.trim())
+
+  // Firmas configuradas (hasta 2 personas)
+  const firmasConfiguradas = (firmas || []).filter(
+    (f) =>
+      (f.nombre && f.nombre.trim()) ||
+      (f.cargo && f.cargo.trim()) ||
+      (f.empresa && f.empresa.trim()),
+  )
+
+  const firmasAFirmar =
+    firmasConfiguradas.length > 0
+      ? firmasConfiguradas.slice(0, 2)
+      : mostrarFirmaSD
+        ? [
+            {
+              nombre: 'Director de Ingeniería & Arquitectura',
+              cargo: 'Líder Técnico',
+              empresa: 'Systems Development C.A.',
+            },
+            {
+              nombre: 'Aprobación / Contraparte',
+              cargo: 'Contraparte Autorizada',
+              empresa: clienteNombre || 'Empresa Cliente',
+            },
+          ]
+        : []
 
   return (
     <div ref={ref} className="met-doc-a4">
@@ -92,7 +132,9 @@ export const MetodologiaDocumento = forwardRef<HTMLDivElement, Props>(function M
 
         {/* Logo adicional del cliente si se configuró (sin texto 'Homologado con' y con tamaño configurable) */}
         {logoCliente && (
-          <div className={`met-doc-logo-cliente-box met-doc-logo-cliente-box--${tamanoLogoCliente}`}>
+          <div
+            className={`met-doc-logo-cliente-box met-doc-logo-cliente-box--${tamanoLogoCliente}`}
+          >
             <img
               src={logoCliente}
               alt={clienteNombre || 'Cliente'}
@@ -130,14 +172,16 @@ export const MetodologiaDocumento = forwardRef<HTMLDivElement, Props>(function M
         </div>
       )}
 
-      {/* Principios de Calidad */}
-      {principios.length > 0 && (
+      {/* Principios de Calidad (si está vacío, no se muestra) */}
+      {/* Principios y Reglas de Calidad (si está vacío, no se muestra) */}
+      {principiosValidos.length > 0 && (
         <section className="met-doc-seccion">
           <h2 className="met-doc-seccion__titulo">
             <ShieldCheck size={14} /> 2. Principios y Estándares de Ingeniería
+            <ShieldCheck size={14} /> 2. Principios y Reglas de Calidad
           </h2>
           <ul className="met-doc-principios-lista">
-            {principios.map((p, i) => (
+            {principiosValidos.map((p, i) => (
               <li key={i} className="met-doc-principio-item">
                 <CheckCircle2 size={13} className="met-doc-principio-check" />
                 <span>{p}</span>
@@ -147,21 +191,24 @@ export const MetodologiaDocumento = forwardRef<HTMLDivElement, Props>(function M
         </section>
       )}
 
-      {/* Fases del Proceso */}
-      {fases.length > 0 && (
+      {/* Fases del Proceso (si está vacío, no se muestra) */}
+      {fasesValidas.length > 0 && (
         <section className="met-doc-seccion">
           <h2 className="met-doc-seccion__titulo">
-            <Clock size={14} /> 3. Fases del Proceso Operacional ({fases.length} Fases)
+            <Clock size={14} /> 3. Fases del Proceso Operacional ({fasesValidas.length}{' '}
+            {fasesValidas.length === 1 ? 'Fase' : 'Fases'})
           </h2>
 
           <div className="met-doc-fases-timeline">
-            {fases.map((f, idx) => (
+            {fasesValidas.map((f, idx) => (
               <div key={f.id || idx} className="met-doc-fase-tarjeta">
                 <div className="met-doc-fase-tarjeta__head">
                   <span className="met-doc-fase-num">{idx + 1}</span>
                   <div className="met-doc-fase-nombre-box">
-                    <h4 className="met-doc-fase-nombre">{f.nombre}</h4>
-                    {f.duracionEstimada && (
+                    <h4 className="met-doc-fase-nombre">
+                      {f.nombre && f.nombre.trim() ? f.nombre : `Fase ${idx + 1}`}
+                    </h4>
+                    {f.duracionEstimada && f.duracionEstimada.trim() && (
                       <span className="met-doc-fase-duracion">
                         <Clock size={11} /> Estimado: {f.duracionEstimada}
                       </span>
@@ -169,7 +216,9 @@ export const MetodologiaDocumento = forwardRef<HTMLDivElement, Props>(function M
                   </div>
                 </div>
 
-                {f.descripcion && <p className="met-doc-fase-desc">{f.descripcion}</p>}
+                {f.descripcion && f.descripcion.trim() && (
+                  <p className="met-doc-fase-desc">{f.descripcion}</p>
+                )}
 
                 {/* Entregables */}
                 {f.entregables && f.entregables.length > 0 && (
@@ -186,7 +235,8 @@ export const MetodologiaDocumento = forwardRef<HTMLDivElement, Props>(function M
                 )}
 
                 {/* Roles y Herramientas */}
-                {((f.roles && f.roles.length > 0) || (f.herramientas && f.herramientas.length > 0)) && (
+                {((f.roles && f.roles.length > 0) ||
+                  (f.herramientas && f.herramientas.length > 0)) && (
                   <div className="met-doc-fase-grid-meta">
                     {f.roles && f.roles.length > 0 && (
                       <div>
@@ -202,7 +252,9 @@ export const MetodologiaDocumento = forwardRef<HTMLDivElement, Props>(function M
                     )}
                     {f.herramientas && f.herramientas.length > 0 && (
                       <div>
-                        <span className="met-doc-fase-bloque__label">Herramientas / Plataformas:</span>
+                        <span className="met-doc-fase-bloque__label">
+                          Herramientas / Plataformas:
+                        </span>
                         <div className="met-doc-pills">
                           {f.herramientas.map((h, i) => (
                             <span key={i} className="met-doc-pill met-doc-pill--herramienta">
@@ -220,7 +272,7 @@ export const MetodologiaDocumento = forwardRef<HTMLDivElement, Props>(function M
         </section>
       )}
 
-      {/* Galería de Diagramas y Arquitectura */}
+      {/* Galería de Diagramas y Arquitectura (si está vacío, no se muestra) */}
       {imagenes.length > 0 && (
         <section className="met-doc-seccion met-doc-seccion--diagramas">
           <h2 className="met-doc-seccion__titulo">
@@ -230,7 +282,11 @@ export const MetodologiaDocumento = forwardRef<HTMLDivElement, Props>(function M
           <div className="met-doc-imagenes-grid">
             {imagenes.map((img, i) => (
               <figure key={img.id || i} className="met-doc-figura">
-                <img src={img.url} alt={img.titulo || `Diagrama ${i + 1}`} className="met-doc-figura__img" />
+                <img
+                  src={img.url}
+                  alt={img.titulo || `Diagrama ${i + 1}`}
+                  className="met-doc-figura__img"
+                />
                 {(img.titulo || img.pie) && (
                   <figcaption className="met-doc-figura__cap">
                     {img.titulo && <strong>{img.titulo}: </strong>}
@@ -243,21 +299,19 @@ export const MetodologiaDocumento = forwardRef<HTMLDivElement, Props>(function M
         </section>
       )}
 
-      {/* Bloque de Firmas */}
-      <section className="met-doc-firmas">
-        {mostrarFirmaSD && (
-          <div className="met-doc-firma-col">
-            <div className="met-doc-firma-linea" />
-            <span className="met-doc-firma-cargo">Director de Ingeniería & Arquitectura</span>
-            <span className="met-doc-firma-empresa">Systems Development C.A.</span>
-          </div>
-        )}
-        <div className="met-doc-firma-col">
-          <div className="met-doc-firma-linea" />
-          <span className="met-doc-firma-cargo">Aprobación / Contraparte</span>
-          <span className="met-doc-firma-empresa">{clienteNombre || 'Contraparte Autorizada'}</span>
-        </div>
-      </section>
+      {/* Bloque de Firmas (si está vacío o desactivado, no se muestra) */}
+      {mostrarFirmas && firmasAFirmar.length > 0 && (
+        <section className={`met-doc-firmas met-doc-firmas--${firmasAFirmar.length}`}>
+          {firmasAFirmar.map((f, i) => (
+            <div key={f.id || i} className="met-doc-firma-col">
+              <div className="met-doc-firma-linea" />
+              {f.nombre && <strong className="met-doc-firma-nombre">{f.nombre}</strong>}
+              {f.cargo && <span className="met-doc-firma-cargo">{f.cargo}</span>}
+              {f.empresa && <span className="met-doc-firma-empresa">{f.empresa}</span>}
+            </div>
+          ))}
+        </section>
+      )}
 
       {/* Pie de página oficial Systems Development */}
       {mostrarLogoSD && mostrarDatosSD && mostrarFirmaSD && <PieSD datos={datosCabecera} />}

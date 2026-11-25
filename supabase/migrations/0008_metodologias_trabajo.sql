@@ -23,6 +23,8 @@ create table if not exists public.metodologias (
   fases jsonb not null default '[]'::jsonb,
   imagenes jsonb not null default '[]'::jsonb,
   principios jsonb not null default '[]'::jsonb,
+  firmas jsonb not null default '[]'::jsonb,
+  mostrar_firmas boolean not null default true,
   version text default '1.0',
   activa boolean not null default true,
   creado_en text not null default now()::text

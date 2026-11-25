@@ -225,7 +225,7 @@ export function MetodologiaPage() {
           setEditando(undefined)
         }}
         titulo={editando ? 'Editar Metodología de Trabajo' : 'Nueva Metodología de Trabajo'}
-        ancho={860}
+        ancho={960}
         cerrarAlClickFondo={false}
       >
         <MetodologiaForm
