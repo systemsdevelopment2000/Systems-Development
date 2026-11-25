@@ -135,13 +135,11 @@ function reducer(estado: EstadoDatos, accion: Accion): EstadoDatos {
     }
 
     case 'sincronizarColeccion': {
-      const actuales = (estado[accion.coleccion] as Record<string, { id: string }>) || {}
+      // Supabase es la fuente de verdad: los datos remotos reemplazan la colección
+      // garantizando que si se vació o eliminaron registros, se refleje de inmediato sin guardar caché obsoleta.
       return {
         ...estado,
-        [accion.coleccion]: {
-          ...actuales,
-          ...accion.datos,
-        },
+        [accion.coleccion]: accion.datos,
       } as EstadoDatos
     }
 
@@ -238,17 +236,6 @@ export function DatosProvider({
             coleccion,
             datos: remotos,
           })
-
-          // Si existen registros locales que no estaban en Supabase (ej. creados offline o fallo previo de sync),
-          // los enviamos a Supabase para que no queden fuera de la base de datos remota
-          const locales = estado[coleccion] as Record<string, { id: string }> | undefined
-          if (locales) {
-            for (const [idLoc, entLoc] of Object.entries(locales)) {
-              if (!remotos[idLoc]) {
-                void guardarEnSupabase(coleccion, entLoc)
-              }
-            }
-          }
         }
       }
 

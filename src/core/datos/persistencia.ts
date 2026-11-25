@@ -3,13 +3,13 @@ import { estadoInicial } from './estadoInicial'
 import { PREFIJOS, asignarCodigosFaltantes } from '@/core/lib/codigos'
 import { notificarError } from '@/core/notificaciones'
 
-const CLAVE = 'sd:datos:v6'
+const CLAVE = 'sd:datos:v7'
 
 /**
  * Versión del esquema del store. Súbela cuando cambie la forma de los datos:
  * en la fase front eso re-siembra el estado (descarta datos locales de ejemplo).
  */
-const VERSION = 6
+const VERSION = 7
 
 interface Envoltura {
   v: number
@@ -107,18 +107,20 @@ export function cargar(): EstadoDatos {
   try {
     if (typeof localStorage !== 'undefined') {
       localStorage.removeItem('sd:datos')
+      localStorage.removeItem('sd:datos:v6')
       localStorage.removeItem('sd:datos:v5')
       localStorage.removeItem('sd:datos:v4')
       localStorage.removeItem('sd:dev-auth-user')
     }
     const raw = localStorage.getItem(CLAVE)
-    if (!raw) return conCodigos(estadoInicial())
+    if (!raw) return conCodigos({ ...estadoInicial(), herramientas: {} })
     const env = JSON.parse(raw) as Envoltura
-    if (env.v !== VERSION || !env.datos) return conCodigos(estadoInicial())
-    // Mezcla con la semilla para tolerar colecciones nuevas.
-    return migrarMarca(conCodigos({ ...estadoInicial(), ...env.datos }))
+    if (env.v !== VERSION || !env.datos) return conCodigos({ ...estadoInicial(), herramientas: {} })
+    // Mezcla con la semilla para tolerar colecciones nuevas, asegurando herramientas limpias.
+    const res = migrarMarca(conCodigos({ ...estadoInicial(), ...env.datos }))
+    return res
   } catch {
-    return conCodigos(estadoInicial())
+    return conCodigos({ ...estadoInicial(), herramientas: {} })
   }
 }
 
