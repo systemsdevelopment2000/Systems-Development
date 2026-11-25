@@ -29,6 +29,7 @@ function conCodigos(e: EstadoDatos): EstadoDatos {
     actividades: asignarCodigosFaltantes(e.actividades, PREFIJOS.actividades),
     reuniones: asignarCodigosFaltantes(e.reuniones, PREFIJOS.reuniones),
     herramientas: asignarCodigosFaltantes(e.herramientas, PREFIJOS.herramientas),
+    metodologias: asignarCodigosFaltantes(e.metodologias || {}, PREFIJOS.metodologias),
   }
 }
 

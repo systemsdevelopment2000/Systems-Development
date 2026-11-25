@@ -17,6 +17,7 @@ import {
   Coins,
   Wallet,
   Wrench,
+  Workflow,
   Settings,
   ShieldCheck,
   ChevronRight,
@@ -71,6 +72,7 @@ const NAV = [
     items: [
       { to: '/usuarios', label: 'Usuarios', Icon: Users },
       { to: '/herramientas', label: 'Herramientas', Icon: Wrench },
+      { to: '/metodologia', label: 'Metodología de Trabajo', Icon: Workflow },
       { to: '/auditoria', label: 'Auditoría', Icon: ShieldCheck },
       { to: '/configuracion', label: 'Configuración', Icon: Settings },
     ],

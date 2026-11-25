@@ -97,6 +97,12 @@ const MODULOS: { titulo: string; ruta: string; detalle: string; alias: string }[
     alias: 'credenciales contraseñas servicios suscripciones dominio hosting',
   },
   {
+    titulo: 'Metodología de Trabajo',
+    ruta: '/metodologia',
+    detalle: 'Administración',
+    alias: 'metodologia desarrollo software fases entregables roles procesos pdf logos diagramas',
+  },
+  {
     titulo: 'Auditoría',
     ruta: '/auditoria',
     detalle: 'Administración',
@@ -225,6 +231,15 @@ export function useBuscadorGlobal() {
       ruta: `/herramientas`,
     }))
 
+    const metodologias = Object.values(estado.metodologias || {}).map((m) => ({
+      id: m.id,
+      tipo: 'herramienta' as const,
+      codigo: m.codigo,
+      titulo: m.titulo,
+      detalle: [m.tipo, m.clienteNombre].filter(Boolean).join(' · '),
+      ruta: `/metodologia`,
+    }))
+
     const modulos = MODULOS.map((m) => ({
       id: 'mod:' + m.ruta,
       tipo: 'modulo' as const,
@@ -242,6 +257,7 @@ export function useBuscadorGlobal() {
       ...tareas,
       ...reuniones,
       ...herramientas,
+      ...metodologias,
     ]
   }, [estado])
 

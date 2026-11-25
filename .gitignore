@@ -17,6 +17,7 @@ build/
 
 # === Vercel ===
 .vercel/
+scratch/
 
 # === Estado de plugins locales (no versionar) ===
 .remember/

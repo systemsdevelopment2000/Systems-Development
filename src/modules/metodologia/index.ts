@@ -1,0 +1,5 @@
+export { MetodologiaPage } from './pages/MetodologiaPage'
+export { useMetodologias } from './hooks/useMetodologias'
+export { MetodologiaDocumento } from './components/MetodologiaDocumento'
+export { MetodologiaCard } from './components/MetodologiaCard'
+export { MetodologiaForm } from './components/MetodologiaForm'

@@ -34,6 +34,7 @@ const PREFIJO_COLECCION: Partial<Record<ColeccionRecord, string>> = {
   presupuestos: PREFIJOS.presupuestos,
   pagos: PREFIJOS.pagos,
   candidatos: PREFIJOS.candidatos,
+  metodologias: PREFIJOS.metodologias,
 }
 
 /**

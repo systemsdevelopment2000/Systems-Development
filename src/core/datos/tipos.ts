@@ -788,6 +788,52 @@ export interface TasaCambio {
   nota?: string
 }
 
+export type TipoMetodologia =
+  | 'desarrollo'
+  | 'soporte'
+  | 'qa'
+  | 'infraestructura'
+  | 'general'
+
+export interface FaseMetodologia {
+  id: string
+  nombre: string
+  descripcion: string
+  entregables?: string[]
+  roles?: string[]
+  herramientas?: string[]
+  duracionEstimada?: string
+}
+
+export interface ImagenMetodologia {
+  id: string
+  url: string
+  titulo?: string
+  pie?: string
+}
+
+export interface MetodologiaTrabajo {
+  id: ID
+  codigo: string
+  titulo: string
+  subtitulo?: string
+  tipo: TipoMetodologia
+  descripcion: string
+  objetivo?: string
+  alcance?: string
+  logo?: string
+  mostrarLogoSD?: boolean
+  logoCliente?: string
+  clienteId?: string
+  clienteNombre?: string
+  fases: FaseMetodologia[]
+  imagenes: ImagenMetodologia[]
+  principios?: string[]
+  version?: string
+  activa: boolean
+  creadoEn: string
+}
+
 export interface EstadoDatos {
   /** Membrete editable (cabecera/pie de PDF). */
   empresa: DatosEmpresa
@@ -813,6 +859,7 @@ export interface EstadoDatos {
   herramientas: Record<ID, Herramienta>
   evalColaborador: Record<ID, EvaluacionColaborador>
   evalCliente: Record<ID, EvaluacionCliente>
+  metodologias: Record<ID, MetodologiaTrabajo>
 }
 
 /** Colecciones del store indexadas por id (todas menos el catálogo ordenado de estados). */

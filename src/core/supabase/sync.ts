@@ -22,6 +22,7 @@ export const MAPA_COLECCION_A_TABLA: Record<string, string> = {
   plantillasEntrevista: 'plantillas_entrevista',
   evalColaborador: 'evaluaciones_colaborador',
   evalCliente: 'evaluaciones_cliente',
+  metodologias: 'metodologias',
   hechos: 'hechos',
   auditoria: 'auditoria',
 }
@@ -43,6 +44,7 @@ export const TABLAS_SYNC: ColeccionRecord[] = [
   'plantillasEntrevista',
   'evalColaborador',
   'evalCliente',
+  'metodologias',
   'hechos',
   'auditoria',
 ]
@@ -188,6 +190,15 @@ export function mapearA_DB(coleccion: string, entidad: Record<string, unknown>):
         delete res[k]
       }
     }
+  } else if (coleccion === 'metodologias') {
+    if (!Array.isArray(res.fases)) res.fases = []
+    if (!Array.isArray(res.imagenes)) res.imagenes = []
+    if (!Array.isArray(res.principios)) res.principios = []
+    if (res.mostrar_logo_sd === undefined) res.mostrar_logo_sd = true
+    if (res.activa === undefined) res.activa = true
+    if (!res.tipo) res.tipo = 'desarrollo'
+    if (!res.descripcion) res.descripcion = ''
+    if (!res.creado_en) res.creado_en = new Date().toISOString()
   }
 
   return res
@@ -264,6 +275,16 @@ export function mapearDe_DB(coleccion: string, fila: Record<string, unknown>): R
         } catch {}
       }
     }
+  } else if (coleccion === 'metodologias') {
+    if (!Array.isArray(res.fases)) res.fases = []
+    if (!Array.isArray(res.imagenes)) res.imagenes = []
+    if (!Array.isArray(res.principios)) res.principios = []
+    if (res.mostrarLogoSD === undefined) {
+      res.mostrarLogoSD = res.mostrar_logo_sd !== undefined ? Boolean(res.mostrar_logo_sd) : true
+    }
+    if (res.activa === undefined) res.activa = true
+    if (!res.tipo) res.tipo = 'desarrollo'
+    if (!res.descripcion) res.descripcion = ''
   }
 
   return res
@@ -320,10 +341,14 @@ export async function guardarEnSupabase(
     const { error } = await clienteDb.from(tabla).upsert(fila)
     if (error) {
       console.error(`[SupabaseSync] Error al sincronizar ${tabla} (${entidad.id}):`, error)
-      notificarError(
-        `Error al sincronizar ${coleccion}`,
-        `No se pudo enviar a Supabase: ${error.message}`,
-      )
+      if (error.code !== 'PGRST205' && !error.message?.includes('schema cache')) {
+        notificarError(
+          `Error al sincronizar ${coleccion}`,
+          `No se pudo enviar a Supabase: ${error.message}`,
+        )
+      } else {
+        console.warn(`[SupabaseSync] La tabla ${tabla} aún no está en el schema cache de Supabase. Datos guardados en almacenamiento local.`)
+      }
     }
   } catch (err) {
     console.error(`[SupabaseSync] Excepción al guardar ${tabla}:`, err)
@@ -348,10 +373,14 @@ export async function eliminarDeSupabase(
     const { error } = await clienteDb.from(tabla).delete().eq('id', id)
     if (error) {
       console.error(`[SupabaseSync] Error al eliminar ${tabla} (${id}):`, error)
-      notificarError(
-        `Error al eliminar en Supabase`,
-        `No se pudo eliminar en el servidor: ${error.message}`,
-      )
+      if (error.code !== 'PGRST205' && !error.message?.includes('schema cache')) {
+        notificarError(
+          `Error al eliminar en Supabase`,
+          `No se pudo eliminar en el servidor: ${error.message}`,
+        )
+      } else {
+        console.warn(`[SupabaseSync] La tabla ${tabla} aún no está en el schema cache de Supabase. Registro eliminado localmente.`)
+      }
     }
   } catch (err) {
     console.error(`[SupabaseSync] Excepción al eliminar ${tabla}:`, err)

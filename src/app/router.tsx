@@ -16,6 +16,7 @@ import { PresupuestoPage, TasasPage, CobranzaPage } from '@/modules/finanzas'
 import { DashboardPage } from '@/modules/dashboard'
 import { UsuariosPage } from '@/modules/usuarios'
 import { HerramientasPage } from '@/modules/herramientas'
+import { MetodologiaPage } from '@/modules/metodologia'
 import { ConfiguracionPage } from '@/modules/configuracion'
 import { AuditoriaPage } from '@/modules/auditoria'
 import { RrhhPage } from '@/modules/rrhh'
@@ -63,6 +64,7 @@ export const router = createBrowserRouter([
       { path: '/dashboard', element: <DashboardPage /> },
       { path: '/usuarios', element: <UsuariosPage /> },
       { path: '/herramientas', element: <HerramientasPage /> },
+      { path: '/metodologia', element: <MetodologiaPage /> },
       { path: '/rrhh', element: <RrhhPage /> },
       { path: '/auditoria', element: <AuditoriaPage /> },
       { path: '/configuracion', element: <ConfiguracionPage /> },

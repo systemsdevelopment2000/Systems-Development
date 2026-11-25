@@ -14,6 +14,7 @@ import {
   BarChart3,
   Users,
   Wrench,
+  Workflow,
   ShieldCheck,
   Settings,
 } from 'lucide-react'
@@ -64,6 +65,7 @@ export const MODULOS_MOVIL = [
     items: [
       { to: '/usuarios', label: 'Usuarios', Icon: Users },
       { to: '/herramientas', label: 'Herramientas', Icon: Wrench },
+      { to: '/metodologia', label: 'Metodología', Icon: Workflow },
       { to: '/auditoria', label: 'Auditoría', Icon: ShieldCheck },
       { to: '/configuracion', label: 'Configuración', Icon: Settings },
     ],

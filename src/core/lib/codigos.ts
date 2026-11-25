@@ -13,6 +13,7 @@ export const PREFIJOS = {
   presupuestos: 'PRE',
   pagos: 'PAG',
   candidatos: 'CAN',
+  metodologias: 'MET',
   propuesta: 'PRO',
   contrato: 'CTR',
 } as const

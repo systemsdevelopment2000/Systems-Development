@@ -86,5 +86,6 @@ export function estadoInicial(): EstadoDatos {
     herramientas: {},
     evalColaborador: {},
     evalCliente: {},
+    metodologias: {},
   }
 }

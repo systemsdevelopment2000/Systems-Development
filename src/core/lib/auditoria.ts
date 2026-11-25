@@ -17,6 +17,7 @@ export const ETIQUETA_COLECCION: Partial<Record<ColeccionRecord | 'empresa' | 'e
   asignaciones: 'Asignación',
   reuniones: 'Reunión',
   herramientas: 'Herramienta',
+  metodologias: 'Metodología de Trabajo',
   presupuestos: 'Presupuesto',
   pagos: 'Cobro',
   tags: 'Etiqueta',
