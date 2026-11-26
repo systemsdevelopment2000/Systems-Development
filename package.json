@@ -11,6 +11,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
+    "validar": "node scripts/validar-push.cjs",
+    "deploy": "node scripts/validar-push.cjs && git push origin main",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"*.{json,md,ts}\"",
