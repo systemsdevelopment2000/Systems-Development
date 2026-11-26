@@ -761,13 +761,13 @@ textarea.field__input {
 .modal {
   position: fixed;
   inset: 0;
-  z-index: 50;
+  z-index: 99999;
   display: grid;
   place-items: center;
   padding: 24px 16px;
-  overflow: hidden;
-  background: rgba(5, 5, 7, 0.65);
-  backdrop-filter: blur(5px);
+  overflow-y: auto;
+  background: rgba(5, 5, 7, 0.72);
+  backdrop-filter: blur(8px);
   animation: modal-fade 0.15s ease both;
 }
 .modal__panel {

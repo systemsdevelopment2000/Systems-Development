@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { reproducir } from '@/core/sonido'
 
@@ -40,8 +41,9 @@ export function Modal({
   }, [abierto, onCerrar])
 
   if (!abierto) return null
+  if (typeof document === 'undefined') return null
 
-  return (
+  return createPortal(
     <div
       className="modal"
       role="presentation"
@@ -71,6 +73,7 @@ export function Modal({
         <div className="modal__body">{children}</div>
         {pie && <footer className="modal__foot">{pie}</footer>}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
