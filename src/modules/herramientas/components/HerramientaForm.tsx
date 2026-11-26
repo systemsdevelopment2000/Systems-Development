@@ -573,6 +573,11 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
                 <span className="field__label">Usuario o Correo registrado</span>
                 <input
                   className="field__input"
+                  name="usuario"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  data-no-capitalize="true"
                   value={acc.usuario ?? ''}
                   onChange={(e) => actualizarAcceso(acc.id, 'usuario', e.target.value)}
                   placeholder="soporte@sd.dev o ID de usuario"
@@ -585,6 +590,12 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
                   <input
                     className="field__input"
                     type={verPass ? 'text' : 'password'}
+                    name="contrasena"
+                    autoComplete="off"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
+                    data-no-capitalize="true"
                     style={{ width: '100%', paddingRight: 36 }}
                     value={acc.contrasena ?? ''}
                     onChange={(e) => actualizarAcceso(acc.id, 'contrasena', e.target.value)}
@@ -608,6 +619,11 @@ export function HerramientaForm({ inicial, clientes, proyectos, onGuardar, onCan
                 </span>
                 <input
                   className="field__input mono"
+                  name="token"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  data-no-capitalize="true"
                   style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 12.5 }}
                   value={acc.token ?? ''}
                   onChange={(e) => actualizarAcceso(acc.id, 'token', e.target.value)}

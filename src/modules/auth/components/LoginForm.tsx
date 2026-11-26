@@ -72,6 +72,11 @@ export function LoginForm({ onIrARegistro, onIrARecuperar, autoFocus = false }: 
           <input
             className="field__input"
             type={verPass ? 'text' : 'password'}
+            name="password"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            data-no-capitalize="true"
             autoComplete="current-password"
             required
             style={{ width: '100%', paddingRight: 38 }}

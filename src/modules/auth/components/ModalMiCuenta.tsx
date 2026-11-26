@@ -477,6 +477,11 @@ export function ModalMiCuenta({ abierto, onCerrar }: Props) {
                 <label className="campo__etiqueta">Contraseña actual (opcional)</label>
                 <input
                   type="password"
+                  name="claveActual"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  data-no-capitalize="true"
                   className="input"
                   value={claveActual}
                   onChange={(e) => setClaveActual(e.target.value)}
@@ -492,6 +497,11 @@ export function ModalMiCuenta({ abierto, onCerrar }: Props) {
                   <div style={{ position: 'relative' }}>
                     <input
                       type={verClave ? 'text' : 'password'}
+                      name="claveNueva"
+                      autoCapitalize="none"
+                      autoCorrect="off"
+                      spellCheck={false}
+                      data-no-capitalize="true"
                       className="input"
                       value={claveNueva}
                       onChange={(e) => setClaveNueva(e.target.value)}
@@ -517,6 +527,11 @@ export function ModalMiCuenta({ abierto, onCerrar }: Props) {
                   </label>
                   <input
                     type={verClave ? 'text' : 'password'}
+                    name="claveConfirmar"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
+                    data-no-capitalize="true"
                     className="input"
                     value={claveConfirmar}
                     onChange={(e) => setClaveConfirmar(e.target.value)}

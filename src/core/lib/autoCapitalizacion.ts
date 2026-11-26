@@ -28,7 +28,12 @@ function esCampoExcluido(el: HTMLInputElement | HTMLTextAreaElement): boolean {
     }
   }
 
-  if (el.dataset.noCapitalize === 'true' || el.classList.contains('no-capitalize')) {
+  if (
+    el.dataset.noCapitalize === 'true' ||
+    el.classList.contains('no-capitalize') ||
+    el.getAttribute('autocapitalize') === 'none' ||
+    el.getAttribute('autocapitalize') === 'off'
+  ) {
     return true
   }
 
@@ -39,6 +44,9 @@ function esCampoExcluido(el: HTMLInputElement | HTMLTextAreaElement): boolean {
     el.className,
     el.getAttribute('placeholder') || '',
     el.getAttribute('autocomplete') || '',
+    el.getAttribute('aria-label') || '',
+    el.getAttribute('data-campo') || '',
+    el.title || '',
   ]
     .join(' ')
     .toLowerCase()
@@ -49,6 +57,8 @@ function esCampoExcluido(el: HTMLInputElement | HTMLTextAreaElement): boolean {
     identificadores.includes('apikey') ||
     identificadores.includes('pass') ||
     identificadores.includes('clave') ||
+    identificadores.includes('contrasena') ||
+    identificadores.includes('contraseña') ||
     identificadores.includes('correo') ||
     identificadores.includes('email') ||
     identificadores.includes('url') ||
@@ -62,6 +72,23 @@ function esCampoExcluido(el: HTMLInputElement | HTMLTextAreaElement): boolean {
     identificadores.includes('rif')
   ) {
     return true
+  }
+
+  // Comprobar contexto circundante en ancestros directos (hasta 4 niveles)
+  let ancestro: HTMLElement | null = el.parentElement
+  for (let i = 0; i < 4 && ancestro; i++) {
+    const texto = (ancestro.textContent || '').toLowerCase()
+    if (
+      texto.includes('contrase') ||
+      texto.includes('password') ||
+      texto.includes('clave') ||
+      texto.includes('token') ||
+      texto.includes('api key') ||
+      texto.includes('apikey')
+    ) {
+      return true
+    }
+    ancestro = ancestro.parentElement
   }
 
   return false

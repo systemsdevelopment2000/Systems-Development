@@ -144,6 +144,11 @@ export function RegisterForm({ onIrALogin, autoFocus = false }: Props) {
               <input
                 className="field__input"
                 type={verPass ? 'text' : 'password'}
+                name="password"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
+                data-no-capitalize="true"
                 autoComplete="new-password"
                 required
                 style={{ width: '100%', paddingRight: 38 }}
@@ -168,6 +173,11 @@ export function RegisterForm({ onIrALogin, autoFocus = false }: Props) {
             <input
               className="field__input"
               type={verPass ? 'text' : 'password'}
+              name="confirmPassword"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              data-no-capitalize="true"
               autoComplete="new-password"
               required
               value={confirmPassword}

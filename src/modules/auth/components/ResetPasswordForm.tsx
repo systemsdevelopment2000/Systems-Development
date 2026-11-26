@@ -79,6 +79,11 @@ export function ResetPasswordForm({ onCompletado, onIrALogin, autoFocus = true }
           <input
             className="field__input"
             type={verNueva ? 'text' : 'password'}
+            name="nuevaPassword"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            data-no-capitalize="true"
             autoComplete="new-password"
             required
             autoFocus={autoFocus}
@@ -105,6 +110,11 @@ export function ResetPasswordForm({ onCompletado, onIrALogin, autoFocus = true }
           <input
             className="field__input"
             type={verConfirmar ? 'text' : 'password'}
+            name="confirmarPassword"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            data-no-capitalize="true"
             autoComplete="new-password"
             required
             style={{ width: '100%', paddingRight: 38 }}

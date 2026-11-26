@@ -81,6 +81,11 @@ export function EditarAccesoModal({ acceso, onGuardar, onCancelar }: Props) {
           <span className="field__label">Usuario o correo registrado</span>
           <input
             className="field__input"
+            name="usuario"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            data-no-capitalize="true"
             value={form.usuario ?? ''}
             onChange={(e) => cambiar('usuario', e.target.value)}
             placeholder="soporte@sd.dev o ID de usuario"
@@ -93,6 +98,12 @@ export function EditarAccesoModal({ acceso, onGuardar, onCancelar }: Props) {
             <input
               className="field__input"
               type={verPass ? 'text' : 'password'}
+              name="contrasena"
+              autoComplete="off"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              data-no-capitalize="true"
               style={{ width: '100%', paddingRight: 36 }}
               value={form.contrasena ?? ''}
               onChange={(e) => cambiar('contrasena', e.target.value)}
@@ -118,6 +129,11 @@ export function EditarAccesoModal({ acceso, onGuardar, onCancelar }: Props) {
           </span>
           <input
             className="field__input mono"
+            name="token"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            data-no-capitalize="true"
             style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 12.5 }}
             value={form.token ?? ''}
             onChange={(e) => cambiar('token', e.target.value)}
