@@ -16,8 +16,12 @@ import { useSession } from '@/core/hooks/useSession'
  * del colaborador.
  */
 function DatosConActor({ children }: { children: ReactNode }) {
-  const { user } = useSession()
-  return <DatosProvider actor={user?.email ?? 'sesión sin identificar'}>{children}</DatosProvider>
+  const { session, user } = useSession()
+  return (
+    <DatosProvider key={user?.id ?? 'publico'} usuarioId={user?.id} sincronizar={Boolean(session)} actor={user?.email}>
+      {children}
+    </DatosProvider>
+  )
 }
 
 /** Aplica al documento la combinación de color guardada en Configuración. */

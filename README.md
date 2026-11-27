@@ -36,9 +36,10 @@ npm install
 cp .env.example .env.local      # en PowerShell: Copy-Item .env.example .env.local
 #    -> rellena VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY
 
-# 3) Crear el esquema en Supabase
-#    SQL Editor del dashboard -> pega supabase/migrations/0001_init.sql
-#    (o usa la CLI: ver supabase/README.md)
+# 3) Aplicar todas las migraciones en una instancia de desarrollo
+npx supabase start
+npx supabase db reset
+# Para una instancia remota, consulta supabase/README.md.
 
 # 4) Arrancar en desarrollo
 npm run dev            # http://localhost:5173
@@ -88,6 +89,10 @@ Alias de imports: `@/` → `src/` (ej. `import { Button } from '@/core/ui'`).
 3. Cada push genera un Preview; `main` publica a Production.
    Alternativa por CLI: `npx vercel` y `npx vercel --prod`.
 
+## Verificación
+
+Ejecuta `npm run lint`, `npm test` y `npm run build`. El flujo de GitHub Actions ejecuta los mismos comandos. Para verificar las políticas por rol, consulta la guía de Supabase.
+
 ## Íconos PWA
 
 El favicon SVG ya trae el monograma SD. Para los PNG instalables, coloca un logo
@@ -96,19 +101,8 @@ cuadrado con fondo transparente en `public/brand-logo.png` y ejecuta
 
 ---
 
-### Supuestos
+### Datos y permisos
 
-- Front SPA que habla **directo** con Supabase (sin capa `/api`); la seguridad
-  recae en las **políticas RLS**.
-- Módulos de ejemplo **genéricos** (`auth`, `usuarios`, `dashboard`,
-  `configuracion`) pensados para renombrarse al dominio real de SD.
-- React 19 / Vite 6 / Node 20; sin librería de componentes (CSS propio con tokens).
-
-### Pendientes
-
-- Definir el **dominio real** de "SD Sistema" y renombrar/crear módulos.
-- Crear el proyecto Supabase y pegar sus credenciales en `.env.local`.
-- Generar `src/core/types/database.types.ts` desde el esquema real.
-- Sustituir `public/brand-logo.png` por el logo cuadrado definitivo y correr
-  `generate-pwa-assets`.
-- (Opcional) Añadir Tailwind/shadcn, tests (Vitest), y CI en GitHub Actions.
+- La SPA llama directamente a Supabase. La migración `0009` aplica permisos por rol en la base de datos.
+- Se usa el rol de `public.usuarios` para autorizar operaciones en Supabase. Los ajustes de colaboradores en la pantalla Usuarios aún son metadatos de la aplicación.
+- La caché se separa por cuenta y excluye la bóveda. La versión previa se conserva para recuperación local y se limpia de registros de la bóveda. Como esa caché carece de identificador de cuenta, la aplicación carga los datos de cada cuenta por separado.

@@ -35,4 +35,4 @@ export const env: AppEnv = {
 export const isProd = env.appEnv === 'production'
 
 // El bypass de auth solo puede activarse fuera de producción.
-env.authBypass = import.meta.env.VITE_AUTH_BYPASS === 'true' && !isProd
+env.authBypass = import.meta.env.VITE_AUTH_BYPASS === 'true' && import.meta.env.DEV && !isProd

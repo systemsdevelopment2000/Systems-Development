@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useReducer, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useReducer, useRef, type ReactNode } from 'react'
 import type {
   AccionAuditoria,
   ColeccionRecord,
@@ -43,10 +43,18 @@ const PREFIJO_COLECCION: Partial<Record<ColeccionRecord, string>> = {
  */
 const SIN_AUDITAR = new Set<string>(['mensajes'])
 
-type Accion =
+type CambioRegistro =
   | { tipo: 'upsert'; coleccion: ColeccionRecord; entidad: { id: string }; actor: string }
   | { tipo: 'eliminar'; coleccion: ColeccionRecord; id: string; actor: string }
-  | { tipo: 'sincronizarColeccion'; coleccion: ColeccionRecord; datos: Record<string, unknown> }
+
+type Accion =
+  | CambioRegistro
+  | {
+      tipo: 'sincronizarColeccion'
+      coleccion: ColeccionRecord
+      datos: Record<string, unknown>
+      modificados: ReadonlySet<string>
+    }
   | { tipo: 'estados'; estados: EstadoProyecto[]; actor: string }
   | { tipo: 'empresa'; empresa: DatosEmpresa; actor: string }
   | { tipo: 'reemplazar'; estado: EstadoDatos; actor: string }
@@ -136,11 +144,16 @@ function reducer(estado: EstadoDatos, accion: Accion): EstadoDatos {
     }
 
     case 'sincronizarColeccion': {
-      // Supabase es la fuente de verdad: los datos remotos reemplazan la colección
-      // garantizando que si se vació o eliminaron registros, se refleje de inmediato sin guardar caché obsoleta.
+      const datos = { ...accion.datos }
+      const actuales = estado[accion.coleccion] as Record<string, unknown>
+      // Una respuesta de carga puede llegar después de una edición o de un evento Realtime.
+      for (const id of accion.modificados) {
+        if (Object.prototype.hasOwnProperty.call(actuales, id)) datos[id] = actuales[id]
+        else delete datos[id]
+      }
       return {
         ...estado,
-        [accion.coleccion]: accion.datos,
+        [accion.coleccion]: datos,
       } as EstadoDatos
     }
 
@@ -212,32 +225,49 @@ const DatosContext = createContext<Ctx | null>(null)
 export function DatosProvider({
   children,
   actor = 'sistema',
+  usuarioId,
+  sincronizar,
 }: {
   children: ReactNode
   /** Quién está operando: queda asentado en la auditoría. */
   actor?: string
+  usuarioId?: string
+  sincronizar: boolean
 }) {
-  const [estado, dispatch] = useReducer(reducer, undefined, cargar)
+  const [estado, dispatch] = useReducer(reducer, usuarioId, cargar)
+  const cambiosDuranteCarga = useRef(new Map<ColeccionRecord, Set<string>>())
+
+  function aplicarCambio(cambio: CambioRegistro) {
+    const id = cambio.tipo === 'upsert' ? cambio.entidad.id : cambio.id
+    cambiosDuranteCarga.current.get(cambio.coleccion)?.add(id)
+    dispatch(cambio)
+  }
 
   useEffect(() => {
-    guardar(estado)
-  }, [estado])
+    guardar(estado, usuarioId)
+  }, [estado, usuarioId])
 
   // Sincronización inicial y Realtime con Supabase
   useEffect(() => {
+    if (!sincronizar) return
     let cancelado = false
+    const cambios = cambiosDuranteCarga.current
+    for (const coleccion of TABLAS_SYNC) cambios.set(coleccion, new Set())
 
     async function sincronizarInicial() {
       for (const coleccion of TABLAS_SYNC) {
         if (cancelado) break
         const remotos = await cargarColeccionDesdeSupabase(coleccion)
-        if (remotos !== null && !cancelado) {
+        if (cancelado) break
+        if (remotos !== null) {
           dispatch({
             tipo: 'sincronizarColeccion',
             coleccion,
             datos: remotos,
+            modificados: cambios.get(coleccion) ?? new Set(),
           })
         }
+        cambios.delete(coleccion)
       }
 
       const [emp, est] = await Promise.all([cargarConfiguracionEmpresa(), cargarEstadosProyecto()])
@@ -247,12 +277,10 @@ export function DatosProvider({
       }
     }
 
-    void sincronizarInicial()
-
     const desuscribir = suscribirRealtime(
       (coleccion, entidad) => {
         if (!cancelado && entidad.id) {
-          dispatch({
+          aplicarCambio({
             tipo: 'upsert',
             coleccion,
             entidad: entidad as { id: string },
@@ -262,7 +290,7 @@ export function DatosProvider({
       },
       (coleccion, id) => {
         if (!cancelado && id) {
-          dispatch({
+          aplicarCambio({
             tipo: 'eliminar',
             coleccion,
             id,
@@ -272,33 +300,36 @@ export function DatosProvider({
       },
     )
 
+    void sincronizarInicial()
+
     return () => {
       cancelado = true
+      cambios.clear()
       desuscribir()
     }
-  }, [])
+  }, [sincronizar])
 
   const valor: Ctx = {
     estado,
     upsert: (coleccion, entidad) => {
-      dispatch({ tipo: 'upsert', coleccion, entidad: entidad as { id: string }, actor })
-      if (actor !== 'supabase-realtime' && actor !== 'supabase-inicial') {
+      aplicarCambio({ tipo: 'upsert', coleccion, entidad: entidad as { id: string }, actor })
+      if (sincronizar && actor !== 'supabase-realtime' && actor !== 'supabase-inicial') {
         void guardarEnSupabase(coleccion, entidad as { id: string })
       }
     },
     eliminar: (coleccion, id) => {
-      dispatch({ tipo: 'eliminar', coleccion, id, actor })
-      if (actor !== 'supabase-realtime') {
+      aplicarCambio({ tipo: 'eliminar', coleccion, id, actor })
+      if (sincronizar && actor !== 'supabase-realtime') {
         void eliminarDeSupabase(coleccion, id)
       }
     },
     setEstados: (estados) => {
       dispatch({ tipo: 'estados', estados, actor })
-      void guardarEstadosProyectoEnSupabase(estados)
+      if (sincronizar) void guardarEstadosProyectoEnSupabase(estados)
     },
     setEmpresa: (empresa) => {
       dispatch({ tipo: 'empresa', empresa, actor })
-      void guardarEmpresaEnSupabase(empresa)
+      if (sincronizar) void guardarEmpresaEnSupabase(empresa)
     },
     reemplazarTodo: (nuevo) => dispatch({ tipo: 'reemplazar', estado: nuevo, actor }),
   }

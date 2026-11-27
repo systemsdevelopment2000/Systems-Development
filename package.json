@@ -18,7 +18,8 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"*.{json,md,ts}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\"",
     "typecheck": "tsc -b --noEmit",
-    "generate-pwa-assets": "pwa-assets-generator"
+    "generate-pwa-assets": "pwa-assets-generator",
+    "test": "node scripts/test-editar-acceso.mjs && node scripts/test-gestos-modal.mjs && node scripts/test-tarjeta-modal-accesos.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

@@ -23,7 +23,7 @@ export function DatosCard() {
   }
 
   function exportar() {
-    const blob = new Blob([JSON.stringify(estado, null, 2)], { type: 'application/json' })
+    const blob = new Blob([JSON.stringify({ ...estado, herramientas: {} }, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
@@ -48,7 +48,7 @@ export function DatosCard() {
         peligro: true,
       })
       if (!ok) return
-      reemplazarTodo({ ...estadoInicial(), ...datos })
+      reemplazarTodo({ ...estadoInicial(), ...datos, herramientas: estado.herramientas })
       setMsg('Respaldo restaurado.')
     } catch {
       setMsg('No se pudo leer el archivo.')
@@ -63,7 +63,7 @@ export function DatosCard() {
       peligro: true,
     })
     if (ok) {
-      reemplazarTodo(estadoInicial())
+      reemplazarTodo({ ...estadoInicial(), herramientas: estado.herramientas })
       setMsg('Datos reiniciados.')
     }
   }
@@ -77,7 +77,7 @@ export function DatosCard() {
         <div>
           <h2 className="cfg-card__tit">Datos locales</h2>
           <p className="cfg-card__sub">
-            En esta fase todo se guarda en este navegador. Haz respaldos antes de limpiar el equipo.
+            Descarga o restaura una copia de los datos locales. La bóveda se excluye del respaldo.
           </p>
         </div>
       </div>

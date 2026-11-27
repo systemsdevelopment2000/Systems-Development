@@ -3,13 +3,13 @@ import { estadoInicial } from './estadoInicial'
 import { PREFIJOS, asignarCodigosFaltantes } from '@/core/lib/codigos'
 import { notificarError } from '@/core/notificaciones'
 
-const CLAVE = 'sd:datos:v7'
+const CLAVE = 'sd:datos:v8'
 
 /**
  * Versión del esquema del store. Súbela cuando cambie la forma de los datos:
  * en la fase front eso re-siembra el estado (descarta datos locales de ejemplo).
  */
-const VERSION = 7
+const VERSION = 8
 
 interface Envoltura {
   v: number
@@ -104,16 +104,23 @@ function migrarMarca(e: EstadoDatos): EstadoDatos {
 }
 
 /** Carga el estado desde localStorage; si no hay o la versión no coincide, usa la semilla. */
-export function cargar(): EstadoDatos {
+export function cargar(usuarioId?: string): EstadoDatos {
   try {
     if (typeof localStorage !== 'undefined') {
       localStorage.removeItem('sd:datos')
       localStorage.removeItem('sd:datos:v6')
       localStorage.removeItem('sd:datos:v5')
       localStorage.removeItem('sd:datos:v4')
-      localStorage.removeItem('sd:dev-auth-user')
+      const anterior = localStorage.getItem('sd:datos:v7')
+      if (anterior) {
+        const legado = JSON.parse(anterior) as Envoltura
+        if (legado.datos?.herramientas && Object.keys(legado.datos.herramientas).length) {
+          legado.datos.herramientas = {}
+          localStorage.setItem('sd:datos:v7', JSON.stringify(legado))
+        }
+      }
     }
-    const raw = localStorage.getItem(CLAVE)
+    const raw = usuarioId ? localStorage.getItem(`${CLAVE}:${usuarioId}`) : null
     if (!raw) return conCodigos({ ...estadoInicial(), herramientas: {} })
     const env = JSON.parse(raw) as Envoltura
     if (env.v !== VERSION || !env.datos) return conCodigos({ ...estadoInicial(), herramientas: {} })
@@ -126,9 +133,12 @@ export function cargar(): EstadoDatos {
 }
 
 /** Persiste el estado en localStorage y notifica si ocurre un error. */
-export function guardar(estado: EstadoDatos): void {
+export function guardar(estado: EstadoDatos, usuarioId?: string): void {
+  if (!usuarioId) return
   try {
-    localStorage.setItem(CLAVE, JSON.stringify({ v: VERSION, datos: estado } satisfies Envoltura))
+    // Los registros de la bóveda solo se conservan en memoria durante la sesión.
+    const datos = { ...estado, herramientas: {} }
+    localStorage.setItem(CLAVE + ':' + usuarioId, JSON.stringify({ v: VERSION, datos } satisfies Envoltura))
   } catch (err) {
     console.error('[Persistencia] Error al guardar datos:', err)
     notificarError(

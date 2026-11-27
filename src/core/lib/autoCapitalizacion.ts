@@ -140,7 +140,7 @@ export function inicializarAutoCapitalizacion() {
         if (start !== null && end !== null) {
           try {
             target.setSelectionRange(start, end)
-          } catch {}
+          } catch { /* El campo puede rechazar la selección. */ }
         }
       }
     },

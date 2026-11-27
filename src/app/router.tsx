@@ -4,23 +4,6 @@ import { AuthLayout } from '@/app/layouts/AuthLayout'
 import { RequireAuth } from '@/app/guards/RequireAuth'
 import { InicioMovil } from '@/app/mobile/InicioMovil'
 
-// Cada página se importa SOLO desde la API pública (barrel) de su módulo.
-import { LoginPage, OnePage } from '@/modules/auth'
-import { TableroPage } from '@/modules/tablero'
-import { ProyectosPage, ProyectoDetallePage, AgendaPage } from '@/modules/proyectos'
-import { DocumentoPage, PendientesPage, MinutaPage } from '@/modules/documentos'
-import { ClientesPage } from '@/modules/clientes'
-import { ColaboradoresPage } from '@/modules/colaboradores'
-import { ReportesPage } from '@/modules/reportes'
-import { PresupuestoPage, TasasPage, CobranzaPage } from '@/modules/finanzas'
-import { DashboardPage } from '@/modules/dashboard'
-import { UsuariosPage } from '@/modules/usuarios'
-import { HerramientasPage } from '@/modules/herramientas'
-import { MetodologiaPage } from '@/modules/metodologia'
-import { ConfiguracionPage } from '@/modules/configuracion'
-import { AuditoriaPage } from '@/modules/auditoria'
-import { RrhhPage } from '@/modules/rrhh'
-
 import { RouteErrorBoundary } from './components/ErrorBoundary'
 
 /**
@@ -32,9 +15,9 @@ export const router = createBrowserRouter([
     element: <AuthLayout />,
     errorElement: <RouteErrorBoundary />,
     children: [
-      { path: '/', element: <OnePage /> },
-      { path: '/home', element: <OnePage /> },
-      { path: '/login', element: <LoginPage /> },
+      { path: '/', lazy: async () => ({ Component: (await import('@/modules/auth')).OnePage }) },
+      { path: '/home', lazy: async () => ({ Component: (await import('@/modules/auth')).OnePage }) },
+      { path: '/login', lazy: async () => ({ Component: (await import('@/modules/auth')).LoginPage }) },
     ],
   },
   {
@@ -46,28 +29,28 @@ export const router = createBrowserRouter([
     errorElement: <RouteErrorBoundary />,
     children: [
       { path: '/inicio', element: <InicioMovil /> },
-      { path: '/tablero', element: <TableroPage /> },
-      { path: '/proyectos', element: <ProyectosPage /> },
-      { path: '/proyectos/:id', element: <ProyectoDetallePage /> },
-      { path: '/proyectos/:id/documento', element: <DocumentoPage /> },
-      { path: '/pendientes', element: <PendientesPage /> },
-      { path: '/reuniones/minuta', element: <MinutaPage /> },
+      { path: '/tablero', lazy: async () => ({ Component: (await import('@/modules/tablero')).TableroPage }) },
+      { path: '/proyectos', lazy: async () => ({ Component: (await import('@/modules/proyectos')).ProyectosPage }) },
+      { path: '/proyectos/:id', lazy: async () => ({ Component: (await import('@/modules/proyectos')).ProyectoDetallePage }) },
+      { path: '/proyectos/:id/documento', lazy: async () => ({ Component: (await import('@/modules/documentos')).DocumentoPage }) },
+      { path: '/pendientes', lazy: async () => ({ Component: (await import('@/modules/documentos')).PendientesPage }) },
+      { path: '/reuniones/minuta', lazy: async () => ({ Component: (await import('@/modules/documentos')).MinutaPage }) },
       // Compatibilidad con el enlace anterior.
       { path: '/minuta', element: <Navigate to="/reuniones/minuta" replace /> },
-      { path: '/reuniones', element: <AgendaPage /> },
-      { path: '/clientes', element: <ClientesPage /> },
-      { path: '/colaboradores', element: <ColaboradoresPage /> },
-      { path: '/reportes', element: <ReportesPage /> },
-      { path: '/presupuesto', element: <PresupuestoPage /> },
-      { path: '/cobranza', element: <CobranzaPage /> },
-      { path: '/tasas', element: <TasasPage /> },
-      { path: '/dashboard', element: <DashboardPage /> },
-      { path: '/usuarios', element: <UsuariosPage /> },
-      { path: '/herramientas', element: <HerramientasPage /> },
-      { path: '/metodologia', element: <MetodologiaPage /> },
-      { path: '/rrhh', element: <RrhhPage /> },
-      { path: '/auditoria', element: <AuditoriaPage /> },
-      { path: '/configuracion', element: <ConfiguracionPage /> },
+      { path: '/reuniones', lazy: async () => ({ Component: (await import('@/modules/proyectos')).AgendaPage }) },
+      { path: '/clientes', lazy: async () => ({ Component: (await import('@/modules/clientes')).ClientesPage }) },
+      { path: '/colaboradores', lazy: async () => ({ Component: (await import('@/modules/colaboradores')).ColaboradoresPage }) },
+      { path: '/reportes', lazy: async () => ({ Component: (await import('@/modules/reportes')).ReportesPage }) },
+      { path: '/presupuesto', lazy: async () => ({ Component: (await import('@/modules/finanzas')).PresupuestoPage }) },
+      { path: '/cobranza', lazy: async () => ({ Component: (await import('@/modules/finanzas')).CobranzaPage }) },
+      { path: '/tasas', lazy: async () => ({ Component: (await import('@/modules/finanzas')).TasasPage }) },
+      { path: '/dashboard', lazy: async () => ({ Component: (await import('@/modules/dashboard')).DashboardPage }) },
+      { path: '/usuarios', lazy: async () => ({ Component: (await import('@/modules/usuarios')).UsuariosPage }) },
+      { path: '/herramientas', lazy: async () => ({ Component: (await import('@/modules/herramientas')).HerramientasPage }) },
+      { path: '/metodologia', lazy: async () => ({ Component: (await import('@/modules/metodologia')).MetodologiaPage }) },
+      { path: '/rrhh', lazy: async () => ({ Component: (await import('@/modules/rrhh')).RrhhPage }) },
+      { path: '/auditoria', lazy: async () => ({ Component: (await import('@/modules/auditoria')).AuditoriaPage }) },
+      { path: '/configuracion', lazy: async () => ({ Component: (await import('@/modules/configuracion')).ConfiguracionPage }) },
     ],
   },
   { path: '*', element: <Navigate to="/" replace /> },

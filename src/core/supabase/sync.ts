@@ -277,7 +277,7 @@ export function mapearDe_DB(coleccion: string, fila: Record<string, unknown>): R
             res.accesos = meta.accesos
           }
           res.notas = (res.notas as string).replace(/<!--SD_VAULT:.*?-->/s, '').trim()
-        } catch {}
+        } catch { /* Conserva las notas si los metadatos no son JSON válido. */ }
       }
     }
   } else if (coleccion === 'metodologias') {
@@ -322,22 +322,23 @@ export async function cargarColeccionDesdeSupabase(
 ): Promise<Record<string, unknown> | null> {
   const tabla = MAPA_COLECCION_A_TABLA[coleccion] ?? coleccion
   try {
-    const { data, error } = await clienteDb.from(tabla).select('*')
-    if (error) {
-      console.warn(`[SupabaseSync] No se pudo consultar ${tabla}:`, error.message)
-      return null
-    }
-
-    if (!data || !Array.isArray(data) || data.length === 0) {
-      return {}
-    }
-
     const mapa: Record<string, unknown> = {}
-    for (const fila of data) {
-      const ent = mapearDe_DB(coleccion, fila as Record<string, unknown>)
-      if (ent.id && typeof ent.id === 'string') {
-        mapa[ent.id] = ent
+    const limite = 500
+    for (let desde = 0; ; desde += limite) {
+      const consulta = () => clienteDb.from(tabla).select('*').order('id').range(desde, desde + limite - 1)
+      const respuesta = coleccion === 'herramientas'
+        ? await clienteDb.rpc('leer_herramientas_seguras', { desde, cantidad: limite })
+        : await consulta()
+      const { data, error } = respuesta.error?.code === 'PGRST202' && coleccion === 'herramientas'
+        ? await consulta()
+        : respuesta
+      if (error) throw error
+      if (!data?.length) break
+      for (const fila of data) {
+        const entidad = mapearDe_DB(coleccion, fila as Record<string, unknown>)
+        if (typeof entidad.id === 'string' && entidad.id) mapa[entidad.id] = entidad
       }
+      if (data.length < limite) break
     }
     return mapa
   } catch (err) {
@@ -359,17 +360,18 @@ export async function guardarEnSupabase(
 
   try {
     const fila = mapearA_DB(coleccion, entidad as Record<string, unknown>)
-    const { error } = await clienteDb.from(tabla).upsert(fila)
+    const respuesta = coleccion === 'herramientas'
+      ? await clienteDb.rpc('guardar_herramienta_segura', { datos: fila })
+      : await clienteDb.from(tabla).upsert(fila)
+    const { error } = respuesta.error?.code === 'PGRST202' && coleccion === 'herramientas'
+      ? await clienteDb.from(tabla).upsert(fila)
+      : respuesta
     if (error) {
-      console.error(`[SupabaseSync] Error al sincronizar ${tabla} (${entidad.id}):`, error)
-      if (error.code !== 'PGRST205' && !error.message?.includes('schema cache')) {
-        notificarError(
-          `Error al sincronizar ${coleccion}`,
-          `No se pudo enviar a Supabase: ${error.message}`,
-        )
-      } else {
-        console.warn(`[SupabaseSync] La tabla ${tabla} aún no está en el schema cache de Supabase. Datos guardados en almacenamiento local.`)
-      }
+      console.error(`[SupabaseSync] Error al sincronizar ${tabla} (${entidad.id}):`, error?.code)
+      notificarError(
+        'Cambio pendiente en Supabase',
+        'El cambio se aplicó localmente. El servidor no confirmó la operación.',
+      )
     }
   } catch (err) {
     console.error(`[SupabaseSync] Excepción al guardar ${tabla}:`, err)
@@ -391,20 +393,17 @@ export async function eliminarDeSupabase(
   if (!tabla) return
 
   try {
-    const { error } = await clienteDb.from(tabla).delete().eq('id', id)
-    if (error) {
-      console.error(`[SupabaseSync] Error al eliminar ${tabla} (${id}):`, error)
-      if (error.code !== 'PGRST205' && !error.message?.includes('schema cache')) {
-        notificarError(
-          `Error al eliminar en Supabase`,
-          `No se pudo eliminar en el servidor: ${error.message}`,
-        )
-      } else {
-        console.warn(`[SupabaseSync] La tabla ${tabla} aún no está en el schema cache de Supabase. Registro eliminado localmente.`)
-      }
+    const { error, count } = await clienteDb.from(tabla).delete({ count: 'exact' }).eq('id', id)
+    if (error || count === 0) {
+      console.error(`[SupabaseSync] Error al eliminar ${tabla} (${id}):`, error?.code)
+      notificarError(
+        'Cambio pendiente en Supabase',
+        'El cambio se aplicó localmente. El servidor no confirmó la operación.',
+      )
     }
   } catch (err) {
     console.error(`[SupabaseSync] Excepción al eliminar ${tabla}:`, err)
+    notificarError('Eliminación pendiente', 'El servidor no confirmó la eliminación.')
   }
 }
 
@@ -419,6 +418,8 @@ export function suscribirRealtime(
   const channel = supabase.channel(canalId)
 
   for (const coleccion of TABLAS_SYNC) {
+    // Realtime solo emite la fila pública de la herramienta, sin accesos.
+    if (coleccion === 'herramientas') continue
     const tabla = MAPA_COLECCION_A_TABLA[coleccion]
     if (!tabla) continue
 
@@ -495,7 +496,7 @@ export async function cargarConfiguracionEmpresa(): Promise<DatosEmpresa | null>
  */
 export async function guardarEmpresaEnSupabase(empresa: DatosEmpresa): Promise<void> {
   try {
-    await clienteDb.from('empresa').upsert({
+    const { error } = await clienteDb.from('empresa').upsert({
       id: 'sd_empresa',
       nombre: empresa.nombre,
       telefonos: empresa.telefonos,
@@ -508,8 +509,10 @@ export async function guardarEmpresaEnSupabase(empresa: DatosEmpresa): Promise<v
       finanzas: empresa.finanzas,
       actualizado_en: new Date().toISOString(),
     })
+    if (error) throw error
   } catch (err) {
     console.warn('[SupabaseSync] Error al guardar empresa:', err)
+    notificarError('Configuración pendiente', 'El servidor no confirmó los cambios de empresa.')
   }
 }
 
@@ -547,8 +550,10 @@ export async function guardarEstadosProyectoEnSupabase(estados: EstadoProyecto[]
       color: e.color,
       es_final: e.esFinal,
     }))
-    await clienteDb.from('estados_proyecto').upsert(filas)
+    const { error } = await clienteDb.from('estados_proyecto').upsert(filas)
+    if (error) throw error
   } catch (err) {
     console.warn('[SupabaseSync] Error al guardar estados:', err)
+    notificarError('Estados de proyecto pendientes', 'El servidor no confirmó los cambios de estados.')
   }
 }

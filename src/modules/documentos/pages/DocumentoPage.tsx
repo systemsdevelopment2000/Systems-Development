@@ -2,7 +2,7 @@ import '../styles/documento.css'
 import { useRef, useState, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, FileDown, Loader2 } from 'lucide-react'
-import { useDatos, type Colaborador } from '@/core/datos'
+import { useDatos, type Colaborador, type Proyecto } from '@/core/datos'
 import { VistaPreviaPdf } from '@/core/ui'
 import { generarPdf, type PdfGenerado } from '@/core/lib/pdf'
 import { notificar } from '@/core/notificaciones'
@@ -18,14 +18,7 @@ import type { DatosDocumento, Plantilla } from '../types'
 
 export function DocumentoPage() {
   const { id } = useParams<{ id: string }>()
-  const nav = useNavigate()
-  const { estado, upsert } = useDatos()
-  const [plantilla, setPlantilla] = useState<Plantilla>('propuesta')
-  const [generando, setGenerando] = useState(false)
-  const [guardando, setGuardando] = useState(false)
-  const [previa, setPrevia] = useState<PdfGenerado | null>(null)
-  const hojaRef = useRef<HTMLDivElement>(null)
-
+  const { estado } = useDatos()
   const p = id ? estado.proyectos[id] : undefined
   if (!p) {
     return (
@@ -34,6 +27,18 @@ export function DocumentoPage() {
       </section>
     )
   }
+
+  return <DocumentoProyecto key={p.id} p={p} />
+}
+
+function DocumentoProyecto({ p }: { p: Proyecto }) {
+  const nav = useNavigate()
+  const { estado, upsert } = useDatos()
+  const [plantilla, setPlantilla] = useState<Plantilla>('propuesta')
+  const [generando, setGenerando] = useState(false)
+  const [guardando, setGuardando] = useState(false)
+  const [previa, setPrevia] = useState<PdfGenerado | null>(null)
+  const hojaRef = useRef<HTMLDivElement>(null)
 
   const tags = useMemo(
     () => p.tagIds.map((tid) => estado.tags[tid]?.nombre).filter(Boolean) as string[],
@@ -138,7 +143,7 @@ export function DocumentoPage() {
     <section className="page doc-page">
       {/* Barra superior de acciones */}
       <div className="doc-toolbar">
-        <button className="btn btn--ghost btn--icono" onClick={() => nav(`/proyectos/${id}`)}>
+        <button className="btn btn--ghost btn--icono" onClick={() => nav(`/proyectos/${p.id}`)}>
           <ArrowLeft size={15} /> Volver
         </button>
 
